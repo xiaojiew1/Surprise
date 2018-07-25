@@ -20,6 +20,9 @@ The available prediction algorithms are:
     co_clustering.CoClustering
 """
 
+#### xiaojie
+from .matrix_factorization import MFIPS
+
 from .algo_base import AlgoBase
 from .random_pred import NormalPredictor
 from .baseline_only import BaselineOnly

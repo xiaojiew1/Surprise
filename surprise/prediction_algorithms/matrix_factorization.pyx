@@ -6,6 +6,9 @@ factorization.
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
+#### xiaojie
+from libc.math cimport sqrt
+
 cimport numpy as np  # noqa
 import numpy as np
 from six.moves import range
@@ -17,9 +20,10 @@ from ..utils import get_rng
 
 #### xiaojie
 class MFIPS(AlgoBase):
-  def __init__(self, n_factors=100, n_epochs=20, biased=True, init_mean=0,
-      init_std_dev=.1, lr_all=.005,
-      reg_all=.02, lr_bu=None, lr_bi=None, lr_pu=None, lr_qi=None,
+  def __init__(self, n_factors=100, n_epochs=20, biased=True, 
+      reg_all=.02, var_all=.001,
+      init_mean=0, init_std_dev=.1, lr_all=.005,
+      lr_bu=None, lr_bi=None, lr_pu=None, lr_qi=None,
       reg_bu=None, reg_bi=None, reg_pu=None, reg_qi=None,
       random_state=None, verbose=False):
     self.n_factors = n_factors
@@ -38,6 +42,8 @@ class MFIPS(AlgoBase):
     self.random_state = random_state
     self.verbose = verbose
 
+    self.var_all = var_all
+
     AlgoBase.__init__(self)
 
   def fit(self, trainset, weights):
@@ -47,10 +53,6 @@ class MFIPS(AlgoBase):
     return self
 
   def sgd(self, trainset, weights):
-    n_users = weights.shape[0]
-    n_items = weights.shape[1]
-    print('#user=%d #item=%d' % (n_users, n_items))
-
     # user biases
     cdef np.ndarray[np.double_t] bu
     # item biases
@@ -59,9 +61,13 @@ class MFIPS(AlgoBase):
     cdef np.ndarray[np.double_t, ndim=2] pu
     # item factors
     cdef np.ndarray[np.double_t, ndim=2] qi
+    # train losses
+    cdef np.ndarray[np.double_t] losses
 
     cdef int u, i, f
-    cdef double r, err, dot, puf, qif
+    cdef double r, err, dot, grad, puf, qif
+    cdef double loss_m, loss_d, grad_c, grad_f, grad_s
+
     cdef double global_mean = self.trainset.global_mean
 
     cdef double lr_bu = self.lr_bu
@@ -83,32 +89,62 @@ class MFIPS(AlgoBase):
     qi = rng.normal(self.init_mean, self.init_std_dev,
                     (trainset.n_items, self.n_factors))
 
+    losses = np.zeros(trainset.n_ratings, np.double)
+
     if not self.biased:
       global_mean = 0
+
+    grad_c = self.var_all * sqrt(trainset.n_ratings) / (trainset.n_ratings - 1)
 
     for current_epoch in range(self.n_epochs):
       if self.verbose:
         print("Processing epoch {}".format(current_epoch))
+
+      for s, (u, i, r) in enumerate(trainset.all_ratings()):
+        dot = 0  # <q_i, p_u>
+        for f in range(self.n_factors):
+          dot += qi[i, f] * pu[u, f]
+        err = r - (global_mean + bu[u] + bi[i] + dot)
+        losses[s] = weights[u, i] * err * err
+      loss_m = 0.0
+      for s in range(trainset.n_ratings):
+        loss_m += losses[s]
+      loss_m /= trainset.n_ratings
+      loss_d = 0.0
+      for s in range(trainset.n_ratings):
+        dev = losses[s] - loss_m
+        loss_d += dev * dev
+      loss_d /= (trainset.n_ratings - 1)
+      loss_d = sqrt(loss_d)
+      grad_f = 1.0 - grad_c * loss_m / loss_d
+      grad_s = 0.5 * grad_c / loss_d
+      # print('grad_f=%.16f grad_s=%.16f' % (grad_f, grad_s))
+      # print('loss_m=%.4f loss_d=%.4f\n' % (loss_m, loss_d))
+
       for u, i, r in trainset.all_ratings():
         # compute current error
         dot = 0  # <q_i, p_u>
         for f in range(self.n_factors):
           dot += qi[i, f] * pu[u, f]
         err = r - (global_mean + bu[u] + bi[i] + dot)
-        # weight error
-        err *= weights[u, i]
+        loss_m = weights[u, i] * err * err
+        grad = weights[u, i] * err
 
         # update biases
         if self.biased:
-          bu[u] += lr_bu * (err - reg_bu * bu[u])
-          bi[i] += lr_bi * (err - reg_bi * bi[i])
+          bu[u] += lr_bu * (grad - reg_bu * bu[u])
+          bi[i] += lr_bi * (grad - reg_bi * bi[i])
 
         # update factors
         for f in range(self.n_factors):
           puf = pu[u, f]
           qif = qi[i, f]
-          pu[u, f] += lr_pu * (err * qif - reg_pu * puf)
-          qi[i, f] += lr_qi * (err * puf - reg_qi * qif)
+          grad_p = grad * qif
+          grad_q = grad * puf
+          grad_p = (grad_f + 2 * grad_s * loss_m) * grad_p
+          grad_q = (grad_f + 2 * grad_s * loss_m) * grad_q
+          pu[u, f] += lr_pu * (grad_p - reg_pu * puf)
+          qi[i, f] += lr_qi * (grad_q - reg_qi * qif)
 
     self.bu = bu
     self.bi = bi

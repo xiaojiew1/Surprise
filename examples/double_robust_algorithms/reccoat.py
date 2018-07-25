@@ -82,20 +82,24 @@ n_epochs_opt = [200,]
 biased_opt = [False,]
 reg_all_opt = [0.1,]
 #### develop
-n_factors_opt = [100,]
-n_epochs_opt = [100,]
+n_factors_opt = [50,]
+n_epochs_opt = [1000,]
 biased_opt = [False,]
 reg_all_opt = [0.1,]
+var_all_opt = [0.00001, 0.0001, 0.001, 0.01, 0.1, 1.0, 10.0, 100.0]
+# var_all_opt = [0.0]
 
 mae_bst, mse_bst, kwargs_bst = np.inf, np.inf, None
 st_time = time.time()
-for n_factors, n_epochs, biased, reg_all in itertools.product(
-    n_factors_opt, n_epochs_opt, biased_opt, reg_all_opt):
+for n_factors, n_epochs, biased, reg_all, var_all in itertools.product(
+    n_factors_opt, n_epochs_opt, biased_opt, reg_all_opt, var_all_opt):
   algo_kwargs = {
     'n_factors': n_factors,
     'n_epochs': n_epochs,
     'biased': biased,
     'reg_all': reg_all,
+    'var_all': var_all,
+    # 'verbose': True,
   }
   algo = MFIPS(**algo_kwargs)
   algo.fit(trainset, weights)
@@ -104,14 +108,15 @@ for n_factors, n_epochs, biased, reg_all in itertools.product(
   eval_kwargs = {'verbose':False}
   mae = accuracy.mae(predictions, **eval_kwargs)
   mse = pow(accuracy.rmse(predictions, **eval_kwargs), 2.0)
-  # print('mae=%.4f mse=%.4f' % (mae, mse))
+  print('var_all=%.4f mae=%.4f mse=%.4f' % (var_all, mae, mse))
 
-  if mse <= mse_bst:
+  if mse < mse_bst:
     mae_bst = min(mae, mae_bst)
     mse_bst = min(mse, mse_bst)
     kwargs_bst = algo_kwargs
-print('mae=%.4f mse=%.4f' % (mae_bst, mse_bst))
-# [print('%10s: %s' % (k, v)) for k, v in algo_kwargs.items()]
+
+print('best mae=%.4f mse=%.4f' % (mae_bst, mse_bst))
+[print('%10s: %s' % (k, v)) for k, v in kwargs_bst.items()]
 e_time = time.time()
 print('%.2fs' % (e_time - st_time))
 

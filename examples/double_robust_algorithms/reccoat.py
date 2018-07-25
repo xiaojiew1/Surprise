@@ -86,8 +86,9 @@ n_factors_opt = [50,]
 n_epochs_opt = [1000,]
 biased_opt = [False,]
 reg_all_opt = [0.1,]
-var_all_opt = [0.00001, 0.0001, 0.001, 0.01, 0.1, 1.0, 10.0, 100.0]
-# var_all_opt = [0.0]
+var_all_opt = [0.0001]
+n_epochs_opt = [10,]
+var_all_opt = [100.0]
 
 mae_bst, mse_bst, kwargs_bst = np.inf, np.inf, None
 st_time = time.time()

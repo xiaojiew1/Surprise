@@ -83,12 +83,11 @@ biased_opt = [False,]
 reg_all_opt = [0.1,]
 #### develop
 n_factors_opt = [50,]
-n_epochs_opt = [1000,]
+n_epochs_opt = [200,]
 biased_opt = [False,]
 reg_all_opt = [0.1,]
 var_all_opt = [0.0001]
-n_epochs_opt = [10,]
-var_all_opt = [100.0]
+var_all_opt = [0.0, 0.00001, 0.0001, 0.001, 0.01, 0.1, 1.0]
 
 mae_bst, mse_bst, kwargs_bst = np.inf, np.inf, None
 st_time = time.time()
@@ -109,7 +108,7 @@ for n_factors, n_epochs, biased, reg_all, var_all in itertools.product(
   eval_kwargs = {'verbose':False}
   mae = accuracy.mae(predictions, **eval_kwargs)
   mse = pow(accuracy.rmse(predictions, **eval_kwargs), 2.0)
-  print('var_all=%.4f mae=%.4f mse=%.4f' % (var_all, mae, mse))
+  print('var_all=%.6f mae=%.4f mse=%.4f' % (var_all, mae, mse))
 
   if mse < mse_bst:
     mae_bst = min(mae, mae_bst)

@@ -118,8 +118,8 @@ class MFIPS(AlgoBase):
       loss_d = sqrt(loss_d)
       grad_f = 1.0 - grad_c * loss_m / loss_d
       grad_s = 0.5 * grad_c / loss_d
-      print('grad_f=%.16f grad_s=%.16f' % (grad_f, grad_s))
-      print('loss_m=%.4f loss_d=%.4f\n' % (loss_m, loss_d))
+      # print('grad_f=%.16f grad_s=%.16f' % (grad_f, grad_s))
+      # print('loss_m=%.16f loss_d=%.16f' % (loss_m, loss_d))
 
       for u, i, r in trainset.all_ratings():
         # compute current error

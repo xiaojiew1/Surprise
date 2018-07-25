@@ -58,8 +58,15 @@ for ruid in range(n_users):
     iid = trainset.to_inner_iid(str(riid))
     # print('%d, %d -> %d, %d' % (ruid, riid, uid, iid))
     propensities[uid, iid] = rpropensities[ruid, riid]
-weights = np.minimum(20.0, 1.0 / propensities)
+# weights = np.minimum(10.0, 1.0 / propensities)
 # weights = np.ones_like(propensities)
+org_sum, tgt_sum = 0.0, 0.0
+for uid, iid, r in trainset.all_ratings():
+  org_sum += 1.0 / propensities[uid, iid]
+  tgt_sum += 1.0
+# print('org_sum=%.4f tgt_sum=%.4f' % (org_sum, tgt_sum))
+weights = (tgt_sum / org_sum) / propensities
+# print('min=%.4f max=%.4f' % (weights.min(), weights.max()))
 
 #### default
 n_factors_opt = [100,]
@@ -104,9 +111,9 @@ for n_factors, n_epochs, biased, reg_all in itertools.product(
     mse_bst = min(mse, mse_bst)
     kwargs_bst = algo_kwargs
 print('mae=%.4f mse=%.4f' % (mae_bst, mse_bst))
-[print('%10s: %s' % (k, v)) for k, v in algo_kwargs.items()]
+# [print('%10s: %s' % (k, v)) for k, v in algo_kwargs.items()]
 e_time = time.time()
-print('%.2f' % (e_time - st_time))
+print('%.2fs' % (e_time - st_time))
 
 
 

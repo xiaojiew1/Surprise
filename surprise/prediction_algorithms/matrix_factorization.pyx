@@ -95,6 +95,8 @@ class MFIPS(AlgoBase):
         for f in range(self.n_factors):
           dot += qi[i, f] * pu[u, f]
         err = r - (global_mean + bu[u] + bi[i] + dot)
+        # weight error
+        err *= weights[u, i]
 
         # update biases
         if self.biased:
@@ -105,9 +107,8 @@ class MFIPS(AlgoBase):
         for f in range(self.n_factors):
           puf = pu[u, f]
           qif = qi[i, f]
-          w = weights[u, i]
-          pu[u, f] += lr_pu * (w * err * qif - reg_pu * puf)
-          qi[i, f] += lr_qi * (w * err * puf - reg_qi * qif)
+          pu[u, f] += lr_pu * (err * qif - reg_pu * puf)
+          qi[i, f] += lr_qi * (err * puf - reg_qi * qif)
 
     self.bu = bu
     self.bi = bi

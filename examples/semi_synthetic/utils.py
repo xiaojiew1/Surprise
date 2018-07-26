@@ -241,8 +241,9 @@ def observe_dist(alpha, test_dist):
     # factor = max(max_rate-rate, 0)
     # factor = max(4-rate, 0)
     # factor = max(rate-2, 0)
-    factor = min(6-rate, 4) if rate < max_rate else 1.0
+    factor = min(6-rate, 4) if rate < max_rate else 0.0
     obs_dist[rate-1] = test_dist[rate-1] * pow(alpha, factor)
+    # print(rate, pow(alpha, factor), test_dist[rate-1])
   obs_dist = obs_dist / obs_dist.sum()
   return obs_dist
 
@@ -252,14 +253,15 @@ if __name__ == '__main__':
   train_dist = marginalize(music_train)
 
   test_dist = marginalize(music_test)
-  stdout.write('%5s:' % ('test'))
-  [stdout.write(' %.4f' % (p*5400*1000)) for p in test_dist]
-  stdout.write('\n')
+  # test_dist = np.asarray([p*5400*1000 for p in test_dist])
+  # stdout.write('%5s:' % ('test'))
+  # [stdout.write(' %.4f' % (p*5400*1000)) for p in test_dist]
+  # stdout.write('\n')
 
-  stdout.write('%5s:' % 'ratio')
-  for train_p, test_p in zip(train_dist, test_dist):
-    stdout.write(' %.4f' % (train_p/test_p))
-  stdout.write('\n')
+  # stdout.write('%5s:' % 'ratio')
+  # for train_p, test_p in zip(train_dist, test_dist):
+  #   stdout.write(' %.4f' % (train_p/test_p))
+  # stdout.write('\n')
 
   bst_alpha, min_error = np.inf, np.inf
   for alpha in np.arange(0.10, 0.90, 0.005):
@@ -274,18 +276,17 @@ if __name__ == '__main__':
     # stdout.write('%5s:' % ('obs'))
     # [stdout.write(' %.4f' % (p)) for p in obs_dist]
     # stdout.write('\n')
-  bst_alpha = 0.40
+  bst_alpha = 0.50
   stdout.write('%5s:' % ('train'))
   [stdout.write(' %.4f' % (p)) for p in train_dist]
   stdout.write('\n')
-  stdout.write('%5s: [' % ('train'))
-  [stdout.write('%.2f,' % (p)) for p in train_dist]
-  stdout.write(']\n')
+  # stdout.write('%5s: [' % ('train'))
+  # [stdout.write('%.2f,' % (p)) for p in train_dist]
+  # stdout.write(']\n')
   obs_dist = observe_dist(bst_alpha, test_dist)
   stdout.write('%.3f:' % (bst_alpha))
   [stdout.write(' %.4f' % (p)) for p in obs_dist]
   stdout.write('\n')
-  stdout.write('%.3f: [' % (bst_alpha))
-  [stdout.write('%.2f,' % (p)) for p in obs_dist]
-  stdout.write(']\n')
-
+  # stdout.write('%.3f: [' % (bst_alpha))
+  # [stdout.write('%.2f,' % (p)) for p in obs_dist]
+  # stdout.write(']\n')

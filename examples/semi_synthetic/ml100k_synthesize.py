@@ -70,7 +70,7 @@ stdout.write('\n')
 exit()
 music_cum = np.zeros(max_rate+1)
 for rate in range(min_rate, min_rate+max_rate):
-  music_cum[rate] = music_dist[rate-1]
+  music_cum[rate+1] = music_dist[rate]
 for rate in range(min_rate, min_rate+max_rate):
   music_cum[rate] = music_cum[rate] + music_cum[rate-1]
 

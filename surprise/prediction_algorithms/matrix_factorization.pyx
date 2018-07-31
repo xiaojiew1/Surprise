@@ -52,7 +52,7 @@ class MFIPS(AlgoBase):
 
     return self
 
-  def sgd(self, trainset, weights):
+  def sgd(self, trainset, weights, testset=None, log_dir=None):
     # user biases
     cdef np.ndarray[np.double_t] bu
     # item biases

@@ -10,8 +10,6 @@ import math
 import numpy as np
 import pickle
 
-utils.create_dir(beta_dir)
-
 def vary_omega(alpha, omegas, dataset, recom_list, risk):
   n_users, n_items, n_rates, indexes, cmpl_rates= dataset
   risk_name, risk = risk
@@ -20,60 +18,45 @@ def vary_omega(alpha, omegas, dataset, recom_list, risk):
   k = config.solve_k(alpha, n_users, n_items, n_rates, cmpl_cnt)
   cmpl_props = config.complete_prop(alpha, k, indexes)
 
-  n_risk_cum, p_risk_cum, sp_risk_cum = 0.0, 0.0, 0.0
-  d_risk_cum, sd_risk_cum = 0.0, 0.0
-  d_risk_cums = np.zeros(len(d_betas))
-  sd_risk_cums = np.zeros(len(sd_betas))
-
-  n_rmse, p_rmse, s_rmse, d_rmse = 0.0, 0.0, 0.0, 0.0
+  n_rmse, p_rmse, s_rmse = 0.0, 0.0, 0.0
+  d_rmses = np.zeros(len(omegas))
   for recom in recom_list:
     recom_name, pred_rates = recom
-    # if recom_name != 'coarsened':
-    #   continue
+    t_risk = config.compute_t(pred_rates, cmpl_rates, risk)
+    dataset = n_users, n_items, n_rates, cmpl_rates, cmpl_cnt, t_risk
 
-    t_risk = utils.compute_t(pred_rates, cmpl_rates, risk)
-    print('%s %s t=%.4f' % (risk_name, recom_name, t_risk))
-    dataset = n_users, n_items, cmpl_rates, cmpl_cnt, t_risk
-    res = utils.evaluate_est(recom, dataset, cmpl_props, betas, risk)
-    n_risk_mse, p_risk_mse, sp_risk_mse, d_risk_mses, sd_risk_mses = res
-    print('\n' + '#'*n_hashtag + '\n')
+    res = config.eval_wt_omega(recom, dataset, cmpl_props, (risk_name, risk), omegas)
+    n_mse, p_mse, s_mse, d_mses = res
 
-    n_risk_cum += n_risk_mse
-    p_risk_cum += p_risk_mse
-    sp_risk_cum += sp_risk_mse
-
-    d_risk_cum += min(d_risk_mses)
-    d_risk_cums += np.asarray(d_risk_mses)
-
-    if len(sd_risk_mses) > 0:
-      sd_risk_cum += min(sd_risk_mses)
-      sd_risk_cums += np.asarray(sd_risk_mses)
-
+    n_rmse += n_risk_mse
+    p_rmse += p_risk_mse
+    s_rmse += s_mse
+    d_rmses += d_mses
   n_recoms = len(recom_list)
-  n_risk_rmse = math.sqrt(n_risk_cum / n_recoms)
-  p_risk_rmse = math.sqrt(p_risk_cum / n_recoms)
-  sp_risk_rmse = math.sqrt(sp_risk_cum / n_recoms)
-  d_risk_rmse = math.sqrt(d_risk_cum / n_recoms)
-  sd_risk_rmse = math.sqrt(sd_risk_cum / n_recoms)
-  d_risk_rmses = np.sqrt(d_risk_cums / n_recoms)
-  sd_risk_rmses = np.sqrt(sd_risk_cums / n_recoms)
+  n_rmse = math.sqrt(n_rmse / n_recoms)
+  p_rmse = math.sqrt(p_rmse / n_recoms)
+  s_rmse = math.sqrt(s_rmse / n_recoms)
+  d_rmses = np.sqrt(d_rmses / n_recoms)
 
-  print('%s rmse n=%.4f p=%.4f sp=%.4f' % 
-      (risk_name, n_risk_rmse, p_risk_rmse, sp_risk_rmse))
-  for d_beta, d_mae_rmse in zip(d_betas, d_risk_rmses):
-    print('  d_beta=%.1f d=%.4f' % (d_beta, d_mae_rmse))
-  for sd_beta, sd_mae_rmse in zip(sd_betas, sd_risk_rmses):
-    print('  sd_beta=%.1f sd=%.4f' % (sd_beta, sd_mae_rmse))
-  print('%s rmse d=%.4f sd=%.4f' % (risk_name, d_risk_rmse, sd_risk_rmse))
+  print('%s alpha=%.1f k=%.4f' % (risk_name, alpha, k))
+  print('  n=%.4f p=%.4f s=%.4f' % (n_rmse, p_rmse, s_rmse))
+  for omega, d_rmse in zip(omegas, d_rmses):
+    print('  omega=%.1f d=%.4f' % (omega, d_rmse))
   print('\n' + '#'*n_hashtag + '\n')
 
-  beta_rmse = {
-    'n': n_risk_rmse,
-    'p': p_risk_rmse, 'sp': sp_risk_rmse,
-    'betas': d_betas,'rmses': d_risk_rmses,
+  outfile = path.join(omega_dir, '%s_%.1f.p' % (risk_name, alpha))
+  if path.isfile(outfile):
+    print('%s exists' % (path.basename(outfile)))
+  config.make_file_dir(outfile)
+  data = {
+    'a': alpha,
+    'k': k,
+    'n': n_rmse,
+    'p': p_rmse,
+    's': s_rmse,
+    'd': d_rmses,
   }
-  out_file = path.join(beta_dir, '%s_%.1f.p' % (risk_name, alpha))
-  pickle.dump(beta_rmse, open(out_file, 'wb'))
+  pickle.dump(data, open(outfile, 'wb'))
 
 #### load data
 n_users, n_items, n_rates, indexes = config.read_data(song_file)

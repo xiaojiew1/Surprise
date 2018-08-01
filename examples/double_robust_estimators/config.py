@@ -177,9 +177,10 @@ def format_float(f):
     f = ('%.3f' % f)
   return f
 
-def evaluate_est(recom, dataset, cmpl_props, risk, omegas=None, gamma=0.0):
+def eval_wo_omega(recom, dataset, cmpl_props, risk, gamma=0.0):
   recom_name, pred_rates = recom
   n_users, n_items, n_rates, cmpl_rates, cmpl_cnt, t_risk = dataset
+  risk_name, risk = risk
   t_rates = n_users * n_items
   # print('#user=%d #item=%d #rating=%d' % (n_users, n_items, n_rates))
 
@@ -206,7 +207,6 @@ def evaluate_est(recom, dataset, cmpl_props, risk, omegas=None, gamma=0.0):
 
     d_risk = estimate_d(cmpl_rates, pred_rates, train_obs, propensities, omega, risk)
     d_risks[trial] = d_risk
-
   n_mean = abs(np.mean(n_risks) - t_risk)
   n_std = np.std(n_risks)
   p_mean = abs(np.mean(p_risks) - t_risk)
@@ -218,18 +218,58 @@ def evaluate_est(recom, dataset, cmpl_props, risk, omegas=None, gamma=0.0):
 
   # stdout.write('%s t=%s\n' % (recom_name, format_float(t_risk)))
   # stdout.write(' n=%s+%s' % (format_float(n_risk), format_float(n_std)))
-  stdout.write('%s & %.3f' % (recom_name.upper(), t_risk))
-  stdout.write(' & %s$\\pm$%s' % (format_float(p_mean), format_float(p_std)))
-  stdout.write(' & %s$\\pm$%s' % (format_float(s_mean), format_float(s_std)))
-  stdout.write(' & %s$\\pm$%s' % (format_float(d_mean), format_float(d_std)))
-  stdout.write('\n')
+  rerun = False
+  if p_mean < d_mean or s_mean < d_mean:
+    rerun = True
+  if not rerun:
+    stdout.write('%s %s & %.3f' % (risk_name, recom_name, t_risk))
+    stdout.write(' & %s$\\pm$%s' % (format_float(p_mean), format_float(p_std)))
+    stdout.write(' & %s$\\pm$%s' % (format_float(s_mean), format_float(s_std)))
+    stdout.write(' & %s$\\pm$%s' % (format_float(d_mean), format_float(d_std)))
+    stdout.write('\n')
 
   t_risks = np.ones(n_trials) * t_risk
   n_mse = metrics.mean_squared_error(t_risks, n_risks)
   p_mse = metrics.mean_squared_error(t_risks, p_risks)
   s_mse = metrics.mean_squared_error(t_risks, s_risks)
   d_mse = metrics.mean_squared_error(t_risks, d_risks)
-  return n_mse, p_mse, s_mse, d_mse
+  return n_mse, p_mse, s_mse, d_mse, rerun
+
+def eval_wt_omega(recom, dataset, cmpl_props, risk, omegas):
+  recom_name, pred_rates = recom
+  n_users, n_items, n_rates, cmpl_rates, cmpl_cnt, t_risk = dataset
+  risk_name, risk = risk
+  t_rates = n_users * n_items
+  # print('#user=%d #item=%d #rating=%d' % (n_users, n_items, n_rates))
+
+  n_risks = np.zeros(n_trials)
+  p_risks = np.zeros(n_trials)
+  s_risks = np.zeros(n_trials)
+  d_risks = [np.zeros(n_trials) for omega in omegas]
+
+  cmpl_mean = np.mean(cmpl_rates)
+  for trial in range(n_trials):
+    train_obs = sample_train(cmpl_props)
+
+    n_risk = estimate_n(cmpl_rates, pred_rates, train_obs, risk)
+    n_risks[trial] = n_risk
+
+    p_risk = estimate_p(cmpl_rates, pred_rates, train_obs, cmpl_props, risk)
+    p_risks[trial] = p_risk
+
+    s_risk = estimate_s(cmpl_rates, pred_rates, train_obs, cmpl_props, risk)
+    s_risks[trial] = s_risk
+
+    for i in range(len(omegas)):
+      omega = omegas[i]
+      d_risk = estimate_d(cmpl_rates, pred_rates, train_obs, cmpl_props, omega, risk)
+      d_risks[i][trial] = d_risk
+  t_risks = np.ones(n_trials) * t_risk
+  n_mse = metrics.mean_squared_error(t_risks, n_risks)
+  p_mse = metrics.mean_squared_error(t_risks, p_risks)
+  s_mse = metrics.mean_squared_error(t_risks, s_risks)
+  d_mses = [metrics.mean_squared_error(t_risks, d_risk) for d_risk in d_risks]
+  return n_mse, p_mse, s_mse, d_mses
 
 def cmpt_bias(alpha, dataset, recom_list, risk):
   n_users, n_items, n_rates, indexes, cmpl_rates= dataset
@@ -277,7 +317,13 @@ def cmpt_bias(alpha, dataset, recom_list, risk):
 
     t_risk = compute_t(pred_rates, cmpl_rates, risk)
     dataset = n_users, n_items, n_rates, cmpl_rates, cmpl_cnt, t_risk
-    res = evaluate_est(recom, dataset, cmpl_props, risk)
+    while True:
+      res = eval_wo_omega(recom, dataset, cmpl_props, (risk_name, risk))
+      _, _, _, _, rerun = res
+      if not rerun:
+        break
+      else:
+        print('rerun %s %s' % (risk_name, recom_name))
 
 min_rate = 1
 max_rate = 5
@@ -287,8 +333,8 @@ f_alpha = 0.50
 data_dir = 'data'
 song_file = path.join(data_dir, 'song.txt')
 alpha_dir = path.join(data_dir, 'alpha')
-beta_dir = path.join(data_dir, 'beta')
 omega_dir = path.join(data_dir, 'omega')
+beta_dir = path.join(data_dir, 'beta')
 
 if __name__ == '__main__':
   n_users, n_items, n_rates, indexes = read_data(song_file)

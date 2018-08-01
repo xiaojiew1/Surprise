@@ -23,13 +23,19 @@ def given_alpha(alpha, dataset, recom_list, risk):
     recom_name, pred_rates = recom
     t_risk = config.compute_t(pred_rates, cmpl_rates, risk)
     dataset = n_users, n_items, n_rates, cmpl_rates, cmpl_cnt, t_risk
-    res = config.evaluate_est(recom, dataset, cmpl_props, risk)
-    n_mse, p_mse, s_mse, d_mse = res
+
+    while True:
+      res = config.eval_wo_omega(recom, dataset, cmpl_props, (risk_name, risk))
+      n_mse, p_mse, s_mse, d_mse, rerun = res
+      if not rerun:
+        break
+      else:
+        print('rerun %s %s' % (risk_name, recom_name))
+
     n_rmse += n_mse
     p_rmse += p_mse
     s_rmse += s_mse
     d_rmse += d_mse
-
   n_recoms = len(recom_list)
   n_rmse = math.sqrt(n_rmse / n_recoms)
   p_rmse = math.sqrt(p_rmse / n_recoms)
@@ -44,7 +50,6 @@ def given_alpha(alpha, dataset, recom_list, risk):
   if path.isfile(outfile):
     print('%s exists' % (path.basename(outfile)))
   config.make_file_dir(outfile)
-  return
   data = {
     'a': alpha,
     'k': k,

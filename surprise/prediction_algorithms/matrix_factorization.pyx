@@ -7,7 +7,11 @@ from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
 #### xiaojie
+from .. import accuracy
 from libc.math cimport sqrt
+from os import path
+
+import os
 
 cimport numpy as np  # noqa
 import numpy as np
@@ -46,13 +50,13 @@ class MFIPS(AlgoBase):
 
     AlgoBase.__init__(self)
 
-  def fit(self, trainset, weights):
+  def fit(self, trainset, weights, **kwargs):
     AlgoBase.fit(self, trainset)
-    self.sgd(trainset, weights)
+    self.sgd(trainset, weights, **kwargs)
 
     return self
 
-  def sgd(self, trainset, weights, testset=None, log_dir=None):
+  def sgd(self, trainset, weights, testset=None, outfile=None):
     # user biases
     cdef np.ndarray[np.double_t] bu
     # item biases
@@ -63,6 +67,9 @@ class MFIPS(AlgoBase):
     cdef np.ndarray[np.double_t, ndim=2] qi
     # train losses
     cdef np.ndarray[np.double_t] losses
+    # learning curves
+    cdef np.ndarray[np.double_t] maes
+    cdef np.ndarray[np.double_t] mses
 
     cdef int u, i, f
     cdef double r, err, dot, grad, puf, qif
@@ -90,6 +97,9 @@ class MFIPS(AlgoBase):
                     (trainset.n_items, self.n_factors))
 
     losses = np.zeros(trainset.n_ratings, np.double)
+
+    maes = np.zeros(self.n_epochs, np.double)
+    mses = np.zeros(self.n_epochs, np.double)
 
     if not self.biased:
       global_mean = 0
@@ -146,10 +156,29 @@ class MFIPS(AlgoBase):
           pu[u, f] += lr_pu * (grad_p - reg_pu * puf)
           qi[i, f] += lr_qi * (grad_q - reg_qi * qif)
 
+      #### learning curves
+      self.bu, self.bi, self.pu, self.qi = bu, bi, pu, qi
+      predictions = self.test(testset)
+      eval_kwargs = {'verbose':False}
+      mae = accuracy.mae(predictions, **eval_kwargs)
+      mse = pow(accuracy.rmse(predictions, **eval_kwargs), 2.0)
+      # print('epoch=%d mae=%.4f mse=%.4f' % (current_epoch, mae, mse))
+      maes[current_epoch] = mae
+      mses[current_epoch] = mse
+
     self.bu = bu
     self.bi = bi
     self.pu = pu
     self.qi = qi
+
+    #### learning curves
+    if not path.exists(path.dirname(outfile)):
+      os.makedirs(path.dirname(outfile))
+    with open(outfile, 'w') as fout:
+      for current_epoch in range(self.n_epochs):
+        mae = maes[current_epoch]
+        mse = mses[current_epoch]
+        fout.write('%d %.16f %.16f\n' % (current_epoch, mae, mse))
 
   def estimate(self, u, i):
     known_user = self.trainset.knows_user(u)

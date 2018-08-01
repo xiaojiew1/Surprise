@@ -236,20 +236,27 @@ def cmpt_bias(alpha, dataset, recom_list, risk):
   risk_name, risk = risk
 
   cmpl_cnt = count_index(indexes)
-  # stdout.write('cnt:')
-  # [stdout.write(' %07d' % (c)) for c in cmpl_cnt]
-  # stdout.write('\n')
+  cmpl_dist = cmpl_cnt / cmpl_cnt.sum()
+  stdout.write('pred mcar rating distribution: [')
+  [stdout.write('%.2f,' % cmpl_dist[i]) for i in range(len(cmpl_dist)-1)]
+  stdout.write('%.2f]\n' % cmpl_dist[-1])
 
   k = solve_k(alpha, n_users, n_items, n_rates, cmpl_cnt)
   print('alpha=%.2f k=%.4f' % (alpha, k))
-  # mnar_dist = np.zeros(max_rate)
-  # for rate in range(min_rate, min_rate+max_rate):
-  #   decay = compute_decay(rate, alpha)
-  #   mnar_dist[rate-1] = decay * cmpl_cnt[rate-1]
-  # mnar_dist /= mnar_dist.sum()
-  # stdout.write('obs:')
-  # [stdout.write(' %.4f' % p) for p in mnar_dist]
-  # stdout.write('\n')
+
+  mnar_dist = np.zeros(max_rate)
+  for rate in range(min_rate, min_rate+max_rate):
+    decay = compute_decay(rate, alpha)
+    mnar_dist[rate-1] = decay * cmpl_dist[rate-1]
+  mnar_dist /= mnar_dist.sum()
+  stdout.write('pred mnar rating distribution: [')
+  [stdout.write('%.4f,' % mnar_dist[i]) for i in range(len(mnar_dist)-1)]
+  stdout.write('%.4f]\n' % mnar_dist[-1])
+  mnar_dist -= 0.002
+  stdout.write('pred mnar rating distribution: [')
+  [stdout.write('%.2f,' % mnar_dist[i]) for i in range(len(mnar_dist)-1)]
+  stdout.write('%.2f]\n' % mnar_dist[-1])
+  exit()
 
   cmpl_props = complete_prop(alpha, k, indexes)
   # rp_set = set()
@@ -281,10 +288,6 @@ song_file = path.join(data_dir, 'song.txt')
 
 if __name__ == '__main__':
   n_users, n_items, n_rates, indexes = read_data(song_file)
-  # print('#user=%d #item=%d #rating=%d' % (n_users, n_items, n_rates))
-  # stdout.write('cum:')
-  # [stdout.write(' %07d' % index) for index in indexes]
-  # stdout.write('\n')
 
   cmpl_rates = complete_rate(indexes)
 

@@ -75,23 +75,24 @@ n_factors_opt = [100,]
 n_epochs_opt = [20,]
 biased_opt = [True,]
 reg_all_opt = [0.02,]
-# n_factors_opt = [10, 20, 50, 100, 200,]
-# n_epochs_opt = [10, 20, 50, 100, 200,]
-# biased_opt = [True, False,]
-# reg_all_opt = [0.001, 0.005, 0.01, 0.05, 0.1]
-n_factors_opt = [200,]
-n_epochs_opt = [200,]
-biased_opt = [False,]
-reg_all_opt = [0.1,]
+n_factors_opt = [10, 20, 50, 100, 200,]
+n_epochs_opt = [10, 20, 50, 100, 200,]
+biased_opt = [True, False,]
+reg_all_opt = [0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1.0, 5.0, 10.0]
+# n_factors_opt = [200,]
+# n_epochs_opt = [200,]
+# biased_opt = [False,]
+# reg_all_opt = [0.1,]
+
 #### develop
 n_factors_opt = [50,]
 n_epochs_opt = [200,]
 biased_opt = [False,]
 reg_all_opt = [0.1,]
 var_all_opt = [0.0001]
-var_all_opt = [0.0, 0.00001, 0.0001, 0.001, 0.01, 0.1, 1.0]
+# var_all_opt = [0.0, 0.00001, 0.0001, 0.001, 0.01, 0.1, 1.0]
 
-mae_bst, mse_bst, kwargs_bst = np.inf, np.inf, None
+mae_bst, mse_bst, kwargs_bst = np.inf, np.inf, {}
 st_time = time.time()
 for n_factors, n_epochs, biased, reg_all, var_all in itertools.product(
     n_factors_opt, n_epochs_opt, biased_opt, reg_all_opt, var_all_opt):
@@ -104,11 +105,14 @@ for n_factors, n_epochs, biased, reg_all, var_all in itertools.product(
     # 'verbose': True,
   }
   kwargs_str = config.stringify(algo_kwargs)
-  out_dir = path.join(tmp_dir, kwargs_str)
-  print(out_dir)
-  exit()
+  outfile = path.join(tmp_dir, '%s.log' % kwargs_str)
+  fit_kwargs = {
+    'testset': testset,
+    'outfile': outfile,
+  }
+
   algo = MFIPS(**algo_kwargs)
-  algo.fit(trainset, weights)
+  algo.fit(trainset, weights, **fit_kwargs)
   predictions = algo.test(testset)
 
   eval_kwargs = {'verbose':False}

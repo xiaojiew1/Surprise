@@ -7,6 +7,8 @@ from surprise import SVD
 from os import path
 from sys import stdout
 
+import config
+
 import itertools
 import io
 import numpy as np
@@ -72,19 +74,19 @@ n_factors_opt = [100,]
 n_epochs_opt = [20,]
 biased_opt = [True,]
 reg_all_opt = [0.02,]
-# n_factors_opt = [10, 20, 50, 100, 200,]
-# n_epochs_opt = [10, 20, 50, 100, 200,]
-# biased_opt = [True, False,]
-# reg_all_opt = [0.001, 0.005, 0.01, 0.05, 0.1]
-n_factors_opt = [200,]
-n_epochs_opt = [200,]
-biased_opt = [False,]
-reg_all_opt = [0.1,]
+n_factors_opt = [10, 20, 50, 100, 200,]
+n_epochs_opt = [5, 10, 20, 50, 100,]
+biased_opt = [True, False,]
+reg_all_opt = [0.001, 0.005, 0.01, 0.05, 0.1]
+# n_factors_opt = [200,]
+# n_epochs_opt = [200,]
+# biased_opt = [False,]
+# reg_all_opt = [0.1,]
 #### develop
-n_factors_opt = [50,]
-n_epochs_opt = [200,]
-biased_opt = [False,]
-reg_all_opt = [0.1,]
+# n_factors_opt = [50,]
+# n_epochs_opt = [2, 4, 6, 8, 10]
+# biased_opt = [False,]
+# reg_all_opt = [0.1,]
 var_all_opt = [0.0001]
 
 mae_bst, mse_bst, kwargs_bst = np.inf, np.inf, None
@@ -97,28 +99,29 @@ for n_factors, n_epochs, biased, reg_all, var_all in itertools.product(
     'biased': biased,
     'reg_all': reg_all,
     # 'var_all': var_all,
-    'verbose': True,
+    'verbose': False,
   }
   algo = SVD(**algo_kwargs)
   algo.fit(trainset)
-  # algo = SVD(**algo_kwargs)
-  # algo.fit(trainset, weights)
   predictions = algo.test(testset)
 
   eval_kwargs = {'verbose':False}
   mae = accuracy.mae(predictions, **eval_kwargs)
   mse = pow(accuracy.rmse(predictions, **eval_kwargs), 2.0)
-  print('var_all=%.6f mae=%.4f mse=%.4f' % (var_all, mae, mse))
+
+  kwargs_str = config.stringify(algo_kwargs)
+  print('%.4f %.4f %s' % (mae, mse, kwargs_str))
+  stdout.flush()
 
   if mse < mse_bst:
     mae_bst = min(mae, mae_bst)
     mse_bst = min(mse, mse_bst)
     kwargs_bst = algo_kwargs
 
-print('best mae=%.4f mse=%.4f' % (mae_bst, mse_bst))
-[print('%10s: %s' % (k, v)) for k, v in kwargs_bst.items()]
-e_time = time.time()
-print('%.2fs' % (e_time - st_time))
+# print('best mae=%.4f mse=%.4f' % (mae_bst, mse_bst))
+# [print('%10s: %s' % (k, v)) for k, v in kwargs_bst.items()]
+# e_time = time.time()
+# print('%.2fs' % (e_time - st_time))
 
 
 

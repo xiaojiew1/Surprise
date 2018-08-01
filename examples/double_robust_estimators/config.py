@@ -283,7 +283,7 @@ min_rate = 1
 max_rate = 5
 n_trials = 50
 n_hashtag = 64
-
+f_alpha = 0.50
 data_dir = 'data'
 song_file = path.join(data_dir, 'song.txt')
 alpha_dir = path.join(data_dir, 'alpha')

@@ -1,9 +1,10 @@
-from config import data_dir, beta_dir
-from config import n_hashtag
+from config import song_file, omega_dir
+from config import f_alpha, n_hashtag
 
 from os import path
+from sys import stdout
 
-import utils
+import config
 
 import math
 import numpy as np
@@ -11,23 +12,20 @@ import pickle
 
 utils.create_dir(beta_dir)
 
-def collect_beta(alpha, betas, dataset, recom_list, risk):
-  d_betas, sd_betas = betas
-  n_users, n_items, cmpl_rates, cmpl_cnt = dataset
+def vary_omega(alpha, omegas, dataset, recom_list, risk):
+  n_users, n_items, n_rates, indexes, cmpl_rates= dataset
   risk_name, risk = risk
-
-  k = utils.solve_k(alpha, n_users, n_items, cmpl_cnt)
-  print('alpha=%.2f k=%.4f' % (alpha, k))
-  print('\n' + '#'*n_hashtag + '\n')
-
-  cmpl_props = utils.complete_prop(alpha, k, cmpl_rates)
-  # print('#cmpl_prop=%d dtype=%s' % (len(cmpl_props), cmpl_props.dtype))
+  cmpl_cnt = config.count_index(indexes)
+  cmpl_dist = cmpl_cnt / cmpl_cnt.sum()
+  k = config.solve_k(alpha, n_users, n_items, n_rates, cmpl_cnt)
+  cmpl_props = config.complete_prop(alpha, k, indexes)
 
   n_risk_cum, p_risk_cum, sp_risk_cum = 0.0, 0.0, 0.0
   d_risk_cum, sd_risk_cum = 0.0, 0.0
   d_risk_cums = np.zeros(len(d_betas))
   sd_risk_cums = np.zeros(len(sd_betas))
 
+  n_rmse, p_rmse, s_rmse, d_rmse = 0.0, 0.0, 0.0, 0.0
   for recom in recom_list:
     recom_name, pred_rates = recom
     # if recom_name != 'coarsened':
@@ -77,31 +75,18 @@ def collect_beta(alpha, betas, dataset, recom_list, risk):
   out_file = path.join(beta_dir, '%s_%.1f.p' % (risk_name, alpha))
   pickle.dump(beta_rmse, open(out_file, 'wb'))
 
-n_users, n_items, indexes = utils.read_data()
-print('#user=%d #item=%d' % (n_users, n_items))
-# [stdout.write('%d ' % (idx)) for idx in indexes]
-# stdout.write('\n')
+#### load data
+n_users, n_items, n_rates, indexes = config.read_data(song_file)
+cmpl_rates = config.complete_rate(indexes)
+dataset = n_users, n_items, n_rates, indexes, cmpl_rates
+recom_list = config.provide_recom(indexes, cmpl_rates)
 
-cmpl_rates = utils.complete_rate(indexes)
-# print('#cmpl_rate=%d dtype=%s' % (len(cmpl_rates), cmpl_rates.dtype))
-
-cmpl_cnt = utils.count_index(indexes)
-cmpl_dist = cmpl_cnt / cmpl_cnt.sum()
-# [stdout.write('%.4f ' % (p)) for p in cmpl_dist]
-# stdout.write('\n')
-
-alpha = 0.40
-# d_betas = np.arange(0.00, 0.25, 0.10)
-sd_betas = np.arange(0.10, 0.05, 0.10)
-dataset = (n_users, n_items, cmpl_rates, cmpl_cnt)
-recom_list = utils.provide_recom(indexes, cmpl_rates)
+alpha = f_alpha
 
 risk = 'mae', np.absolute
-d_betas = np.arange(0.00, 3.25, 0.10)
-betas = d_betas, sd_betas
-collect_beta(alpha, betas, dataset, recom_list, risk)
+omegas = np.arange(0.00, 3.25, 0.10)
+vary_omega(alpha, omegas, dataset, recom_list, risk)
 risk = 'mse', np.square
-d_betas = np.arange(0.00, 4.85, 0.10)
-betas = d_betas, sd_betas
-collect_beta(alpha, betas, dataset, recom_list, risk)
+omegas = np.arange(0.00, 4.85, 0.10)
+vary_omega(alpha, omegas, dataset, recom_list, risk)
 

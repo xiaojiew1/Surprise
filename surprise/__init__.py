@@ -1,4 +1,5 @@
 #### xiaojie
+from .prediction_algorithms import MFDR
 from .prediction_algorithms import MFIPS
 
 from pkg_resources import get_distribution

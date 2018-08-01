@@ -1,6 +1,7 @@
 from surprise import accuracy
 from surprise import Dataset
 from surprise import Reader
+from surprise import MFDR
 from surprise import MFIPS
 from surprise import SVD
 
@@ -101,7 +102,8 @@ for n_factors, n_epochs, biased, reg_all, lr_all, var_all in itertools.product(
     # 'var_all': var_all,
     'verbose': False,
   }
-  algo = SVD(**algo_kwargs)
+  # algo = SVD(**algo_kwargs)
+  algo = MFDR(**algo_kwargs)
   algo.fit(trainset)
   predictions = algo.test(testset)
 

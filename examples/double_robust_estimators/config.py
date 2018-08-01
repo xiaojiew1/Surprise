@@ -158,7 +158,6 @@ def d(cmpl_rates, pred_rates, train_obs, propensities, omega, risk):
   pred_errors = risk(pred_rates - np.mean(cmpl_rates))
   # omega = true_errors.sum() / risk(pred_rates - np.mean(cmpl_rates)).sum()
   pred_errors *= omega
-  # print('pred_beta=%.4f' % (pred_beta))
 
   pred_errors = np.multiply(propensities-train_obs, pred_errors)
   pred_errors = np.divide(pred_errors, propensities)
@@ -177,7 +176,7 @@ def format_float(f):
     f = ('%.3f' % f)
   return f
 
-def eval_wo_omega(recom, dataset, cmpl_props, risk, gamma=0.0):
+def eval_wo_omega(recom, dataset, cmpl_props, risk, beta=0.0):
   recom_name, pred_rates = recom
   n_users, n_items, n_rates, cmpl_rates, cmpl_cnt, t_risk = dataset
   risk_name, risk = risk
@@ -193,8 +192,8 @@ def eval_wo_omega(recom, dataset, cmpl_props, risk, gamma=0.0):
   omega = risk(pred_rates-cmpl_rates).sum() / risk(pred_rates-cmpl_mean).sum()
   for trial in range(n_trials):
     train_obs = sample_train(cmpl_props)
-    propensities = (gamma * train_obs.sum() / t_rates) * np.ones(t_rates)
-    propensities += (1 - gamma) * np.copy(cmpl_props)
+    propensities = (beta * train_obs.sum() / t_rates) * np.ones(t_rates)
+    propensities += (1 - beta) * np.copy(cmpl_props)
 
     n_risk = estimate_n(cmpl_rates, pred_rates, train_obs, risk)
     n_risks[trial] = n_risk

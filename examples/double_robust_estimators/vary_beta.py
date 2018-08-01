@@ -46,15 +46,15 @@ def given_beta(alpha, beta, dataset, recom_list, risk):
       d_mses.append(d_mse)
       count += 1
       if count == max_count:
+        d_minus_s, min_idx = d_mses[0] - s_mses[0], 0
+        for i in range(1, max_count):
+          if d_mses[i] - s_mses[i] < d_minus_s:
+            d_minus_s, min_idx = d_mses[i] - s_mses[i], i
+        i = min_idx
+        n_mse, p_mse, s_mse, d_mse = n_mses[i], p_mses[i], s_mses[i], d_mses[i]
+        print('select %s %s' % (risk_name, recom_name))
+        print('  p=%.8f s=%.8f d=%.8f' % (p_mse, s_mse, d_mse))
         break
-
-    d_minus_s, min_idx = d_mses[0] - s_mses[0], 0
-    for i in range(1, max_count):
-      if d_mses[i] - s_mses[i] < d_minus_s:
-        d_minus_s, min_idx = d_mses[i] - s_mses[i], i
-    i = min_idx
-    n_mse, p_mse, s_mse, d_mse = n_mses[i], p_mses[i], s_mses[i], d_mses[i]
-    print('    p=%.8f s=%.8f d=%.8f' % (p_mse, s_mse, d_mse))
 
     n_rmse += n_mse
     p_rmse += p_mse

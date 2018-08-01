@@ -1,9 +1,12 @@
+from config import tmp_dir
 from surprise import accuracy
 from surprise import Dataset
 from surprise import Reader
 from surprise import MFIPS
 
 from os import path
+
+import config
 
 import itertools
 import io
@@ -100,6 +103,10 @@ for n_factors, n_epochs, biased, reg_all, var_all in itertools.product(
     'var_all': var_all,
     # 'verbose': True,
   }
+  kwargs_str = config.stringify(algo_kwargs)
+  out_dir = path.join(tmp_dir, kwargs_str)
+  print(out_dir)
+  exit()
   algo = MFIPS(**algo_kwargs)
   algo.fit(trainset, weights)
   predictions = algo.test(testset)

@@ -60,8 +60,8 @@ def provide_skewed(cmpl_rates):
 
 def provide_coarsened(cmpl_rates):
   coarsened = np.copy(cmpl_rates)
-  coarsened[coarsened<2.5] = 1
-  coarsened[coarsened>2.5] = 5
+  coarsened[coarsened<1.5] = 1
+  coarsened[coarsened>1.5] = 5
   #### icml2016
   # coarsened[coarsened<3.5] = 3
   # coarsened[coarsened>3.5] = 4
@@ -145,19 +145,19 @@ def estimate_s(cmpl_rates, pred_rates, train_obs, propensities, risk):
   normalizer = np.multiply(1.0 / propensities, train_obs).sum()
   return true_errors.sum() / normalizer
 
-def d(cmpl_rates, pred_rates, train_obs, propensities, beta, risk):
+def d(cmpl_rates, pred_rates, train_obs, propensities, omega, risk):
   true_errors = risk(pred_rates - cmpl_rates)
   true_errors = np.multiply(train_obs, true_errors)
   true_errors = np.divide(true_errors, propensities)
 
   #### true error
-  # pred_errors = beta * true_errors
+  # pred_errors = omega * true_errors
   #### mean error
-  # pred_errors = beta * np.mean(true_errors) * np.ones_like(true_errors)
+  # pred_errors = omega * np.mean(true_errors) * np.ones_like(true_errors)
   #### mean rate
   pred_errors = risk(pred_rates - np.mean(cmpl_rates))
-  # beta = true_errors.sum() / risk(pred_rates - np.mean(cmpl_rates)).sum()
-  pred_errors *= beta
+  # omega = true_errors.sum() / risk(pred_rates - np.mean(cmpl_rates)).sum()
+  pred_errors *= omega
   # print('pred_beta=%.4f' % (pred_beta))
 
   pred_errors = np.multiply(propensities-train_obs, pred_errors)
@@ -165,8 +165,8 @@ def d(cmpl_rates, pred_rates, train_obs, propensities, beta, risk):
   tot_errors = true_errors + pred_errors
   return tot_errors
 
-def estimate_d(cmpl_rates, pred_rates, train_obs, propensities, beta, risk):
-  tot_errors = d(cmpl_rates, pred_rates, train_obs, propensities, beta, risk)
+def estimate_d(cmpl_rates, pred_rates, train_obs, propensities, omega, risk):
+  tot_errors = d(cmpl_rates, pred_rates, train_obs, propensities, omega, risk)
   return tot_errors.sum() / len(cmpl_rates)
 
 def format_float(f):
@@ -177,7 +177,7 @@ def format_float(f):
     f = ('%.3f' % f)
   return f
 
-def evaluate_est(recom, dataset, cmpl_props, risk, betas=None, gamma=0.0):
+def evaluate_est(recom, dataset, cmpl_props, risk, omegas=None, gamma=0.0):
   recom_name, pred_rates = recom
   n_users, n_items, n_rates, cmpl_rates, cmpl_cnt, t_risk = dataset
   t_rates = n_users * n_items
@@ -189,7 +189,7 @@ def evaluate_est(recom, dataset, cmpl_props, risk, betas=None, gamma=0.0):
   d_risks = np.zeros(n_trials)
 
   cmpl_mean = np.mean(cmpl_rates)
-  beta = risk(pred_rates-cmpl_rates).sum() / risk(pred_rates-cmpl_mean).sum()
+  omega = risk(pred_rates-cmpl_rates).sum() / risk(pred_rates-cmpl_mean).sum()
   for trial in range(n_trials):
     train_obs = sample_train(cmpl_props)
     propensities = (gamma * train_obs.sum() / t_rates) * np.ones(t_rates)
@@ -201,10 +201,10 @@ def evaluate_est(recom, dataset, cmpl_props, risk, betas=None, gamma=0.0):
     p_risk = estimate_p(cmpl_rates, pred_rates, train_obs, propensities, risk)
     p_risks[trial] = p_risk
 
-    sp_risk = estimate_s(cmpl_rates, pred_rates, train_obs, propensities, risk)
-    s_risks[trial] = sp_risk
+    s_risk = estimate_s(cmpl_rates, pred_rates, train_obs, propensities, risk)
+    s_risks[trial] = s_risk
 
-    d_risk = estimate_d(cmpl_rates, pred_rates, train_obs, propensities, beta, risk)
+    d_risk = estimate_d(cmpl_rates, pred_rates, train_obs, propensities, omega, risk)
     d_risks[trial] = d_risk
 
   n_mean = abs(np.mean(n_risks) - t_risk)
@@ -225,11 +225,11 @@ def evaluate_est(recom, dataset, cmpl_props, risk, betas=None, gamma=0.0):
   stdout.write('\n')
 
   t_risks = np.ones(n_trials) * t_risk
-  n_risk_mse = metrics.mean_squared_error(t_risks, n_risks)
-  p_risk_mse = metrics.mean_squared_error(t_risks, p_risks)
-  sp_risk_mse = metrics.mean_squared_error(t_risks, s_risks)
-  d_risk_mse = metrics.mean_squared_error(t_risks, d_risks)
-  return n_risk_mse, p_risk_mse, sp_risk_mse, d_risk_mse
+  n_mse = metrics.mean_squared_error(t_risks, n_risks)
+  p_mse = metrics.mean_squared_error(t_risks, p_risks)
+  s_mse = metrics.mean_squared_error(t_risks, s_risks)
+  d_mse = metrics.mean_squared_error(t_risks, d_risks)
+  return n_mse, p_mse, s_mse, d_mse
 
 def cmpt_bias(alpha, dataset, recom_list, risk):
   n_users, n_items, n_rates, indexes, cmpl_rates= dataset
@@ -256,7 +256,6 @@ def cmpt_bias(alpha, dataset, recom_list, risk):
   stdout.write('pred mnar rating distribution: [')
   [stdout.write('%.2f,' % mnar_dist[i]) for i in range(len(mnar_dist)-1)]
   stdout.write('%.2f]\n' % mnar_dist[-1])
-  exit()
 
   cmpl_props = complete_prop(alpha, k, indexes)
   # rp_set = set()
@@ -283,8 +282,13 @@ def cmpt_bias(alpha, dataset, recom_list, risk):
 min_rate = 1
 max_rate = 5
 n_trials = 50
+n_hashtag = 64
+
 data_dir = 'data'
 song_file = path.join(data_dir, 'song.txt')
+alpha_dir = path.join(data_dir, 'alpha')
+beta_dir = path.join(data_dir, 'beta')
+omega_dir = path.join(data_dir, 'omega')
 
 if __name__ == '__main__':
   n_users, n_items, n_rates, indexes = read_data(song_file)

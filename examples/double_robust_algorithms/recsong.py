@@ -74,30 +74,30 @@ n_factors_opt = [100,]
 n_epochs_opt = [20,]
 biased_opt = [True,]
 reg_all_opt = [0.02,]
-n_factors_opt = [10, 20, 50, 100, 200,]
-n_epochs_opt = [5, 10, 20, 50, 100,]
+lr_all = [0.005]
+n_factors_opt = [5, 10]
+n_epochs_opt = [2, 4, 8, 16, 32,]
 biased_opt = [True, False,]
-reg_all_opt = [0.001, 0.005, 0.01, 0.05, 0.1]
-# n_factors_opt = [200,]
-# n_epochs_opt = [200,]
-# biased_opt = [False,]
-# reg_all_opt = [0.1,]
+reg_all_opt = [0.01, 0.1]
+lr_all_opt = [0.0001, 0.0005, 0.001, 0.005]
+
 #### develop
 # n_factors_opt = [50,]
-# n_epochs_opt = [2, 4, 6, 8, 10]
+# n_epochs_opt = [10]
 # biased_opt = [False,]
 # reg_all_opt = [0.1,]
 var_all_opt = [0.0001]
 
 mae_bst, mse_bst, kwargs_bst = np.inf, np.inf, None
 st_time = time.time()
-for n_factors, n_epochs, biased, reg_all, var_all in itertools.product(
-    n_factors_opt, n_epochs_opt, biased_opt, reg_all_opt, var_all_opt):
+for n_factors, n_epochs, biased, reg_all, lr_all, var_all in itertools.product(
+    n_factors_opt, n_epochs_opt, biased_opt, reg_all_opt, lr_all_opt, var_all_opt):
   algo_kwargs = {
     'n_factors': n_factors,
     'n_epochs': n_epochs,
     'biased': biased,
     'reg_all': reg_all,
+    'lr_all': lr_all,
     # 'var_all': var_all,
     'verbose': False,
   }

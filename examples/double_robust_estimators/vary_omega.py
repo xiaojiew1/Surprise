@@ -67,9 +67,11 @@ recom_list = config.provide_recom(indexes, cmpl_rates)
 alpha = f_alpha
 
 risk = 'mae', np.absolute
-omegas = np.arange(0.00, 3.25, 0.10)
+# omegas = np.arange(0.00, 3.25, 0.10)
+omegas = np.arange(0.00, 0.25, 0.10)
 vary_omega(alpha, omegas, dataset, recom_list, risk)
 risk = 'mse', np.square
-omegas = np.arange(0.00, 4.85, 0.10)
+# omegas = np.arange(0.00, 4.85, 0.10)
+omegas = np.arange(0.00, 0.25, 0.10)
 vary_omega(alpha, omegas, dataset, recom_list, risk)
 

@@ -13,6 +13,12 @@ import pickle
 def given_beta(alpha, beta, dataset, recom_list, risk):
   n_users, n_items, n_rates, indexes, cmpl_rates= dataset
   risk_name, risk = risk
+
+  outfile = path.join(beta_dir, '%s_%.1f.p' % (risk_name, beta))
+  if path.isfile(outfile):
+    print('%s exists' % (path.basename(outfile)))
+    return
+
   cmpl_cnt = config.count_index(indexes)
   cmpl_dist = cmpl_cnt / cmpl_cnt.sum()
   k = config.solve_k(alpha, n_users, n_items, n_rates, cmpl_cnt)
@@ -24,6 +30,7 @@ def given_beta(alpha, beta, dataset, recom_list, risk):
     t_risk = config.compute_t(pred_rates, cmpl_rates, risk)
     dataset = n_users, n_items, n_rates, cmpl_rates, cmpl_cnt, t_risk
 
+    count = 0
     while True:
       res = config.eval_wo_omega(recom, dataset, cmpl_props, (risk_name, risk), beta=beta)
       n_mse, p_mse, s_mse, d_mse, rerun = res
@@ -31,6 +38,9 @@ def given_beta(alpha, beta, dataset, recom_list, risk):
         break
       else:
         print('rerun %s %s' % (risk_name, recom_name))
+      count += 1
+      if count == 10:
+        break
 
     n_rmse += n_mse
     p_rmse += p_mse
@@ -46,9 +56,6 @@ def given_beta(alpha, beta, dataset, recom_list, risk):
   print('  n=%.4f p=%.4f s=%.4f d=%.4f' % (n_rmse, p_rmse, s_rmse, d_rmse))
   print('\n' + '#'*n_hashtag + '\n')
 
-  outfile = path.join(beta_dir, '%s_%.1f.p' % (risk_name, beta))
-  if path.isfile(outfile):
-    print('%s exists' % (path.basename(outfile)))
   config.make_file_dir(outfile)
   data = {
     'a': alpha,

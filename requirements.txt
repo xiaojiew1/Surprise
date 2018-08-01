@@ -4,7 +4,7 @@ scipy>=1.0.0
 six>=1.10.0
 
 matplotlib==2.2.2
-pandas==0.23.3
+pandas==0.22.0
 requests==2.19.1
 sklearn==0.0
 tabulate==0.8.2

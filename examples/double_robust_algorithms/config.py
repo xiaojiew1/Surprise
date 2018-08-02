@@ -31,6 +31,16 @@ def stringify(kwargs):
       kwargs_str += '_'
   return kwargs_str
 
+def read_err_kwargs(infile):
+  err_kwargs =  []
+  with open(infile) as fin:
+    for line in fin.readlines():
+      fields = line.split()
+      mae, mse, kwargs_str = fields[0], fields[1], fields[2]
+      err_kwargs.append((mae, mse, kwargs_str))
+  kwargs_set = set([t[2] for t in err_kwargs])
+  return err_kwargs, kwargs_set
+
 tmp_dir = 'tmp'
 dnld_dir = path.expanduser('~/Downloads')
 
@@ -50,14 +60,14 @@ if __name__ == '__main__':
   print(sciformat(712345.6))
   print(sciformat(7123456.))
 
-
   print(sciformat(0.000001))
   print(sciformat(0.0000000001))
 
   print(sciformat(1000000))
   print(sciformat(10000000000))
 
-
+  err_kwargs, kwargs_set = read_err_kwargs('rec_coat.p')
+  print(kwargs_set)
 
 
 

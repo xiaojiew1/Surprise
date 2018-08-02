@@ -155,7 +155,7 @@ def d(cmpl_rates, pred_rates, train_obs, propensities, omega, risk):
   #### mean rate
   pred_errors = risk(pred_rates - np.mean(cmpl_rates))
   #### pred omega
-  # omega = true_errors.sum() / risk(pred_rates - np.mean(cmpl_rates)).sum()
+  omega = true_errors.sum() / risk(pred_rates - np.mean(cmpl_rates)).sum()
   pred_errors *= omega
   pred_errors = np.multiply(propensities-train_obs, pred_errors)
   pred_errors = np.divide(pred_errors, propensities)

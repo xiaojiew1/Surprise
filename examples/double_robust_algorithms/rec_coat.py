@@ -4,6 +4,7 @@ from surprise import accuracy
 from surprise import MFREC
 
 from os import path
+from sys import stdout
 
 import config
 
@@ -18,6 +19,7 @@ biased_opt = [True,]
 reg_all_opt = [0.02,]
 lr_all_opt = [0.005,]
 
+#### tuning
 n_factors_opt = [16, 32, 64, 128, 256]
 n_epochs_opt = [16, 32, 64, 128, 256]
 biased_opt = [True, False]
@@ -25,7 +27,7 @@ reg_all_opt = [0.005, 0.01, 0.05, 0.1, 0.5]
 lr_all_opt = [0.0005, 0.001, 0.005, 0.01, 0.05]
 
 mae_bst, mse_bst, kwargs_bst = np.inf, np.inf, {}
-st_time = time.time()
+s_time = time.time()
 for n_factors, n_epochs, biased, reg_all, lr_all in itertools.product(
     n_factors_opt, n_epochs_opt, biased_opt, reg_all_opt, lr_all_opt):
   algo_kwargs = {
@@ -34,19 +36,18 @@ for n_factors, n_epochs, biased, reg_all, lr_all in itertools.product(
     'biased': biased,
     'reg_all': reg_all,
     'lr_all': lr_all,
-    # 'verbose': True,
+    'verbose': False,
   }
-
   algo = MFREC(**algo_kwargs)
   algo.fit(trainset)
 
   predictions = algo.test(testset)
-
   eval_kwargs = {'verbose':False}
   mae = accuracy.mae(predictions, **eval_kwargs)
   mse = pow(accuracy.rmse(predictions, **eval_kwargs), 2.0)
   kwargs_str = config.stringify(algo_kwargs)
   print('%.4f %.4f %s' % (mae, mse, kwargs_str))
+  stdout.flush()
 
   if mse < mse_bst:
     mae_bst = min(mae, mae_bst)
@@ -57,7 +58,7 @@ kwargs_bst = config.stringify(kwargs_bst)
 print('%.4f %.4f %s' % (mae_bst, mse_bst, kwargs_bst))
 
 e_time = time.time()
-# print('%.2fs' % (e_time - st_time))
+# print('%.2fs' % (e_time - s_time))
 
 
 

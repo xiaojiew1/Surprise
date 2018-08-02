@@ -72,7 +72,6 @@ if __name__ == '__main__':
   print(sciformat(1000000))
   print(sciformat(10000000000))
 
-  err_kwargs, kwargs_set = read_err_kwargs('rec_coat.p')
   print(kwargs_set)
 
 

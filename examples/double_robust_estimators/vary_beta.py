@@ -63,7 +63,6 @@ def given_beta(alpha, beta, dataset, recom_list, risk):
   print('  n=%.4f p=%.4f s=%.4f d=%.4f' % (n_rmse, p_rmse, s_rmse, d_rmse))
   print('\n' + '#'*n_hashtag + '\n')
 
-  return
   config.make_file_dir(outfile)
   data = {
     'a': alpha,
@@ -84,7 +83,7 @@ recom_list = config.provide_recom(indexes, cmpl_rates)
 
 alpha = f_alpha
 betas = v_beta
-betas = np.flip(v_beta)
+# betas = np.flip(v_beta)
 
 for beta in betas:
   risk = 'mae', np.absolute

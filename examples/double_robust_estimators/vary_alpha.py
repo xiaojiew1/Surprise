@@ -13,6 +13,12 @@ import pickle
 def given_alpha(alpha, dataset, recom_list, risk):
   n_users, n_items, n_rates, indexes, cmpl_rates= dataset
   risk_name, risk = risk
+
+  outfile = path.join(alpha_dir, '%s_%.1f.p' % (risk_name, alpha))
+  if path.isfile(outfile):
+    print('%s exists' % (path.basename(outfile)))
+    return
+
   cmpl_cnt = config.count_index(indexes)
   cmpl_dist = cmpl_cnt / cmpl_cnt.sum()
   k = config.solve_k(alpha, n_users, n_items, n_rates, cmpl_cnt)
@@ -46,9 +52,6 @@ def given_alpha(alpha, dataset, recom_list, risk):
   print('  n=%.4f p=%.4f s=%.4f d=%.4f' % (n_rmse, p_rmse, s_rmse, d_rmse))
   print('\n' + '#'*n_hashtag + '\n')
 
-  outfile = path.join(alpha_dir, '%s_%.1f.p' % (risk_name, alpha))
-  if path.isfile(outfile):
-    print('%s exists' % (path.basename(outfile)))
   config.make_file_dir(outfile)
   data = {
     'a': alpha,

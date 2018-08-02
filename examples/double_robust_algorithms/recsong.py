@@ -63,6 +63,8 @@ if not path.isfile(test_file) or not path.isfile(propensity_file):
   [stdout.write(' %.4f' % p) for p in propensities]
   stdout.write('\n')
 
+exit()
+
 reader = Reader(line_format='user item rating', sep='\t')
 data = Dataset(reader=reader, rating_scale=rating_scale)
 raw_trainset = data.read_ratings(train_file)

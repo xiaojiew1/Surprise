@@ -37,14 +37,14 @@ def read_gsearch(infile):
     for line in fin.readlines():
       fields = line.split()
       mae, mse, kwargs_str = fields[0], fields[1], fields[2]
-      err_kwargs.append((mae, mse, kwargs_str))
+      err_kwargs.append((float(mae), float(mse), kwargs_str))
   kwargs_set = set([t[2] for t in err_kwargs])
   return err_kwargs, kwargs_set
 
 def write_gsearch(err_kwargs, outfile):
   with open(outfile, 'w') as fout:
     for mae, mse, kwargs_str in err_kwargs:
-      fout.write('%s %s %s\n' % (mae, mse, kwargs_str))
+      fout.write('%.16f %.16f %s\n' % (mae, mse, kwargs_str))
 
 tmp_dir = 'tmp'
 dnld_dir = path.expanduser('~/Downloads')

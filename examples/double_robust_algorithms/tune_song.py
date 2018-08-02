@@ -19,7 +19,7 @@ biased_opt = [True,]
 reg_all_opt = [0.02,]
 lr_all_opt = [0.005,]
 
-#### tuning
+#### gsearch
 n_factors_opt = [16, 32, 64, 128, 256]
 n_epochs_opt = [16, 32, 64, 128, 256]
 biased_opt = [True, False]

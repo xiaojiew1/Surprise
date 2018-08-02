@@ -1,6 +1,16 @@
 from decimal import Decimal
 from os import path
 
+import os
+
+def make_dir(dirpath):
+  if not path.exists(dirpath):
+    os.makedirs(dirpath)
+
+def make_file_dir(filepath):
+  dirpath = path.dirname(filepath)
+  make_dir(dirpath)
+
 def sciformat(v):
   v = '%e' % Decimal(v)
   s_index = v.rfind('e')
@@ -18,7 +28,8 @@ def stringify(kwargs):
   for i in range(len(keys)):
     k = keys[i]
     v = kwargs[k]
-    kwargs_str += k.upper() + '_'
+    kwargs_str += k.upper().replace(separator, concatenator)
+    kwargs_str += separator
     if type(v) == bool:
       kwargs_str += str(v).lower()
     elif type(v) == float:
@@ -28,26 +39,54 @@ def stringify(kwargs):
     else:
       raise Exception('unknown format %s' % type(v))
     if i < len(keys) - 1:
-      kwargs_str += '_'
+      kwargs_str += separator
   return kwargs_str
+
+def dictify(kwargs_str):
+  kwargs = {}
+  fields = kwargs_str.split(separator)
+  for i in range(0, len(fields), 2):
+    k = fields[i].lower().replace(concatenator, separator)
+    v = fields[i+1]
+    if k == 'n_factors':
+      v = int(v)
+    elif k == 'n_epochs':
+      v = int(v)
+    elif k == 'biased':
+      v == bool(v)
+    elif k == 'reg_all':
+      v = float(v)
+    elif k == 'lr_all':
+      v = float(v)
+    else:
+      raise Exception('unknown key %s' % k)
+    kwargs[k] = v
+  return kwargs
 
 def read_gsearch(infile):
   err_kwargs =  []
-  with open(infile) as fin:
-    for line in fin.readlines():
-      fields = line.split()
-      mae, mse, kwargs_str = fields[0], fields[1], fields[2]
-      err_kwargs.append((float(mae), float(mse), kwargs_str))
+  if path.isfile(infile):
+    with open(infile) as fin:
+      for line in fin.readlines():
+        fields = line.split()
+        mae, mse, kwargs_str = fields[0], fields[1], fields[2]
+        err_kwargs.append((float(mae), float(mse), kwargs_str))
   kwargs_set = set([t[2] for t in err_kwargs])
   return err_kwargs, kwargs_set
 
 def write_gsearch(err_kwargs, outfile):
+  make_file_dir(outfile)
   with open(outfile, 'w') as fout:
     for mae, mse, kwargs_str in err_kwargs:
       fout.write('%.16f %.16f %s\n' % (mae, mse, kwargs_str))
 
 tmp_dir = 'tmp'
 dnld_dir = path.expanduser('~/Downloads')
+data_dir = 'data'
+rec_coat_file = path.join(data_dir, 'rec_coat.p')
+
+separator = '_'
+concatenator = '-'
 
 if __name__ == '__main__':
   print(sciformat(7.123456))

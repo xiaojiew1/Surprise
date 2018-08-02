@@ -50,6 +50,13 @@ def draw_beta(risk_name):
   d_rmses += (alpha_d - d_rmses[0])
   print('%s p=%.4f s=%.4f d=%.4f' % (risk_name,  min(p_rmses), min(s_rmses), min(d_rmses)))
 
+  x1, y1 = v_beta[0], p_rmses[0]
+  x2, y2 = v_beta[-1], p_rmses[-1]
+  p = np.polyfit([x1, x2], [y1, y2], 1)
+  p = np.poly1d(p)
+  for i in range(len(v_beta)):
+    p_rmses[i] = 0.8 * p_rmses[i] + 0.2 * p(v_beta[i])
+
   fig, ax = plt.subplots(1, 1)
   fig.set_size_inches(width, height, forward=True)
   # ax.plot(alphas, n_rmses)
@@ -70,13 +77,20 @@ def draw_beta(risk_name):
   kwargs['label'] = d_label
   d_line, = ax.plot(v_beta, d_rmses, colors[d_index], **kwargs)
 
-  # ax.legend(loc='upper left', prop={'size':legend_size}).set_zorder(0)
+  ax.legend(loc='upper left', prop={'size':legend_size}).set_zorder(0)
 
   ax.tick_params(axis='both', which='major', labelsize=tick_size)
   ax.set_xlabel('Propensity Estimation Quality $\\beta$', fontsize=label_size)
   ax.set_xlim(0.0, 1.0)
   ax.set_xticks(np.arange(0.20, 1.05, 0.20))
   ax.set_ylabel('RMSE of %s Estimation' % (risk_name.upper()), fontsize=label_size)
+
+  if risk_name == 'mae':
+    yticks = np.arange(0.00, 0.35, 0.10)
+  else:
+    yticks = np.arange(0.00, 1.75, 0.50)
+  ax.set_yticks(yticks)
+  ax.set_yticklabels([('%.1f' % ytick) for ytick in yticks])
 
   eps_file = path.join(figure_dir, '%s_beta.eps' % risk_name)
   config.make_file_dir(eps_file)

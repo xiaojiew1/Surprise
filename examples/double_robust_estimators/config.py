@@ -352,7 +352,7 @@ mse_v_omega = np.arange(0.00, 4.85, 0.10)
 # import matplotlib as mpl
 # print(mpl.rcParams['figure.figsize'])
 width, height = 6.4, 4.8
-legend_size = 24
+legend_size = 26
 label_size = 20
 line_width = 2.0
 marker_size = 20

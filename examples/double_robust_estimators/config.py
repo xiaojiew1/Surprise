@@ -156,7 +156,8 @@ def d(cmpl_rates, pred_rates, train_obs, propensities, omega, risk):
   # pred_errors = omega * np.mean(true_errors) * np.ones_like(true_errors)
   #### mean rate
   pred_errors = risk(pred_rates - np.mean(cmpl_rates))
-  # omega = true_errors.sum() / risk(pred_rates - np.mean(cmpl_rates)).sum()
+  #### pred omega
+  omega = true_errors.sum() / risk(pred_rates - np.mean(cmpl_rates)).sum()
   pred_errors *= omega
 
   pred_errors = np.multiply(propensities-train_obs, pred_errors)
@@ -324,16 +325,38 @@ def cmpt_bias(alpha, dataset, recom_list, risk):
       else:
         print('rerun %s %s' % (risk_name, recom_name))
 
-min_rate = 1
-max_rate = 5
-n_trials = 50
-n_hashtag = 64
-f_alpha = 0.50
 data_dir = 'data'
 song_file = path.join(data_dir, 'song.txt')
 alpha_dir = path.join(data_dir, 'alpha')
 omega_dir = path.join(data_dir, 'omega')
 beta_dir = path.join(data_dir, 'beta')
+figure_dir = path.join(data_dir, 'figure')
+
+min_rate = 1
+max_rate = 5
+n_trials = 50
+n_hashtag = 64
+f_alpha = 0.50
+mae_offset, mse_offset = 0.0005, 0.0020
+v_alpha = np.arange(0.10, 1.05, 0.10)
+v_beta = np.arange(0.00, 1.05, 0.10)
+mae_v_omega = np.arange(0.00, 3.25, 0.10)
+mse_v_omega = np.arange(0.00, 4.85, 0.10)
+
+#### draw
+# import matplotlib as mpl
+# print(mpl.rcParams['figure.figsize'])
+width, height = 6.4, 4.8
+legend_size = 24
+label_size = 20
+line_width = 2.0
+marker_size = 20
+tick_size = 18
+pad_inches = 0.10
+markers = [(4, 2, 45), (6, 2, 0), (8, 2, 22.5)]
+colors = ['r', 'g', 'b']
+p_index, s_index, d_index = 0, 1, 2
+p_label, s_label, d_label = 'IPS', 'SNIPS', 'DR'
 
 if __name__ == '__main__':
   n_users, n_items, n_rates, indexes = read_data(song_file)

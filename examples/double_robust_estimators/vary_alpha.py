@@ -1,5 +1,5 @@
 from config import song_file, alpha_dir
-from config import n_hashtag
+from config import n_hashtag, v_alpha
 
 from os import path
 from sys import stdout
@@ -69,7 +69,7 @@ cmpl_rates = config.complete_rate(indexes)
 dataset = n_users, n_items, n_rates, indexes, cmpl_rates
 recom_list = config.provide_recom(indexes, cmpl_rates)
 
-alphas = np.arange(0.10, 1.05, 0.10)
+alphas = v_alpha
 
 print('\n' + '#'*n_hashtag + '\n')
 for alpha in alphas:

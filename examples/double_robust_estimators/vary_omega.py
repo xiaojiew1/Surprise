@@ -1,5 +1,5 @@
 from config import song_file, omega_dir
-from config import f_alpha, n_hashtag
+from config import n_hashtag, f_alpha, mae_v_omega, mse_v_omega
 
 from os import path
 from sys import stdout
@@ -67,11 +67,11 @@ recom_list = config.provide_recom(indexes, cmpl_rates)
 alpha = f_alpha
 
 risk = 'mae', np.absolute
-omegas = np.arange(0.00, 3.25, 0.10)
+omegas = mae_v_omega
 # omegas = np.arange(0.00, 0.25, 0.10)
 vary_omega(alpha, omegas, dataset, recom_list, risk)
 risk = 'mse', np.square
-omegas = np.arange(0.00, 4.85, 0.10)
+omegas = mse_v_omega
 # omegas = np.arange(0.00, 0.25, 0.10)
 vary_omega(alpha, omegas, dataset, recom_list, risk)
 

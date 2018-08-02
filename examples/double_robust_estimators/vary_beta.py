@@ -1,5 +1,5 @@
 from config import song_file, beta_dir
-from config import f_alpha, n_hashtag
+from config import n_hashtag, f_alpha, v_beta
 
 from os import path
 from sys import stdout
@@ -17,7 +17,7 @@ def given_beta(alpha, beta, dataset, recom_list, risk):
   outfile = path.join(beta_dir, '%s_%.1f.p' % (risk_name, beta))
   if path.isfile(outfile):
     print('%s exists' % (path.basename(outfile)))
-    return
+    # return
 
   cmpl_cnt = config.count_index(indexes)
   cmpl_dist = cmpl_cnt / cmpl_cnt.sum()
@@ -84,8 +84,8 @@ dataset = n_users, n_items, n_rates, indexes, cmpl_rates
 recom_list = config.provide_recom(indexes, cmpl_rates)
 
 alpha = f_alpha
-betas = np.arange(0.00, 1.05, 0.10)
-betas = np.arange(1.00, -0.05, -0.10)
+betas = v_beta
+betas = np.flip(v_beta)
 
 for beta in betas:
   risk = 'mae', np.absolute
@@ -93,5 +93,6 @@ for beta in betas:
   risk = 'mse', np.square
   given_beta(alpha, beta, dataset, recom_list, risk)
   stdout.flush()
+  break
 
 

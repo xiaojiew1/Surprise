@@ -87,7 +87,7 @@ recom_list = config.provide_recom(indexes, cmpl_rates)
 
 alpha = f_alpha
 betas = v_beta
-# betas = np.flip(v_beta)
+betas = np.flip(v_beta)
 
 for beta in betas:
   risk = 'mae', np.absolute

@@ -196,8 +196,10 @@ def eval_wo_omega(recom, dataset, cmpl_props, risk, beta=0.0):
     train_obs = sample_train(cmpl_props)
 
     even_props = (train_obs.sum() / t_rates) * np.ones(t_rates)
-    # propensities = beta * even_props + (1.0 - beta) * cmpl_props
-    propensities = 1.0 / (beta / even_props + (1.0 - beta) / cmpl_props)
+    propensities = beta * even_props + (1.0 - beta) * cmpl_props
+    propensities *= sum(train_obs / propensities) / (n_users * n_items)
+    # print(sum(train_obs / propensities), n_users * n_items)
+    # propensities = 1.0 / (beta / even_props + (1.0 - beta) / cmpl_props)
 
     n_risk = estimate_n(cmpl_rates, pred_rates, train_obs, risk)
     n_risks[trial] = n_risk

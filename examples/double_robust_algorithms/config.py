@@ -31,7 +31,7 @@ def stringify(kwargs):
       kwargs_str += '_'
   return kwargs_str
 
-def read_err_kwargs(infile):
+def read_gsearch(infile):
   err_kwargs =  []
   with open(infile) as fin:
     for line in fin.readlines():
@@ -40,6 +40,12 @@ def read_err_kwargs(infile):
       err_kwargs.append((mae, mse, kwargs_str))
   kwargs_set = set([t[2] for t in err_kwargs])
   return err_kwargs, kwargs_set
+
+def write_gsearch(err_kwargs, outfile):
+  with open(outfile, 'w') as fout:
+    for mae, mse, kwargs_str in err_kwargs:
+      fout.write('%s %s %s\n' % (mae, mse, kwargs_str))
+
 
 tmp_dir = 'tmp'
 dnld_dir = path.expanduser('~/Downloads')

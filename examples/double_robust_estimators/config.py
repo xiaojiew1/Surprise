@@ -147,21 +147,22 @@ def estimate_s(cmpl_rates, pred_rates, train_obs, propensities, risk):
 
 def d(cmpl_rates, pred_rates, train_obs, propensities, omega, risk):
   true_errors = risk(pred_rates - cmpl_rates)
-  true_errors = np.multiply(train_obs, true_errors)
-  true_errors = np.divide(true_errors, propensities)
 
   #### true error
-  pred_errors = true_errors
+  # pred_errors = true_errors
   #### mean error
-  # pred_errors = np.mean(true_errors) * np.ones_like(true_errors)
+  pred_errors = np.mean(true_errors) * np.ones_like(true_errors)
   #### mean rate
   # pred_errors = risk(pred_rates - np.mean(cmpl_rates))
   #### pred omega
   # omega = true_errors.sum() / risk(pred_rates - np.mean(cmpl_rates)).sum()
-  # pred_errors *= omega
-
+  pred_errors *= omega
   pred_errors = np.multiply(propensities-train_obs, pred_errors)
   pred_errors = np.divide(pred_errors, propensities)
+
+  true_errors = np.multiply(train_obs, true_errors)
+  true_errors = np.divide(true_errors, propensities)
+
   tot_errors = true_errors + pred_errors
   return tot_errors
 

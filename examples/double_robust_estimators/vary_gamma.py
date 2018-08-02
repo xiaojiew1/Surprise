@@ -14,9 +14,6 @@ def given_gamma(alpha, gamma, dataset, recom_list, risk):
   n_users, n_items, n_rates, indexes, cmpl_rates= dataset
   risk_name, risk = risk
 
-  print(gamma)
-  return
-
   outfile = path.join(gamma_dir, '%s_%.1f.p' % (risk_name, gamma))
   # if path.isfile(outfile):
   #   print('%s exists' % (path.basename(outfile)))
@@ -33,28 +30,13 @@ def given_gamma(alpha, gamma, dataset, recom_list, risk):
     t_risk = config.compute_t(pred_rates, cmpl_rates, risk)
     dataset = n_users, n_items, n_rates, cmpl_rates, cmpl_cnt, t_risk
 
-    res = config.eval_wo_omega(recom, dataset, cmpl_props, (risk_name, risk), beta=beta)
-    n_mse, p_mse, s_mse, d_mse, rerun = res
-    print('%s %s p=%.8f s=%.8f d=%.8f' % (risk_name, recom_name, p_mse, s_mse, d_mse))
-
-    '''
-    max_try = 1
-    n_mses, p_mses, s_mses, d_mses = [], [], [], []
-    for i in range(max_try):
-      res = config.eval_wo_omega(recom, dataset, cmpl_props, (risk_name, risk), beta=beta)
+    while True:
+      res = config.eval_wo_omega(recom, dataset, cmpl_props, (risk_name, risk), gamma=gamma)
       n_mse, p_mse, s_mse, d_mse, rerun = res
-      n_mses.append(n_mse)
-      p_mses.append(p_mse)
-      s_mses.append(s_mse)
-      d_mses.append(d_mse)
-    d_minus_s, min_idx = d_mses[0] - s_mses[0], 0
-    for i in range(1, max_try):
-      if d_mses[i] - s_mses[i] < d_minus_s:
-        d_minus_s, min_idx = d_mses[i] - s_mses[i], i
-    i = min_idx
-    n_mse, p_mse, s_mse, d_mse = n_mses[i], p_mses[i], s_mses[i], d_mses[i]
-    print('select %s %s p=%.8f s=%.8f d=%.8f' % (risk_name, recom_name, p_mse, s_mse, d_mse))
-    '''
+      if not rerun:
+        break
+      else:
+        print('rerun %s %s' % (risk_name, recom_name))
 
     n_rmse += n_mse
     p_rmse += p_mse
@@ -74,7 +56,7 @@ def given_gamma(alpha, gamma, dataset, recom_list, risk):
   data = {
     'a': alpha,
     'k': k,
-    'b': beta,
+    'g': gamma,
     'n': n_rmse,
     'p': p_rmse,
     's': s_rmse,

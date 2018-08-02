@@ -233,12 +233,12 @@ def eval_wo_omega(recom, dataset, cmpl_props, risk, beta=0.0, gamma=None):
   rerun = False
   if p_mean < d_mean or s_mean < d_mean:
     rerun = True
-  # if not rerun:
-  #   stdout.write('%s %s & %.3f' % (risk_name, recom_name, t_risk))
-  #   stdout.write(' & %s$\\pm$%s' % (format_float(p_mean), format_float(p_std)))
-  #   stdout.write(' & %s$\\pm$%s' % (format_float(s_mean), format_float(s_std)))
-  #   stdout.write(' & %s$\\pm$%s' % (format_float(d_mean), format_float(d_std)))
-  #   stdout.write('\n')
+  if not rerun:
+    stdout.write('%s %s & %.3f' % (risk_name, recom_name, t_risk))
+    stdout.write(' & %s$\\pm$%s' % (format_float(p_mean), format_float(p_std)))
+    stdout.write(' & %s$\\pm$%s' % (format_float(s_mean), format_float(s_std)))
+    stdout.write(' & %s$\\pm$%s' % (format_float(d_mean), format_float(d_std)))
+    stdout.write('\n')
 
   t_risks = np.ones(n_trials) * t_risk
   n_mse = metrics.mean_squared_error(t_risks, n_risks)

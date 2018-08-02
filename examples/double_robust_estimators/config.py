@@ -169,8 +169,8 @@ def d(cmpl_rates, pred_rates, train_obs, propensities, omega, risk, gamma=None):
   tot_errors = true_errors + pred_errors
   return tot_errors
 
-def estimate_d(cmpl_rates, pred_rates, train_obs, propensities, omega, risk):
-  tot_errors = d(cmpl_rates, pred_rates, train_obs, propensities, omega, risk)
+def estimate_d(cmpl_rates, pred_rates, train_obs, propensities, omega, risk, gamma=gamma):
+  tot_errors = d(cmpl_rates, pred_rates, train_obs, propensities, omega, risk, gamma=gamma)
   return tot_errors.sum() / len(cmpl_rates)
 
 def format_float(f):
@@ -217,7 +217,7 @@ def eval_wo_omega(recom, dataset, cmpl_props, risk, beta=0.0, gamma=None):
     s_risk = estimate_s(cmpl_rates, pred_rates, train_obs, propensities, risk)
     s_risks[trial] = s_risk
 
-    d_risk = estimate_d(cmpl_rates, pred_rates, train_obs, propensities, omega, risk)
+    d_risk = estimate_d(cmpl_rates, pred_rates, train_obs, propensities, omega, risk, gamma=gamma)
     d_risks[trial] = d_risk
   n_mean = abs(np.mean(n_risks) - t_risk)
   n_std = np.std(n_risks)

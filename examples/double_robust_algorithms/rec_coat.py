@@ -10,6 +10,7 @@ import config
 
 import itertools
 import numpy as np
+import operator
 import time
 
 #### default
@@ -40,11 +41,8 @@ for n_factors, n_epochs, biased, reg_all, lr_all in itertools.product(
     'lr_all': lr_all,
   }
   kwargs_str = config.stringify(algo_kwargs)
-  print(kwargs_str)
-  print(kwargs_str in kwargs_set)
   if kwargs_str in kwargs_set:
     continue
-  exit()
 
   algo = MFREC(**algo_kwargs)
   algo.fit(trainset)
@@ -53,12 +51,14 @@ for n_factors, n_epochs, biased, reg_all, lr_all in itertools.product(
   eval_kwargs = {'verbose':False}
   mae = accuracy.mae(predictions, **eval_kwargs)
   mse = pow(accuracy.rmse(predictions, **eval_kwargs), 2.0)
-  print('%.4f %.4f %s' % (mae, mse, kwargs_str))
-  stdout.flush()
+  # print('%.4f %.4f %s' % (mae, mse, kwargs_str))
+  # stdout.flush()
+  err_kwargs.append((mae, mse, kwargs_str))
 
 e_time = time.time()
-# print('%.2fs' % (e_time - s_time))
-
+print('%.2fs' % (e_time - s_time))
+err_kwargs = sorted(err_kwargs, key=operator.itemgetter(2))
+config.write_gsearch(err_kwargs, gsearch_file)
 
 
 

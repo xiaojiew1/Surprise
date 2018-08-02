@@ -169,7 +169,7 @@ def d(cmpl_rates, pred_rates, train_obs, propensities, omega, risk, gamma=None):
   tot_errors = true_errors + pred_errors
   return tot_errors
 
-def estimate_d(cmpl_rates, pred_rates, train_obs, propensities, omega, risk, gamma=gamma):
+def estimate_d(cmpl_rates, pred_rates, train_obs, propensities, omega, risk, gamma=None):
   tot_errors = d(cmpl_rates, pred_rates, train_obs, propensities, omega, risk, gamma=gamma)
   return tot_errors.sum() / len(cmpl_rates)
 

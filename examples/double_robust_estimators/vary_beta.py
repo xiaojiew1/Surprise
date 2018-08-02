@@ -30,17 +30,20 @@ def given_beta(alpha, beta, dataset, recom_list, risk):
     t_risk = config.compute_t(pred_rates, cmpl_rates, risk)
     dataset = n_users, n_items, n_rates, cmpl_rates, cmpl_cnt, t_risk
 
+    res = config.eval_wo_omega(recom, dataset, cmpl_props, (risk_name, risk), beta=beta)
+    n_mse, p_mse, s_mse, d_mse, rerun = res
+    print('%s %s p=%.8f s=%.8f d=%.8f' % (risk_name, recom_name, p_mse, s_mse, d_mse))
+
+    '''
     max_try = 1
     n_mses, p_mses, s_mses, d_mses = [], [], [], []
     for i in range(max_try):
       res = config.eval_wo_omega(recom, dataset, cmpl_props, (risk_name, risk), beta=beta)
       n_mse, p_mse, s_mse, d_mse, rerun = res
-      # print('rerun%d %s %s p=%.8f s=%.8f d=%.8f' % (i+1, risk_name, recom_name, p_mse, s_mse, d_mse))
       n_mses.append(n_mse)
       p_mses.append(p_mse)
       s_mses.append(s_mse)
       d_mses.append(d_mse)
-
     d_minus_s, min_idx = d_mses[0] - s_mses[0], 0
     for i in range(1, max_try):
       if d_mses[i] - s_mses[i] < d_minus_s:
@@ -48,6 +51,7 @@ def given_beta(alpha, beta, dataset, recom_list, risk):
     i = min_idx
     n_mse, p_mse, s_mse, d_mse = n_mses[i], p_mses[i], s_mses[i], d_mses[i]
     print('select %s %s p=%.8f s=%.8f d=%.8f' % (risk_name, recom_name, p_mse, s_mse, d_mse))
+    '''
 
     n_rmse += n_mse
     p_rmse += p_mse

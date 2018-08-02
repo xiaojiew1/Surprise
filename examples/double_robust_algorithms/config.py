@@ -1,4 +1,5 @@
 from decimal import Decimal
+from os import path
 
 def sciformat(v):
   v = '%e' % Decimal(v)
@@ -31,6 +32,7 @@ def stringify(kwargs):
   return kwargs_str
 
 tmp_dir = 'tmp'
+dnld_dir = path.expanduser('~/Downloads')
 
 if __name__ == '__main__':
   print(sciformat(7.123456))

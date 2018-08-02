@@ -21,7 +21,7 @@ The available prediction algorithms are:
 """
 
 #### xiaojie
-from .matrix_factorization import MFDR
+from .matrix_factorization import MFREC
 from .matrix_factorization import MFIPS
 
 from .algo_base import AlgoBase

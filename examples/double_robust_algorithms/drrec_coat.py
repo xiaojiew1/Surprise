@@ -101,7 +101,7 @@ for n_factors, n_epochs, biased, reg_all, var_all in itertools.product(
     'n_epochs': n_epochs,
     'biased': biased,
     'reg_all': reg_all,
-    'var_all': var_all,
+    # 'var_all': var_all,
     # 'verbose': True,
   }
   kwargs_str = config.stringify(algo_kwargs)
@@ -111,8 +111,11 @@ for n_factors, n_epochs, biased, reg_all, var_all in itertools.product(
     'outfile': outfile,
   }
 
-  algo = MFIPS(**algo_kwargs)
-  algo.fit(trainset, weights, **fit_kwargs)
+  # algo = MFIPS(**algo_kwargs)
+  # algo.fit(trainset, weights, **fit_kwargs)
+  algo = MFDR(**algo_kwargs)
+  algo.fit(trainset)
+
   predictions = algo.test(testset)
 
   eval_kwargs = {'verbose':False}

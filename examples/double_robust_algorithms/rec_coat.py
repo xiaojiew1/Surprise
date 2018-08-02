@@ -51,7 +51,7 @@ for n_factors, n_epochs, biased, reg_all, lr_all in itertools.product(
   eval_kwargs = {'verbose':False}
   mae = accuracy.mae(predictions, **eval_kwargs)
   mse = pow(accuracy.rmse(predictions, **eval_kwargs), 2.0)
-  # print('%.4f %.4f %s' % (mae, mse, kwargs_str))
+  print('%.4f %.4f %s' % (mae, mse, kwargs_str))
   # stdout.flush()
   err_kwargs.append((mae, mse, kwargs_str))
 

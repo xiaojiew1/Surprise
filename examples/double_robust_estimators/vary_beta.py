@@ -15,9 +15,9 @@ def given_beta(alpha, beta, dataset, recom_list, risk):
   risk_name, risk = risk
 
   outfile = path.join(beta_dir, '%s_%.1f.p' % (risk_name, beta))
-  if path.isfile(outfile):
-    print('%s exists' % (path.basename(outfile)))
-    # return
+  # if path.isfile(outfile):
+  #   print('%s exists' % (path.basename(outfile)))
+  #   return
 
   cmpl_cnt = config.count_index(indexes)
   cmpl_dist = cmpl_cnt / cmpl_cnt.sum()

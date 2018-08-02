@@ -156,8 +156,7 @@ def d(cmpl_rates, pred_rates, train_obs, propensities, omega, risk):
   # pred_errors = omega * np.mean(true_errors) * np.ones_like(true_errors)
   #### mean rate
   pred_errors = risk(pred_rates - np.mean(cmpl_rates))
-  #### pred omega
-  omega = true_errors.sum() / risk(pred_rates - np.mean(cmpl_rates)).sum()
+  # omega = true_errors.sum() / risk(pred_rates - np.mean(cmpl_rates)).sum()
   pred_errors *= omega
 
   pred_errors = np.multiply(propensities-train_obs, pred_errors)
@@ -193,8 +192,10 @@ def eval_wo_omega(recom, dataset, cmpl_props, risk, beta=0.0):
   omega = risk(pred_rates-cmpl_rates).sum() / risk(pred_rates-cmpl_mean).sum()
   for trial in range(n_trials):
     train_obs = sample_train(cmpl_props)
-    propensities = (beta * train_obs.sum() / t_rates) * np.ones(t_rates)
-    propensities += (1 - beta) * np.copy(cmpl_props)
+
+    even_props = (train_obs.sum() / t_rates) * np.ones(t_rates)
+    # propensities = beta * even_props + (1.0 - beta) * cmpl_props
+    propensities = 1.0 / (beta / even_props + (1.0 - beta) / cmpl_props)
 
     n_risk = estimate_n(cmpl_rates, pred_rates, train_obs, risk)
     n_risks[trial] = n_risk
@@ -221,12 +222,12 @@ def eval_wo_omega(recom, dataset, cmpl_props, risk, beta=0.0):
   rerun = False
   if p_mean < d_mean or s_mean < d_mean:
     rerun = True
-  if not rerun:
-    stdout.write('%s %s & %.3f' % (risk_name, recom_name, t_risk))
-    stdout.write(' & %s$\\pm$%s' % (format_float(p_mean), format_float(p_std)))
-    stdout.write(' & %s$\\pm$%s' % (format_float(s_mean), format_float(s_std)))
-    stdout.write(' & %s$\\pm$%s' % (format_float(d_mean), format_float(d_std)))
-    stdout.write('\n')
+  # if not rerun:
+  #   stdout.write('%s %s & %.3f' % (risk_name, recom_name, t_risk))
+  #   stdout.write(' & %s$\\pm$%s' % (format_float(p_mean), format_float(p_std)))
+  #   stdout.write(' & %s$\\pm$%s' % (format_float(s_mean), format_float(s_std)))
+  #   stdout.write(' & %s$\\pm$%s' % (format_float(d_mean), format_float(d_std)))
+  #   stdout.write('\n')
 
   t_risks = np.ones(n_trials) * t_risk
   n_mse = metrics.mean_squared_error(t_risks, n_risks)

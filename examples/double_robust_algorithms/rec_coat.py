@@ -57,7 +57,7 @@ for n_factors, n_epochs, biased, reg_all, lr_all in itertools.product(
 
 e_time = time.time()
 print('%.2fs' % (e_time - s_time))
-err_kwargs = sorted(err_kwargs, key=operator.itemgetter(2))
+err_kwargs = sorted(err_kwargs, key=operator.itemgetter(1,0))
 config.write_gsearch(err_kwargs, gsearch_file)
 
 

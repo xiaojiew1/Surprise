@@ -63,7 +63,15 @@ if not path.isfile(test_file) or not path.isfile(propensity_file):
   [stdout.write(' %.4f' % p) for p in propensities]
   stdout.write('\n')
 
-exit()
+with open(propensity_file) as fin:
+  line = fin.readline()
+  propensities = np.asarray([float(f) for f in line.split()])
+propensities /= propensities.sum()
+[stdout.write('%.4f ' % p) for p in propensities]
+stdout.write('\n')
+weights = 1.0 / propensities
+[stdout.write('%.4f ' % w) for w in weights]
+stdout.write('\n')
 
 reader = Reader(line_format='user item rating', sep='\t')
 data = Dataset(reader=reader, rating_scale=rating_scale)

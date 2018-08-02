@@ -10,6 +10,7 @@ from __future__ import (absolute_import, division, print_function,
 from .. import accuracy
 from libc.math cimport sqrt
 from os import path
+from sys import stdout
 
 import os
 
@@ -46,13 +47,13 @@ class MFDR(AlgoBase):
 
     AlgoBase.__init__(self)
 
-  def fit(self, trainset):
+  def fit(self, trainset, weights):
     AlgoBase.fit(self, trainset)
-    self.sgd(trainset)
+    self.sgd(trainset, weights)
 
     return self
 
-  def sgd(self, trainset):
+  def sgd(self, trainset, weights):
     # user biases
     cdef np.ndarray[np.double_t] bu
     # item biases
@@ -87,6 +88,9 @@ class MFDR(AlgoBase):
 
     if not self.biased:
       global_mean = 0
+
+    [stdout.write('%.4f ' % w) for w in weights]
+    stdout.write('\n')
 
     for current_epoch in range(self.n_epochs):
       if self.verbose:

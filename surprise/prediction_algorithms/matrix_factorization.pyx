@@ -64,7 +64,7 @@ class MFDR(AlgoBase):
     cdef np.ndarray[np.double_t, ndim=2] qi
 
     cdef int u, i, f
-    cdef double r, err, dot, puf, qif
+    cdef double r, err, grad, dot, puf, qif
     cdef double global_mean = self.trainset.global_mean
 
     cdef double lr_bu = self.lr_bu
@@ -89,8 +89,8 @@ class MFDR(AlgoBase):
     if not self.biased:
       global_mean = 0
 
-    [stdout.write('%.4f ' % w) for w in weights]
-    stdout.write('\n')
+    # [stdout.write('%.4f ' % w) for w in weights]
+    # stdout.write('\n')
 
     for current_epoch in range(self.n_epochs):
       if self.verbose:
@@ -103,17 +103,21 @@ class MFDR(AlgoBase):
           dot += qi[i, f] * pu[u, f]
         err = r - (global_mean + bu[u] + bi[i] + dot)
 
+        print(r)
+        grad = err
+        # grad = weights[int(r)-1] * err
+
         # update biases
         if self.biased:
-          bu[u] += lr_bu * (err - reg_bu * bu[u])
-          bi[i] += lr_bi * (err - reg_bi * bi[i])
+          bu[u] += lr_bu * (grad - reg_bu * bu[u])
+          bi[i] += lr_bi * (grad - reg_bi * bi[i])
 
         # update factors
         for f in range(self.n_factors):
           puf = pu[u, f]
           qif = qi[i, f]
-          pu[u, f] += lr_pu * (err * qif - reg_pu * puf)
-          qi[i, f] += lr_qi * (err * puf - reg_qi * qif)
+          pu[u, f] += lr_pu * (grad * qif - reg_pu * puf)
+          qi[i, f] += lr_qi * (grad * puf - reg_qi * qif)
 
     self.bu = bu
     self.bi = bi
@@ -194,7 +198,7 @@ class MFIPS(AlgoBase):
     cdef np.ndarray[np.double_t] mses
 
     cdef int u, i, f
-    cdef double r, err, dot, grad, puf, qif
+    cdef double r, err, grad, dot, puf, qif
     cdef double loss_m, loss_d, grad_c, grad_f, grad_s
 
     cdef double global_mean = self.trainset.global_mean

@@ -103,9 +103,8 @@ class MFDR(AlgoBase):
           dot += qi[i, f] * pu[u, f]
         err = r - (global_mean + bu[u] + bi[i] + dot)
 
-        print(r)
-        grad = err
-        # grad = weights[int(r)-1] * err
+        # grad = err
+        grad = weights[int(r)-1] * err
 
         # update biases
         if self.biased:

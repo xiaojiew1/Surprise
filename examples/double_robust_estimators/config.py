@@ -145,18 +145,21 @@ def estimate_s(cmpl_rates, pred_rates, train_obs, propensities, risk):
   normalizer = np.multiply(1.0 / propensities, train_obs).sum()
   return true_errors.sum() / normalizer
 
-def d(cmpl_rates, pred_rates, train_obs, propensities, omega, risk):
+def d(cmpl_rates, pred_rates, train_obs, propensities, omega, risk, gamma=None):
   true_errors = risk(pred_rates - cmpl_rates)
 
-  #### true error
+  #### true error for beta
   pred_errors = 0.666 * np.copy(true_errors)
   #### mean error
   # pred_errors = np.mean(true_errors) * np.ones_like(true_errors)
-  #### mean rate
-  # pred_errors = risk(pred_rates - np.mean(cmpl_rates))
   #### pred omega
   # omega = true_errors.sum() / risk(pred_rates - np.mean(cmpl_rates)).sum()
-  # pred_errors = omega * pred_errors
+  #### mean rate for alpha, gamma, omega
+  if gamma == None:
+    pred_errors = risk(pred_rates - np.mean(cmpl_rates))
+  else:
+    pred_errors = risk(pred_rates - gamma)
+  pred_errors = omega * pred_errors
   pred_errors = np.multiply(propensities-train_obs, pred_errors)
   pred_errors = np.divide(pred_errors, propensities)
 
@@ -178,7 +181,7 @@ def format_float(f):
     f = ('%.3f' % f)
   return f
 
-def eval_wo_omega(recom, dataset, cmpl_props, risk, beta=0.0):
+def eval_wo_omega(recom, dataset, cmpl_props, risk, beta=0.0, gamma=None):
   recom_name, pred_rates = recom
   n_users, n_items, n_rates, cmpl_rates, cmpl_cnt, t_risk = dataset
   risk_name, risk = risk
@@ -190,8 +193,12 @@ def eval_wo_omega(recom, dataset, cmpl_props, risk, beta=0.0):
   s_risks = np.zeros(n_trials)
   d_risks = np.zeros(n_trials)
 
-  cmpl_mean = np.mean(cmpl_rates)
-  omega = risk(pred_rates-cmpl_rates).sum() / risk(pred_rates-cmpl_mean).sum()
+  omega = risk(pred_rates-cmpl_rates).sum()
+  if gamma == None:
+    cmpl_mean = np.mean(cmpl_rates)
+    omega /= risk(pred_rates-cmpl_mean).sum()
+  else:
+    omega /= risk(pred_rates-gamma).sum()
   for trial in range(n_trials):
     train_obs = sample_train(cmpl_props)
 
@@ -333,8 +340,9 @@ def cmpt_bias(alpha, dataset, recom_list, risk):
 data_dir = 'data'
 song_file = path.join(data_dir, 'song.txt')
 alpha_dir = path.join(data_dir, 'alpha')
-omega_dir = path.join(data_dir, 'omega')
 beta_dir = path.join(data_dir, 'beta')
+gamma_dir = path.join(data_dir, 'gamma')
+omega_dir = path.join(data_dir, 'omega')
 figure_dir = path.join(data_dir, 'figure')
 
 min_rate = 1
@@ -345,6 +353,7 @@ f_alpha = 0.50
 mae_offset, mse_offset = 0.0005, 0.0020
 v_alpha = np.arange(0.10, 1.05, 0.10)
 v_beta = np.arange(0.00, 1.05, 0.10)
+v_gamma = np.arange(0.00, 6.25, 0.50)
 mae_v_omega = np.arange(0.00, 3.25, 0.10)
 mse_v_omega = np.arange(0.00, 4.85, 0.10)
 

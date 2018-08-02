@@ -48,7 +48,7 @@ def given_gamma(alpha, gamma, dataset, recom_list, risk):
   s_rmse = math.sqrt(s_rmse / n_recoms)
   d_rmse = math.sqrt(d_rmse / n_recoms)
 
-  print('%s alpha=%.1f k=%.4f beta=%.1f' % (risk_name, alpha, k, beta))
+  print('%s alpha=%.1f k=%.4f gamma=%.1f' % (risk_name, alpha, k, gamma))
   print('  n=%.4f p=%.4f s=%.4f d=%.4f' % (n_rmse, p_rmse, s_rmse, d_rmse))
   print('\n' + '#'*n_hashtag + '\n')
 

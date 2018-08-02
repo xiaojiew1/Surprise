@@ -22,12 +22,13 @@ from .algo_base import AlgoBase
 from .predictions import PredictionImpossible
 from ..utils import get_rng
 
+#### xiaojie
 class MFDR(AlgoBase):
-  def __init__(self, n_factors=100, n_epochs=20, biased=True, 
+  def __init__(self, n_factors=100, n_epochs=20, biased=True,
       reg_all=.02, var_all=.001, lr_all=.005,
       init_mean=0, init_std_dev=.1,
-      lr_bu=None, lr_bi=None, lr_pu=None, lr_qi=None,
       reg_bu=None, reg_bi=None, reg_pu=None, reg_qi=None,
+      lr_bu=None, lr_bi=None, lr_pu=None, lr_qi=None,
       random_state=None, verbose=False):
     self.n_factors = n_factors
     self.n_epochs = n_epochs
@@ -47,13 +48,13 @@ class MFDR(AlgoBase):
 
     AlgoBase.__init__(self)
 
-  def fit(self, trainset, weights):
-    AlgoBase.fit(self, trainset)
-    self.sgd(trainset, weights)
+  def fit(self, trainset):
+      AlgoBase.fit(self, trainset)
+      self.sgd(trainset)
 
-    return self
+      return self
 
-  def sgd(self, trainset, weights):
+  def sgd(self, trainset):
     # user biases
     cdef np.ndarray[np.double_t] bu
     # item biases
@@ -64,7 +65,7 @@ class MFDR(AlgoBase):
     cdef np.ndarray[np.double_t, ndim=2] qi
 
     cdef int u, i, f
-    cdef double r, err, grad, dot, puf, qif
+    cdef double r, err, dot, puf, qif
     cdef double global_mean = self.trainset.global_mean
 
     cdef double lr_bu = self.lr_bu
@@ -87,36 +88,30 @@ class MFDR(AlgoBase):
                     (trainset.n_items, self.n_factors))
 
     if not self.biased:
-      global_mean = 0
-
-    # [stdout.write('%.4f ' % w) for w in weights]
-    # stdout.write('\n')
+        global_mean = 0
 
     for current_epoch in range(self.n_epochs):
       if self.verbose:
         print("Processing epoch {}".format(current_epoch))
       for u, i, r in trainset.all_ratings():
 
-        # compute current error
-        dot = 0  # <q_i, p_u>
-        for f in range(self.n_factors):
-          dot += qi[i, f] * pu[u, f]
-        err = r - (global_mean + bu[u] + bi[i] + dot)
+          # compute current error
+          dot = 0  # <q_i, p_u>
+          for f in range(self.n_factors):
+              dot += qi[i, f] * pu[u, f]
+          err = r - (global_mean + bu[u] + bi[i] + dot)
 
-        # grad = err
-        grad = weights[int(r)-1] * err
+          # update biases
+          if self.biased:
+              bu[u] += lr_bu * (err - reg_bu * bu[u])
+              bi[i] += lr_bi * (err - reg_bi * bi[i])
 
-        # update biases
-        if self.biased:
-          bu[u] += lr_bu * (grad - reg_bu * bu[u])
-          bi[i] += lr_bi * (grad - reg_bi * bi[i])
-
-        # update factors
-        for f in range(self.n_factors):
-          puf = pu[u, f]
-          qif = qi[i, f]
-          pu[u, f] += lr_pu * (grad * qif - reg_pu * puf)
-          qi[i, f] += lr_qi * (grad * puf - reg_qi * qif)
+          # update factors
+          for f in range(self.n_factors):
+              puf = pu[u, f]
+              qif = qi[i, f]
+              pu[u, f] += lr_pu * (err * qif - reg_pu * puf)
+              qi[i, f] += lr_qi * (err * puf - reg_qi * qif)
 
     self.bu = bu
     self.bi = bi
@@ -152,8 +147,8 @@ class MFIPS(AlgoBase):
   def __init__(self, n_factors=100, n_epochs=20, biased=True, 
       reg_all=.02, var_all=.001, lr_all=.005,
       init_mean=0, init_std_dev=.1,
-      lr_bu=None, lr_bi=None, lr_pu=None, lr_qi=None,
       reg_bu=None, reg_bi=None, reg_pu=None, reg_qi=None,
+      lr_bu=None, lr_bi=None, lr_pu=None, lr_qi=None,
       random_state=None, verbose=False):
     self.n_factors = n_factors
     self.n_epochs = n_epochs

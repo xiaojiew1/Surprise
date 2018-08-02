@@ -93,12 +93,12 @@ reg_all_opt = [0.01, 0.1]
 lr_all_opt = [0.0001, 0.0005, 0.001, 0.005]
 
 #### develop
-n_factors_opt = [5,]
-n_epochs_opt = [16,]
+n_factors_opt = [50,]
+n_epochs_opt = [2, 4, 8]
 biased_opt = [False,]
 reg_all_opt = [0.005,]
 var_all_opt = [0.0001,]
-lr_all_opt = [0.001,]
+lr_all_opt = [0.001, 0.005,]
 
 mae_bst, mse_bst, kwargs_bst = np.inf, np.inf, None
 st_time = time.time()
@@ -115,7 +115,7 @@ for n_factors, n_epochs, biased, reg_all, lr_all, var_all in itertools.product(
   }
   # algo = SVD(**algo_kwargs)
   algo = MFDR(**algo_kwargs)
-  algo.fit(trainset, weights)
+  algo.fit(trainset)
   predictions = algo.test(testset)
 
   eval_kwargs = {'verbose':False}

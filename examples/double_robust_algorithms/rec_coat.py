@@ -18,11 +18,11 @@ biased_opt = [True,]
 reg_all_opt = [0.02,]
 lr_all_opt = [0.005,]
 
-n_factors_opt = [100,]
-n_epochs_opt = [20,]
+n_factors_opt = [32, 64, 128,]
+n_epochs_opt = [32, 64, 128,]
 biased_opt = [True, False]
-reg_all_opt = [0.02,]
-lr_all_opt = [0.005,]
+reg_all_opt = [0.005, 0.01, 0.05,]
+lr_all_opt = [0.0005, 0.001, 0.005,]
 
 mae_bst, mse_bst, kwargs_bst = np.inf, np.inf, {}
 st_time = time.time()

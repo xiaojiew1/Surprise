@@ -46,7 +46,6 @@ def write_gsearch(err_kwargs, outfile):
     for mae, mse, kwargs_str in err_kwargs:
       fout.write('%s %s %s\n' % (mae, mse, kwargs_str))
 
-
 tmp_dir = 'tmp'
 dnld_dir = path.expanduser('~/Downloads')
 

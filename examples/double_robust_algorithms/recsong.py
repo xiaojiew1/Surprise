@@ -67,11 +67,11 @@ with open(propensity_file) as fin:
   line = fin.readline()
   propensities = np.asarray([float(f) for f in line.split()])
 propensities /= propensities.sum()
-[stdout.write('%.4f ' % p) for p in propensities]
-stdout.write('\n')
+# [stdout.write('%.4f ' % p) for p in propensities]
+# stdout.write('\n')
 weights = 1.0 / propensities
-[stdout.write('%.4f ' % w) for w in weights]
-stdout.write('\n')
+# [stdout.write('%.4f ' % w) for w in weights]
+# stdout.write('\n')
 
 reader = Reader(line_format='user item rating', sep='\t')
 data = Dataset(reader=reader, rating_scale=rating_scale)
@@ -94,10 +94,11 @@ lr_all_opt = [0.0001, 0.0005, 0.001, 0.005]
 
 #### develop
 n_factors_opt = [5,]
-n_epochs_opt = [4,]
+n_epochs_opt = [16,]
 biased_opt = [False,]
 reg_all_opt = [0.005,]
 var_all_opt = [0.0001,]
+lr_all_opt = [0.001,]
 
 mae_bst, mse_bst, kwargs_bst = np.inf, np.inf, None
 st_time = time.time()
@@ -114,7 +115,7 @@ for n_factors, n_epochs, biased, reg_all, lr_all, var_all in itertools.product(
   }
   # algo = SVD(**algo_kwargs)
   algo = MFDR(**algo_kwargs)
-  algo.fit(trainset)
+  algo.fit(trainset, weights)
   predictions = algo.test(testset)
 
   eval_kwargs = {'verbose':False}

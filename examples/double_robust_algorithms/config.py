@@ -88,6 +88,11 @@ def write_gsearch(err_kwargs, outfile):
     for mae, mse, kwargs_str in err_kwargs:
       fout.write('%.16f %.16f %s\n' % (mae, mse, kwargs_str))
 
+def get_p_file(alg_kwargs):
+  kwargs_str = stringify(alg_kwargs)
+  kwargs_file = path.join(curve_dir, 'COAT_%s.p' % kwargs_str)
+  return kwargs_file
+
 tmp_dir = 'tmp'
 dnld_dir = path.expanduser('~/Downloads')
 data_dir = 'data'

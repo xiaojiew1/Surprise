@@ -287,19 +287,13 @@ def eval_wt_gamma(recom, dataset, cmpl_props, risk, gammas):
   for trial in range(n_trials):
     train_obs = sample_train(cmpl_props)
 
-    even_props = (train_obs.sum() / t_rates) * np.ones(t_rates)
-    propensities = beta * even_props + (1.0 - beta) * cmpl_props
-    propensities *= sum(train_obs / propensities) / (n_users * n_items)
-    # print(sum(train_obs / propensities), n_users * n_items)
-    # propensities = 1.0 / (beta / even_props + (1.0 - beta) / cmpl_props)
-
     n_risk = estimate_n(cmpl_rates, pred_rates, train_obs, risk)
     n_risks[trial] = n_risk
 
-    p_risk = estimate_p(cmpl_rates, pred_rates, train_obs, propensities, risk)
+    p_risk = estimate_p(cmpl_rates, pred_rates, train_obs, cmpl_props, risk)
     p_risks[trial] = p_risk
 
-    s_risk = estimate_s(cmpl_rates, pred_rates, train_obs, propensities, risk)
+    s_risk = estimate_s(cmpl_rates, pred_rates, train_obs, cmpl_props, risk)
     s_risks[trial] = s_risk
 
     for i in range(len(gammas)):

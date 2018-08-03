@@ -33,6 +33,7 @@ def min_kwargs(alg_kwargs, err_kwargs):
   tmp_kwargs = sorted(tmp_kwargs, key=operator.itemgetter(0))
   kwargs_str = tmp_kwargs[0][2]
   alg_kwargs = config.dictify(kwargs_str)
+  print('mae=%.4f %s' % (tmp_kwargs[0][0], alg_kwargs))
   return alg_kwargs
 
 def reg_coat(alg_kwargs, err_kwargs):
@@ -42,7 +43,6 @@ def reg_coat(alg_kwargs, err_kwargs):
   config.make_file_dir(kwargs_file)
 
   alg_kwargs = min_kwargs(alg_kwargs, err_kwargs)
-  print('min_kwargs %s' % alg_kwargs)
   alg_kwargs['eval_space'] = trainset.n_ratings
   alg_kwargs['kwargs_file'] = kwargs_file
   alg_kwargs['n_epochs'] = n_epochs

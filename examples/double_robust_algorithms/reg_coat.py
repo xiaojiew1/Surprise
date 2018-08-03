@@ -16,10 +16,22 @@ import operator
 import time
 
 def min_kwargs(alg_kwargs, err_kwargs):
-  kwargs_str = config.stringify(alg_kwargs)
-  err_kwargs = [alg_kwargs for alg_kwargs in err_kwargs if kwargs_str in alg_kwargs[2]]
-  err_kwargs = sorted(err_kwargs, key=operator.itemgetter(0))
-  kwargs_str = err_kwargs[0][2]
+  kwargs_strs = []
+  for k, v in alg_kwargs.items():
+    tmp_kwargs = {k:v,}
+    kwargs_str = config.stringify(tmp_kwargs)
+    kwargs_strs.append(kwargs_str)
+  tmp_kwargs = []
+  for alg_kwargs in err_kwargs:
+    skip = False
+    for kwargs_str in kwargs_strs:
+      if kwargs_str not in alg_kwargs[2]:
+        skip = True
+        break
+    if not skip:
+      tmp_kwargs.append(alg_kwargs)
+  tmp_kwargs = sorted(tmp_kwargs, key=operator.itemgetter(0))
+  kwargs_str = tmp_kwargs[0][2]
   alg_kwargs = config.dictify(kwargs_str)
   return alg_kwargs
 
@@ -30,6 +42,7 @@ def reg_coat(alg_kwargs, err_kwargs):
   config.make_file_dir(kwargs_file)
 
   alg_kwargs = min_kwargs(alg_kwargs, err_kwargs)
+  print('min_kwargs %s' % alg_kwargs)
   alg_kwargs['eval_space'] = trainset.n_ratings
   alg_kwargs['kwargs_file'] = kwargs_file
   alg_kwargs['n_epochs'] = n_epochs
@@ -58,6 +71,10 @@ for lr_all in lr_all_opt:
 
 for reg_all in reg_all_opt:
   alg_kwargs = {'reg_all':reg_all,}
+  reg_coat(alg_kwargs, err_kwargs)
+
+for lr_all, reg_all in itertools.product(lr_all_opt, reg_all_opt):
+  alg_kwargs = {'lr_all':lr_all, 'reg_all':reg_all,}
   reg_coat(alg_kwargs, err_kwargs)
 
 

@@ -30,7 +30,7 @@ def vary_gamma(alpha, gammas, dataset, recom_list, risk):
     t_risk = config.compute_t(pred_rates, cmpl_rates, risk)
     dataset = n_users, n_items, n_rates, cmpl_rates, cmpl_cnt, t_risk
 
-    res = config.eval_wt_omega(recom, dataset, cmpl_props, (risk_name, risk), gammas)
+    res = config.eval_wt_gamma(recom, dataset, cmpl_props, (risk_name, risk), gammas)
     n_mse, p_mse, s_mse, d_mses = res
 
     n_rmse += n_mse
@@ -45,8 +45,8 @@ def vary_gamma(alpha, gammas, dataset, recom_list, risk):
 
   print('%s alpha=%.1f k=%.4f' % (risk_name, alpha, k))
   print('  n=%.4f p=%.4f s=%.4f' % (n_rmse, p_rmse, s_rmse))
-  for omega, d_rmse in zip(gammas, d_rmses):
-    print('  omega=%.1f d=%.4f' % (omega, d_rmse))
+  for gamma, d_rmse in zip(gammas, d_rmses):
+    print('  gamma=%.1f d=%.4f' % (gamma, d_rmse))
   print('\n' + '#'*n_hashtag + '\n')
 
   return
@@ -71,11 +71,13 @@ alpha = f_alpha
 
 risk = 'mae', np.absolute
 gammas = mae_v_gamma
-gammas = np.arange(-2.00, -1.25, 0.50)
+# gammas = np.arange(-2.00, -1.25, 0.50)
+gammas = np.arange(4.00, 4.25, 0.50)
 vary_gamma(alpha, gammas, dataset, recom_list, risk)
 risk = 'mse', np.square
 gammas = mse_v_gamma
-gammas = np.arange(-2.00, -1.25, 0.50)
+# gammas = np.arange(-2.00, -1.25, 0.50)
+gammas = np.arange(4.00, 4.25, 0.50)
 vary_gamma(alpha, gammas, dataset, recom_list, risk)
 
 

@@ -88,7 +88,7 @@ def draw_gamma(risk_name):
   fig.savefig(eps_file, format='eps', bbox_inches='tight', pad_inches=pad_inches)
 
 draw_gamma('mae')
-draw_gamma('mse')
+# draw_gamma('mse')
 
 
 

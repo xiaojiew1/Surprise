@@ -16,6 +16,9 @@ import time
 gsearch_file = rec_coat_file
 err_kwargs, kwargs_set = config.read_gsearch(gsearch_file)
 err_kwargs = sorted(err_kwargs, key=operator.itemgetter(1,0))
+if len(err_kwargs) == 0:
+  raise Exception('first tune coat')
+
 kwargs_str = err_kwargs[0][2]
 algo_kwargs = config.dictify(kwargs_str)
 
@@ -28,6 +31,7 @@ eval_kwargs = {'verbose':False}
 mae = accuracy.mae(predictions, **eval_kwargs)
 mse = pow(accuracy.rmse(predictions, **eval_kwargs), 2.0)
 print('%.4f %.4f %s' % (mae, mse, kwargs_str))
+stdout.flush()
 
 e_time = time.time()
 print('%.2fs' % (e_time - s_time))

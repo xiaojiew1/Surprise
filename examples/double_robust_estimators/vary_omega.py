@@ -18,6 +18,11 @@ def vary_omega(alpha, omegas, dataset, recom_list, risk):
   k = config.solve_k(alpha, n_users, n_items, n_rates, cmpl_cnt)
   cmpl_props = config.complete_prop(alpha, k, indexes)
 
+  outfile = path.join(omega_dir, '%s_%.1f.p' % (risk_name, alpha))
+  # if path.isfile(outfile):
+  #   print('%s exists' % (path.basename(outfile)))
+  #   return
+
   n_rmse, p_rmse, s_rmse = 0.0, 0.0, 0.0
   d_rmses = np.zeros(len(omegas))
   for recom in recom_list:
@@ -44,9 +49,7 @@ def vary_omega(alpha, omegas, dataset, recom_list, risk):
     print('  omega=%.1f d=%.4f' % (omega, d_rmse))
   print('\n' + '#'*n_hashtag + '\n')
 
-  outfile = path.join(omega_dir, '%s_%.1f.p' % (risk_name, alpha))
-  if path.isfile(outfile):
-    print('%s exists' % (path.basename(outfile)))
+  return
   config.make_file_dir(outfile)
   data = {
     'a': alpha,
@@ -68,10 +71,10 @@ alpha = f_alpha
 
 risk = 'mae', np.absolute
 omegas = mae_v_omega
-# omegas = np.arange(0.00, 0.25, 0.10)
+omegas = np.arange(0.00, 0.25, 0.10)
 vary_omega(alpha, omegas, dataset, recom_list, risk)
 risk = 'mse', np.square
 omegas = mse_v_omega
-# omegas = np.arange(0.00, 0.25, 0.10)
+omegas = np.arange(0.00, 0.25, 0.10)
 vary_omega(alpha, omegas, dataset, recom_list, risk)
 

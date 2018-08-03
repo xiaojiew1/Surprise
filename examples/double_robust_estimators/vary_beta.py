@@ -30,7 +30,7 @@ def given_beta(alpha, beta, dataset, recom_list, risk):
     t_risk = config.compute_t(pred_rates, cmpl_rates, risk)
     dataset = n_users, n_items, n_rates, cmpl_rates, cmpl_cnt, t_risk
 
-    res = config.eval_wo_omega(recom, dataset, cmpl_props, (risk_name, risk), beta=beta)
+    res = config.eval_wo_error(recom, dataset, cmpl_props, (risk_name, risk), beta=beta)
     n_mse, p_mse, s_mse, d_mse, rerun = res
     print('%s %s p=%.8f s=%.8f d=%.8f' % (risk_name, recom_name, p_mse, s_mse, d_mse))
 
@@ -38,7 +38,7 @@ def given_beta(alpha, beta, dataset, recom_list, risk):
     max_try = 1
     n_mses, p_mses, s_mses, d_mses = [], [], [], []
     for i in range(max_try):
-      res = config.eval_wo_omega(recom, dataset, cmpl_props, (risk_name, risk), beta=beta)
+      res = config.eval_wo_error(recom, dataset, cmpl_props, (risk_name, risk), beta=beta)
       n_mse, p_mse, s_mse, d_mse, rerun = res
       n_mses.append(n_mse)
       p_mses.append(p_mse)

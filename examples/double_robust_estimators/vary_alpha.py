@@ -31,7 +31,7 @@ def given_alpha(alpha, dataset, recom_list, risk):
     dataset = n_users, n_items, n_rates, cmpl_rates, cmpl_cnt, t_risk
 
     while True:
-      res = config.eval_wo_omega(recom, dataset, cmpl_props, (risk_name, risk))
+      res = config.eval_wo_error(recom, dataset, cmpl_props, (risk_name, risk))
       n_mse, p_mse, s_mse, d_mse, rerun = res
       if not rerun:
         break

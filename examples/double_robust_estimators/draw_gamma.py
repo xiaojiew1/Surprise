@@ -39,7 +39,6 @@ def draw_gamma(risk_name):
     p_rmse = gamma_rmse['p']
     s_rmse = gamma_rmse['s']
     d_rmse = gamma_rmse['d']
-    print(p_rmse, s_rmse)
 
     gammas.append(gamma)
     p_rmses.append(p_rmse)

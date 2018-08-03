@@ -304,25 +304,15 @@ def eval_wt_gamma(recom, dataset, cmpl_props, risk, gammas):
 
     for i in range(len(gammas)):
       gamma = gammas[i]
-
-      d_risk = estimate_d(cmpl_rates, pred_rates, train_obs, cmpl_props, omega, risk)
+      omega = risk(pred_rates-cmpl_rates).sum() / risk(pred_rates-gamma).sum()
+      d_risk = estimate_d(cmpl_rates, pred_rates, train_obs, cmpl_props, risk, omega, gamma)
       d_risks[i][trial] = d_risk
-
-  n_mean = abs(np.mean(n_risks) - t_risk)
-  n_std = np.std(n_risks)
-  p_mean = abs(np.mean(p_risks) - t_risk)
-  p_std = np.std(p_risks)
-  s_mean = abs(np.mean(s_risks) - t_risk)
-  s_std = np.std(s_risks)
-  d_mean = abs(np.mean(d_risks) - t_risk)
-  d_std = np.std(d_risks)
-
   t_risks = np.ones(n_trials) * t_risk
   n_mse = metrics.mean_squared_error(t_risks, n_risks)
   p_mse = metrics.mean_squared_error(t_risks, p_risks)
   s_mse = metrics.mean_squared_error(t_risks, s_risks)
-  d_mse = metrics.mean_squared_error(t_risks, d_risks)
-  return n_mse, p_mse, s_mse, d_mse, rerun
+  d_mses = [metrics.mean_squared_error(t_risks, d_risk) for d_risk in d_risks]
+  return n_mse, p_mse, s_mse, d_mses
 
 def cmpt_bias(alpha, dataset, recom_list, risk):
   n_users, n_items, n_rates, indexes, cmpl_rates= dataset
@@ -397,6 +387,8 @@ v_beta = np.arange(0.00, 1.05, 0.10)
 v_gamma = np.arange(0.00, 6.25, 0.50)
 mae_v_omega = np.arange(0.00, 3.25, 0.10)
 mse_v_omega = np.arange(0.00, 4.85, 0.10)
+mae_v_gamma = np.arange(-2.00, 2.25, 0.50)
+mse_v_gamma = np.arange(-2.00, 2.25, 0.50)
 
 #### draw
 # import matplotlib as mpl

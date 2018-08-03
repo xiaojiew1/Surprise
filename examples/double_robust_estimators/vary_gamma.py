@@ -49,7 +49,6 @@ def vary_gamma(alpha, gammas, dataset, recom_list, risk):
     print('  gamma=%.1f d=%.4f' % (gamma, d_rmse))
   print('\n' + '#'*n_hashtag + '\n')
 
-  return
   config.make_file_dir(outfile)
   data = {
     'a': alpha,
@@ -71,13 +70,13 @@ alpha = f_alpha
 
 risk = 'mae', np.absolute
 gammas = mae_v_gamma
-# gammas = np.arange(-2.00, -1.25, 0.50)
-gammas = np.arange(4.00, 4.25, 0.50)
+# gammas = np.arange(-2.00, -1.75, 0.50)
+# gammas = np.arange(4.00, 4.25, 0.50)
 vary_gamma(alpha, gammas, dataset, recom_list, risk)
 risk = 'mse', np.square
 gammas = mse_v_gamma
-# gammas = np.arange(-2.00, -1.25, 0.50)
-gammas = np.arange(4.00, 4.25, 0.50)
+# gammas = np.arange(-2.00, -1.75, 0.50)
+# gammas = np.arange(4.00, 4.25, 0.50)
 vary_gamma(alpha, gammas, dataset, recom_list, risk)
 
 

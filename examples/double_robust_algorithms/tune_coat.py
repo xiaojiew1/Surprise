@@ -52,7 +52,7 @@ for n_factors, n_epochs, biased, reg_all, lr_all in itertools.product(
     continue
 
   algo = MFREC(**algo_kwargs)
-  algo.fit(trainset)
+  algo.fit(trainset, test)
 
   predictions = algo.test(testset)
   eval_kwargs = {'verbose':False}

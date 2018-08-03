@@ -282,10 +282,11 @@ class MFREC(AlgoBase):
     pu = rng.normal(self.init_loc, self.init_scale, (trainset.n_users, self.n_factors))
     qi = rng.normal(self.init_loc, self.init_scale, (trainset.n_items, self.n_factors))
 
-    n_times = self.n_epochs * trainset.n_ratings // self.eval_space
-    maes = np.zeros(n_times, np.double)
-    mses = np.zeros(n_times, np.double)
-    counts = np.zeros(n_times, np.int)
+    if (self.eval_space != 0):
+      n_times = self.n_epochs * trainset.n_ratings // self.eval_space
+      maes = np.zeros(n_times, np.double)
+      mses = np.zeros(n_times, np.double)
+      counts = np.zeros(n_times, np.int)
 
     if not self.biased:
       global_mean = 0
@@ -315,7 +316,7 @@ class MFREC(AlgoBase):
 
         #### run evaluation
         n_sample += 1
-        if n_sample % self.eval_space == 0:
+        if (self.eval_space != 0) and (n_sample % self.eval_space == 0):
           self.bu, self.bi, self.pu, self.qi = bu, bi, pu, qi
           predictions = self.test(testset)
           mae = accuracy.mae(predictions, **{'verbose':False,})
@@ -330,7 +331,7 @@ class MFREC(AlgoBase):
     self.bi = bi
     self.pu = pu
     self.qi = qi
-    if self.kwargs_file != None:
+    if (self.eval_space != 0) and (self.kwargs_file != None):
       with open(self.kwargs_file, 'w') as fout:
         for count, mae, mse in zip(counts, maes, mses):
           fout.write('%d %.16f %.16f\n' % (count, mae, mse))

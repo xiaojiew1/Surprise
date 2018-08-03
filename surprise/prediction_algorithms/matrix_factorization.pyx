@@ -185,7 +185,7 @@ class VARREC(AlgoBase):
       with open(self.kwargs_file, 'w') as fout:
         for count, mae, mse in zip(counts, maes, mses):
           fout.write('%d %.16f %.16f\n' % (count, mae, mse))
-    print('final var_all=%.8f mae=%.4f mse=%.4f' % (self.var_all, maes[-1], mses[-1]))
+    print('final var_all=%.16f mae=%.4f mse=%.4f' % (self.var_all, maes[-1], mses[-1]))
     self.bu = bu
     self.bi = bi
     self.pu = pu

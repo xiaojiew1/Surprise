@@ -12,29 +12,27 @@ from sys import stdout
 
 import config
 
+import itertools
 import matplotlib.pyplot as plt
 import numpy as np
 import operator
 import time
 
-def rec_coat(kwargs):
-  kwargs = config.dictify(kwargs)
-  kwargs_str = config.stringify(kwargs)
+def rec_coat(alg_kwargs):
+  alg_kwargs['n_epochs'] = n_epochs
+  kwargs_str = config.stringify(alg_kwargs)
   kwargs_file = path.join(curve_dir, 'COAT_%s.p' % kwargs_str)
-  if not path.isfile(kwargs_file):
-    config.make_file_dir(kwargs_file)
-    kwargs['n_epochs'] = n_epochs
-    kwargs['eval_space'] = eval_space
-    kwargs['kwargs_file'] = kwargs_file
+  config.make_file_dir(kwargs_file)
+  alg_kwargs['eval_space'] = eval_space
+  alg_kwargs['kwargs_file'] = kwargs_file
 
-    algo = MFREC(**kwargs)
-    algo.fit(trainset, testset)
-    predictions = algo.test(testset)
-    mae = accuracy.mae(predictions, **{'verbose':False})
-    mse = pow(accuracy.rmse(predictions, **{'verbose':False}), 2.0)
-    print('%.4f %.4f %s' % (mae, mse, kwargs_str))
-    stdout.flush()
-  return kwargs_file
+  algo = MFREC(**alg_kwargs)
+  algo.fit(trainset, testset)
+  predictions = algo.test(testset)
+  mae = accuracy.mae(predictions, **{'verbose':False})
+  mse = pow(accuracy.rmse(predictions, **{'verbose':False}), 2.0)
+  print('%.4f %.4f %s' % (mae, mse, path.basename(kwargs_file)))
+  stdout.flush()
 
 def load_mae(kwargs_file):
   maes = []
@@ -56,66 +54,38 @@ err_kwargs = sorted(err_kwargs, key=operator.itemgetter(mae_index))
 if len(err_kwargs) == 0:
   raise Exception('first tune coat')
 bt_kwargs = err_kwargs[0][arg_index]
+# print(bt_kwargs)
+# exit()
 
-bl_kwargs = {'reg_all': 0.005,}
-bl_kwargs = config.stringify(bl_kwargs)
-bls_kwargs = [err_kwarg for err_kwarg in err_kwargs if bl_kwargs in err_kwarg[arg_index]]
-bls_kwargs = sorted(bls_kwargs, key=operator.itemgetter(arg_index))
-bl_kwargs = bls_kwargs[0][arg_index]
+lr_all_opt = [0.05,]
+reg_all_opt = [0.005,]
+lr_all_opt = [0.01, 0.03, 0.05,]
+reg_all_opt = [0.001, 0.003, 0.005,]
+lr_reg_all_opt = [
+  (0.05, 0.1),
+  # (0.004, 0.2),
+]
+# for lr_all, reg_all in itertools.product(lr_all_opt, reg_all_opt):
+for lr_all, reg_all in lr_reg_all_opt:
+  alg_kwargs = config.dictify(bt_kwargs)
+  alg_kwargs['lr_all'] = lr_all
+  alg_kwargs['reg_all'] = reg_all
+  rec_coat(alg_kwargs)
+exit()
 
-s_time = time.time()
-bt_file = rec_coat(bt_kwargs)
-bl_file = rec_coat(bl_kwargs)
-e_time = time.time()
-print('%.2fs' % (e_time - s_time))
+reg_all_opt = [pow(10.0, i) for i in range(-5, -0)]
+reg_all_opt += [5*pow(10.0, i) for i in range(-5, -0)]
+for reg_all in reg_all_opt:
+  alg_kwargs = config.dictify(bt_kwargs)
+  alg_kwargs['reg_all'] = reg_all
+  rec_coat(alg_kwargs)
+exit()
 
-bt_maes = load_mae(bt_file)
-bl_maes = load_mae(bl_file)
-n_times = n_epochs * trainset.n_ratings // eval_space
-epochs = np.arange(1, 1+n_times)
-
-indexes = np.arange(0, n_times, 1)
-bt_maes = bt_maes[indexes]
-bl_maes = bl_maes[indexes]
-epochs = epochs[indexes]
-
-fig, ax = plt.subplots(1, 1)
-fig.set_size_inches(width, height, forward=True)
-kwargs = {'linewidth': line_width, 'markersize': marker_size,}
-
-## ips estimator
-kwargs['label'] = 'bt'
-ax.plot(epochs, bt_maes, **kwargs)
-
-## snips estimator
-kwargs['label'] = 'bl'
-kwargs['linestyle'] = ':'
-ax.plot(epochs, bl_maes, **kwargs)
-
-ax.legend(loc='upper right', prop={'size':legend_size})
-
-# ax.set_xticks(np.arange(0.20, 1.05, 0.20))
-# ax.tick_params(axis='both', which='major', labelsize=tick_size)
-# ax.set_xlabel('Selection Bias $\\alpha$', fontsize=label_size)
-# ax.set_xlim(0.1, 1.0)
-
-# ax.set_ylabel('RMSE of %s Estimation' % (risk_name.upper()), fontsize=label_size)
-
-# if risk_name == 'mae':
-#   yticks = np.arange(0.000, 0.070, 0.020)
-#   ax.set_yticks(yticks)
-#   ax.set_yticklabels([('%.2f' % ytick)[1:] for ytick in yticks])
-# else:
-#   yticks = np.arange(0.00, 0.35, 0.10)
-#   ax.set_yticks(yticks)
-#   ax.set_yticklabels([('%.1f' % ytick)[1:] for ytick in yticks])
-
-eps_file = path.join(figure_dir, 'coat_curve.eps')
-config.make_file_dir(eps_file)
-fig.savefig(eps_file, format='eps', bbox_inches='tight', pad_inches=pad_inches)
-
-
-
-
+lr_all_opt = [pow(10.0, i) for i in range(-6, -1)]
+lr_all_opt += [5*pow(10.0, i) for i in range(-6, -1)]
+for lr_all in lr_all_opt:
+  alg_kwargs = config.dictify(bt_kwargs)
+  alg_kwargs['lr_all'] = lr_all
+  rec_coat(alg_kwargs)
 
 

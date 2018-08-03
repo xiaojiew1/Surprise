@@ -22,7 +22,9 @@ def var_coat(alg_kwargs, var_all):
   alg_kwargs['n_epochs'] = n_epochs
   alg_kwargs['var_all'] = var_all
   kwargs_str = config.stringify(alg_kwargs)
+  kwargs_file = path.join(curve_dir, 'COAT_%s.p' % kwargs_str)
   alg_kwargs['eval_space'] = eval_space
+  alg_kwargs['kwargs_file'] = kwargs_file
   algo = VARREC(**alg_kwargs)
   algo.fit(trainset, testset)
   predictions = algo.test(testset)
@@ -34,7 +36,7 @@ def var_coat(alg_kwargs, var_all):
 mae_index = 0
 arg_index = 2
 n_epochs = 400
-eval_space = int(trainset.n_ratings * n_epochs / 1)
+eval_space = int(trainset.n_ratings * n_epochs / n_epochs)
 
 gsearch_file = rec_coat_file
 err_kwargs, kwargs_set = config.read_gsearch(gsearch_file)
@@ -44,7 +46,7 @@ if len(err_kwargs) == 0:
 bt_kwargs = err_kwargs[0][arg_index]
 
 s_time = time.time()
-var_all_opt = [0.0001, 0.001, 0.01, 0.1, 1.0, 0.0]
+var_all_opt = [pow(10.0, i) for i in range(-10, 3)]
 for var_all in var_all_opt:
   bt_file = var_coat(bt_kwargs, var_all)
 e_time = time.time()

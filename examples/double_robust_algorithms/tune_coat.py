@@ -1,4 +1,4 @@
-from config import rec_coat_file
+from config import tune_coat_file
 from util_coat import trainset, testset
 from surprise import accuracy
 from surprise import MFREC
@@ -34,7 +34,7 @@ lr_all_opt = [0.0005, 0.001, 0.005, 0.01, 0.05]
 # reg_all_opt = [0.02,]
 # lr_all_opt = [0.005,]
 
-gsearch_file = rec_coat_file
+gsearch_file = tune_coat_file
 err_kwargs, kwargs_set = config.read_gsearch(gsearch_file)
 
 s_time = time.time()

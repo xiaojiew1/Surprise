@@ -1,4 +1,4 @@
-from config import curve_dir, rec_coat_file
+from config import curve_dir, tune_coat_file
 
 from util_coat import trainset, testset
 from surprise import accuracy
@@ -57,7 +57,7 @@ def reg_coat(alg_kwargs, err_kwargs):
 
 n_epochs = 1024
 epochs = np.arange(1, 1+n_epochs)
-gsearch_file = rec_coat_file
+gsearch_file = tune_coat_file
 err_kwargs, kwargs_set = config.read_gsearch(gsearch_file)
 lr_all_opt, reg_all_opt = set(), set()
 for kwargs_str in kwargs_set:

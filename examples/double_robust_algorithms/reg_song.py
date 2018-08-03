@@ -1,4 +1,4 @@
-from config import rec_song_file
+from config import tune_song_file
 from util_song import trainset, testset
 from surprise import accuracy
 from surprise import MFREC
@@ -13,7 +13,7 @@ import numpy as np
 import operator
 import time
 
-gsearch_file = rec_song_file
+gsearch_file = tune_song_file
 err_kwargs, kwargs_set = config.read_gsearch(gsearch_file)
 err_kwargs = sorted(err_kwargs, key=operator.itemgetter(1,0))
 if len(err_kwargs) == 0:

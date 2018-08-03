@@ -1,4 +1,4 @@
-from config import data_dir, curve_dir, figure_dir, rec_coat_file
+from config import data_dir, curve_dir, figure_dir, tune_coat_file
 from config import width, height, pad_inches
 from config import line_width, marker_size, legend_size, tick_size, label_size
 
@@ -38,7 +38,7 @@ arg_index = 2
 n_epochs = 400
 eval_space = int(trainset.n_ratings * n_epochs / n_epochs)
 
-gsearch_file = rec_coat_file
+gsearch_file = tune_coat_file
 err_kwargs, kwargs_set = config.read_gsearch(gsearch_file)
 err_kwargs = sorted(err_kwargs, key=operator.itemgetter(mae_index))
 if len(err_kwargs) == 0:

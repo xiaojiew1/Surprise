@@ -1,4 +1,4 @@
-from config import data_dir, curve_dir, figure_dir, rec_coat_file
+from config import data_dir, curve_dir, figure_dir, tune_coat_file
 from config import width, height, pad_inches
 from config import line_width, marker_size, legend_size, tick_size, label_size
 
@@ -22,7 +22,7 @@ def load_error(alg_kwargs):
   errors = np.asarray(errors)
   return errors
 
-gsearch_file = rec_coat_file
+gsearch_file = tune_coat_file
 err_kwargs, kwargs_set = config.read_gsearch(gsearch_file)
 lr_all_opt, reg_all_opt = set(), set()
 for kwargs_str in kwargs_set:

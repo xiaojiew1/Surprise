@@ -23,11 +23,11 @@ from .predictions import PredictionImpossible
 from ..utils import get_rng
 
 #### xiaojie
-class MFREC(AlgoBase):
+class VARREC(AlgoBase):
   def __init__(self, n_factors=100, n_epochs=20, biased=True,
-      lr_all=.005, reg_all=.02, 
+      lr_all=.005, reg_all=.02, var_all=.001,
       init_loc=0, init_scale=.1,
-      batch_size=0, kwargs_file=None,
+      eval_space=0, kwargs_file=None,
       lr_bu=None, lr_bi=None, lr_pu=None, lr_qi=None,
       reg_bu=None, reg_bi=None, reg_pu=None, reg_qi=None,
       random_state=None, verbose=False):
@@ -37,7 +37,197 @@ class MFREC(AlgoBase):
 
     self.init_loc = init_loc
     self.init_scale = init_scale
-    self.batch_size = batch_size
+    self.eval_space = eval_space
+    self.kwargs_file = kwargs_file
+
+    self.lr_bu = lr_bu if lr_bu is not None else lr_all
+    self.lr_bi = lr_bi if lr_bi is not None else lr_all
+    self.lr_pu = lr_pu if lr_pu is not None else lr_all
+    self.lr_qi = lr_qi if lr_qi is not None else lr_all
+    self.reg_bu = reg_bu if reg_bu is not None else reg_all
+    self.reg_bi = reg_bi if reg_bi is not None else reg_all
+    self.reg_pu = reg_pu if reg_pu is not None else reg_all
+    self.reg_qi = reg_qi if reg_qi is not None else reg_all
+    self.random_state = random_state
+    self.verbose = verbose
+
+    #### var
+    self.var_all = var_all
+
+    AlgoBase.__init__(self)
+
+  def fit(self, trainset, testset):
+    AlgoBase.fit(self, trainset)
+    self.sgd(trainset, testset)
+    return self
+
+  def sgd(self, trainset, testset):
+    # user biases
+    cdef np.ndarray[np.double_t] bu
+    # item biases
+    cdef np.ndarray[np.double_t] bi
+    # user factors
+    cdef np.ndarray[np.double_t, ndim=2] pu
+    # item factors
+    cdef np.ndarray[np.double_t, ndim=2] qi
+    # learning curves
+    cdef np.ndarray[np.double_t] maes
+    cdef np.ndarray[np.double_t] mses
+
+    cdef int u, i, f
+    cdef double r, err, dot, puf, qif
+    cdef double global_mean = trainset.global_mean
+
+    #### var
+    cdef np.ndarray[np.double_t] losses
+    cdef double loss_m, loss_d, loss_s
+    cdef double grad_c, grad_f, grad_s
+    cdef double grad_u, grad_i, grad_p, grad_q
+
+    cdef double lr_bu = self.lr_bu
+    cdef double lr_bi = self.lr_bi
+    cdef double lr_pu = self.lr_pu
+    cdef double lr_qi = self.lr_qi
+
+    cdef double reg_bu = self.reg_bu
+    cdef double reg_bi = self.reg_bi
+    cdef double reg_pu = self.reg_pu
+    cdef double reg_qi = self.reg_qi
+
+    rng = get_rng(self.random_state)
+
+    bu = np.zeros(trainset.n_users, np.double)
+    bi = np.zeros(trainset.n_items, np.double)
+    pu = rng.normal(self.init_loc, self.init_scale, (trainset.n_users, self.n_factors))
+    qi = rng.normal(self.init_loc, self.init_scale, (trainset.n_items, self.n_factors))
+
+    n_times = self.n_epochs * trainset.n_ratings // self.eval_space
+    maes = np.zeros(n_times, np.double)
+    mses = np.zeros(n_times, np.double)
+    counts = np.zeros(n_times, np.int)
+
+    if not self.biased:
+      global_mean = 0
+
+    #### var
+    losses = np.zeros(trainset.n_ratings, np.double)
+    grad_c = self.var_all * sqrt(trainset.n_ratings) / (trainset.n_ratings - 1)
+
+    n_sample = 0
+    for current_epoch in range(self.n_epochs):
+      if self.verbose:
+        print("Processing epoch {}".format(current_epoch))
+
+      #### var
+      for s, (u, i, r) in enumerate(trainset.all_ratings()):
+        dot = 0  # <q_i, p_u>
+        for f in range(self.n_factors):
+          dot += qi[i, f] * pu[u, f]
+        err = r - (global_mean + bu[u] + bi[i] + dot)
+        losses[s] = err * err
+      loss_m = 0.0
+      for s in range(trainset.n_ratings):
+        loss_m += losses[s]
+      loss_m /= trainset.n_ratings
+      loss_d = 0.0
+      for s in range(trainset.n_ratings):
+        dev = losses[s] - loss_m
+        loss_d += dev * dev
+      loss_d /= (trainset.n_ratings - 1)
+      loss_d = sqrt(loss_d)
+      grad_f = 1.0 - grad_c * loss_m / loss_d
+      grad_s = 0.5 * grad_c / loss_d
+      # print('#epoch=%d grad_f=%.16f grad_s=%.16f' % (current_epoch, grad_f, grad_s))
+      # print('#epoch=%d loss_m=%.16f loss_d=%.16f' % (current_epoch, loss_m, loss_d))
+
+      for u, i, r in trainset.all_ratings():
+        #### compute current error
+        dot = 0  # <q_i, p_u>
+        for f in range(self.n_factors):
+          dot += qi[i, f] * pu[u, f]
+        err = r - (global_mean + bu[u] + bi[i] + dot)
+        loss_s = err * err
+
+        #### update biases
+        if self.biased:
+          grad_u = err
+          grad_i = err
+          grad_u = (grad_f + 2 * grad_s * loss_s) * grad_u
+          grad_i = (grad_f + 2 * grad_s * loss_s) * grad_i
+          bu[u] += lr_bu * (grad_u - reg_bu * bu[u])
+          bi[i] += lr_bi * (grad_i - reg_bi * bi[i])
+
+        #### update factors
+        for f in range(self.n_factors):
+          puf = pu[u, f]
+          qif = qi[i, f]
+          grad_p = err * qif
+          grad_q = err * puf
+          grad_p = (grad_f + 2 * grad_s * loss_s) * grad_p
+          grad_q = (grad_f + 2 * grad_s * loss_s) * grad_q
+          pu[u, f] += lr_pu * (grad_p - reg_pu * puf)
+          qi[i, f] += lr_qi * (grad_q - reg_qi * qif)
+
+        #### run evaluation
+        n_sample += 1
+        if n_sample % self.eval_space == 0:
+          self.bu, self.bi, self.pu, self.qi = bu, bi, pu, qi
+          predictions = self.test(testset)
+          mae = accuracy.mae(predictions, **{'verbose':False,})
+          mse = pow(accuracy.rmse(predictions, **{'verbose':False,}), 2.0)
+          index = n_sample // self.eval_space - 1
+          # print('#sample=%d mae=%.4f mse=%.4f' % (n_sample, mae, mse))
+          maes[index] = mae
+          mses[index] = mse
+          counts[index] = n_sample
+
+    if self.kwargs_file != None:
+      with open(self.kwargs_file, 'w') as fout:
+        for count, mae, mse in zip(counts, maes, mses):
+          fout.write('%d %.16f %.16f\n' % (count, mae, mse))
+    print('final var_all=%.8f mae=%.4f mse=%.4f' % (self.var_all, maes[-1], mses[-1]))
+    self.bu = bu
+    self.bi = bi
+    self.pu = pu
+    self.qi = qi
+
+  def estimate(self, u, i):
+    known_user = self.trainset.knows_user(u)
+    known_item = self.trainset.knows_item(i)
+
+    if self.biased:
+      est = self.trainset.global_mean
+      if known_user:
+        est += self.bu[u]
+      if known_item:
+        est += self.bi[i]
+      if known_user and known_item:
+        est += np.dot(self.qi[i], self.pu[u])
+    else:
+      if known_user and known_item:
+        est = np.dot(self.qi[i], self.pu[u])
+      else:
+        raise PredictionImpossible('User and item are unkown.')
+
+    return est
+
+
+#### xiaojie
+class MFREC(AlgoBase):
+  def __init__(self, n_factors=100, n_epochs=20, biased=True,
+      lr_all=.005, reg_all=.02, 
+      init_loc=0, init_scale=.1,
+      eval_space=0, kwargs_file=None,
+      lr_bu=None, lr_bi=None, lr_pu=None, lr_qi=None,
+      reg_bu=None, reg_bi=None, reg_pu=None, reg_qi=None,
+      random_state=None, verbose=False):
+    self.n_factors = n_factors
+    self.n_epochs = n_epochs
+    self.biased = biased
+
+    self.init_loc = init_loc
+    self.init_scale = init_scale
+    self.eval_space = eval_space
     self.kwargs_file = kwargs_file
 
     self.lr_bu = lr_bu if lr_bu is not None else lr_all
@@ -73,7 +263,7 @@ class MFREC(AlgoBase):
 
     cdef int u, i, f
     cdef double r, err, dot, puf, qif
-    cdef double global_mean = self.trainset.global_mean
+    cdef double global_mean = trainset.global_mean
 
     cdef double lr_bu = self.lr_bu
     cdef double lr_bi = self.lr_bi
@@ -92,7 +282,7 @@ class MFREC(AlgoBase):
     pu = rng.normal(self.init_loc, self.init_scale, (trainset.n_users, self.n_factors))
     qi = rng.normal(self.init_loc, self.init_scale, (trainset.n_items, self.n_factors))
 
-    n_times = self.n_epochs * trainset.n_ratings // self.batch_size
+    n_times = self.n_epochs * trainset.n_ratings // self.eval_space
     maes = np.zeros(n_times, np.double)
     mses = np.zeros(n_times, np.double)
     counts = np.zeros(n_times, np.int)
@@ -125,12 +315,12 @@ class MFREC(AlgoBase):
 
         #### run evaluation
         n_sample += 1
-        if n_sample % self.batch_size == 0:
+        if n_sample % self.eval_space == 0:
           self.bu, self.bi, self.pu, self.qi = bu, bi, pu, qi
           predictions = self.test(testset)
           mae = accuracy.mae(predictions, **{'verbose':False,})
           mse = pow(accuracy.rmse(predictions, **{'verbose':False,}), 2.0)
-          index = n_sample // self.batch_size - 1
+          index = n_sample // self.eval_space - 1
           # print('#sample=%d mae=%.4f mse=%.4f' % (n_sample, mae, mse))
           maes[index] = mae
           mses[index] = mse
@@ -140,9 +330,10 @@ class MFREC(AlgoBase):
     self.bi = bi
     self.pu = pu
     self.qi = qi
-    with open(self.kwargs_file, 'w') as fout:
-      for count, mae, mse in zip(counts, maes, mses):
-        fout.write('%d %.16f %.16f\n' % (count, mae, mse))
+    if self.kwargs_file != None:
+      with open(self.kwargs_file, 'w') as fout:
+        for count, mae, mse in zip(counts, maes, mses):
+          fout.write('%d %.16f %.16f\n' % (count, mae, mse))
     print('final mae=%.4f mse=%.4f' % (maes[-1], mses[-1]))
 
   def estimate(self, u, i):

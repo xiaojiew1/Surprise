@@ -1,4 +1,4 @@
-from config import data_dir, figure_dir, rec_coat_file
+from config import data_dir, curve_dir, figure_dir, rec_coat_file
 from config import width, height, pad_inches
 from config import line_width, marker_size, legend_size, tick_size, label_size
 
@@ -20,11 +20,11 @@ import time
 def rec_coat(kwargs):
   kwargs = config.dictify(kwargs)
   kwargs_str = config.stringify(kwargs)
-  kwargs_file = path.join(data_dir, 'COAT_%s.p' % kwargs_str)
+  kwargs_file = path.join(curve_dir, 'COAT_%s.p' % kwargs_str)
   if not path.isfile(kwargs_file):
-    config.make_dir(data_dir)
+    config.make_file_dir(kwargs_file)
     kwargs['n_epochs'] = n_epochs
-    kwargs['batch_size'] = batch_size
+    kwargs['eval_space'] = eval_space
     kwargs['kwargs_file'] = kwargs_file
 
     algo = MFREC(**kwargs)
@@ -47,8 +47,8 @@ def load_mae(kwargs_file):
 
 mae_index = 0
 arg_index = 2
-n_epochs = 200
-batch_size = int(trainset.n_ratings / 5)
+n_epochs = 400
+eval_space = trainset.n_ratings
 
 gsearch_file = rec_coat_file
 err_kwargs, kwargs_set = config.read_gsearch(gsearch_file)
@@ -71,13 +71,13 @@ print('%.2fs' % (e_time - s_time))
 
 bt_maes = load_mae(bt_file)
 bl_maes = load_mae(bl_file)
-n_times = n_epochs * trainset.n_ratings // batch_size
+n_times = n_epochs * trainset.n_ratings // eval_space
 epochs = np.arange(1, 1+n_times)
 
-# indexes = np.arange(0, 100, 1)
-# bt_maes = bt_maes[indexes]
-# bl_maes = bl_maes[indexes]
-# epochs = epochs[indexes]
+indexes = np.arange(0, n_times, 1)
+bt_maes = bt_maes[indexes]
+bl_maes = bl_maes[indexes]
+epochs = epochs[indexes]
 
 fig, ax = plt.subplots(1, 1)
 fig.set_size_inches(width, height, forward=True)
@@ -89,6 +89,7 @@ ax.plot(epochs, bt_maes, **kwargs)
 
 ## snips estimator
 kwargs['label'] = 'bl'
+kwargs['linestyle'] = ':'
 ax.plot(epochs, bl_maes, **kwargs)
 
 ax.legend(loc='upper right', prop={'size':legend_size})

@@ -2,7 +2,7 @@ from config import alpha_dir, figure_dir, gamma_dir
 from config import f_alpha, mae_offset, mse_offset, mae_v_gamma, mse_v_gamma
 from config import width, height, pad_inches
 from config import p_label, s_label, d_label
-from config import colors, markers, p_index, s_index, d_index
+from config import colors, markers, linestyles, p_index, s_index, d_index
 from config import line_width, marker_size, legend_size, tick_size, label_size
 
 from os import path
@@ -51,17 +51,20 @@ def draw_gamma(risk_name):
 
   # ips estimator
   kwargs['label'] = p_label
+  kwargs['linestyle'] = linestyles[p_index]
   gamma_p = np.ones_like(v_gamma) * gamma_p
   ax.plot(v_gamma, gamma_p, colors[p_index], **kwargs)
 
   # snips estimator
   kwargs['label'] = s_label
+  kwargs['linestyle'] = linestyles[s_index]
   gamma_s = np.ones_like(v_gamma) * gamma_s
   ax.plot(v_gamma, gamma_s, colors[s_index], **kwargs)
 
   # dr estimator
   kwargs['marker'] = markers[d_index]
   kwargs['label'] = d_label
+  kwargs['linestyle'] = linestyles[d_index]
   ax.plot(v_gamma, gamma_d, colors[d_index], **kwargs)
 
 

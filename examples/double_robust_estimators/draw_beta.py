@@ -77,7 +77,7 @@ def draw_beta(risk_name):
   kwargs['label'] = d_label
   d_line, = ax.plot(v_beta, d_rmses, colors[d_index], **kwargs)
 
-  ax.legend(loc='upper left', prop={'size':legend_size}).set_zorder(0)
+  ax.legend(loc='upper left', prop={'size':legend_size}) # .set_zorder(0)
 
   ax.tick_params(axis='both', which='major', labelsize=tick_size)
   ax.set_xlabel('Propensity Estimation Quality $\\beta$', fontsize=label_size)

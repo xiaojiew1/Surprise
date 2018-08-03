@@ -92,6 +92,7 @@ tmp_dir = 'tmp'
 dnld_dir = path.expanduser('~/Downloads')
 data_dir = 'data'
 figure_dir = path.join(data_dir, 'figure')
+curve_dir = path.join(data_dir, 'curve')
 # rec_coat_file = path.join(data_dir, 'dev_coat.p')
 # rec_song_file = path.join(data_dir, 'dev_song.p')
 rec_coat_file = path.join(data_dir, 'rec_coat.p')

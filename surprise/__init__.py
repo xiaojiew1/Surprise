@@ -1,5 +1,6 @@
 #### xiaojie
 from .prediction_algorithms import MFREC
+from .prediction_algorithms import VARREC
 from .prediction_algorithms import MFIPS
 
 from pkg_resources import get_distribution

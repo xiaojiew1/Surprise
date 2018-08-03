@@ -14,3 +14,52 @@ pip install -e .
 # learning theory
 ################################################################
 http://www.shivani-agarwal.net/Teaching/E0370/Aug-2011/Lectures/3.pdf
+
+
+\begin{figure}[tbp]
+\small
+\centering
+\begin{subfigure}{0.238\textwidth}
+ \centering
+ \includegraphics[width=1.00\linewidth]{mae_alpha.eps}
+\end{subfigure}
+\hspace*{-0.75em} % \hfill
+\begin{subfigure}{0.238\textwidth}
+ \centering
+ \includegraphics[width=1.00\linewidth]{mse_alpha.eps}
+\end{subfigure}
+\caption{Accuracy of different estimators as the degree of selection bias becomes less severe.}
+\label{fig:selection bias}
+\end{figure}
+
+\begin{figure}[tbp]
+\small
+\centering
+\begin{subfigure}{0.238\textwidth}
+ \centering
+ \includegraphics[width=1.00\linewidth]{mae_beta.eps}
+\end{subfigure}
+\hspace*{-0.75em} % \hfill
+\begin{subfigure}{0.238\textwidth}
+ \centering
+ \includegraphics[width=1.00\linewidth]{mse_beta.eps}
+\end{subfigure}
+\caption{Accuracy of different estimators as the quality of the propensity model degrades.}
+\label{fig:propensity model quality}
+\end{figure}
+
+\begin{figure}[tbp]
+\small
+\centering
+\begin{subfigure}{0.238\textwidth}
+ \centering
+ \includegraphics[width=1.00\linewidth]{mae_omega.eps}
+\end{subfigure}
+\hspace*{-0.75em} % \hfill
+\begin{subfigure}{0.238\textwidth}
+ \centering
+ \includegraphics[width=1.00\linewidth]{mse_omega.eps}
+\end{subfigure}
+\caption{Accuracy of the double robust estimator with varying quality of the imputation model.}
+\label{fig:imputation model quality}
+\end{figure}

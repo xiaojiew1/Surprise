@@ -15,8 +15,11 @@ def sciformat(v):
   v = '%e' % Decimal(v)
   s_index = v.rfind('e')
   e_index = s_index - 1
-  while v[e_index] == '0' or v[e_index] == '.':
+  while v[e_index] == '0':
     e_index -= 1
+    if v[e_index] == '.':
+      e_index -= 1
+      break
   e_index += 1
   v = v[:e_index] + v[s_index:]
   v = v.replace('e+0', 'e+').replace('e-0', 'e-')
@@ -118,9 +121,7 @@ if __name__ == '__main__':
   print(sciformat(1000000))
   print(sciformat(10000000000))
 
-  print(kwargs_set)
-
-
+  print(sciformat(0.0))
 
 
 

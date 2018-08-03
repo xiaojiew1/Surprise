@@ -39,7 +39,10 @@ def draw_gamma(risk_name):
   gamma_d = np.flip(gamma_rmse['d'], axis=0)
 
   #### consistency with alpha
-  gamma_d += (alpha_d - gamma_d.mean())
+  if risk_name == 'mae':
+    gamma_d += (alpha_d - gamma_d.mean())
+  else:
+    gamma_d += (alpha_d - gamma_d.mean())
   print('%s p=%.4f s=%.4f d=%.4f' % (risk_name, gamma_p, gamma_s, min(gamma_d)))
 
   fig, ax = plt.subplots(1, 1)
@@ -61,29 +64,27 @@ def draw_gamma(risk_name):
   kwargs['label'] = d_label
   ax.plot(v_gamma, gamma_d, colors[d_index], **kwargs)
 
-  # ax.legend(loc='upper left', prop={'size':legend_size})
-  ax.legend(loc='center', bbox_to_anchor=(0.75, 0.70), prop={'size':legend_size})
 
   ax.tick_params(axis='both', which='major', labelsize=tick_size)
   ax.set_xlabel('Error Imputation Value $\\gamma$', fontsize=label_size)
 
   ax.set_ylabel('RMSE of %s Estimation' % (risk_name.upper()), fontsize=label_size)
 
-  # if risk_name == 'mae':
-  #   ax.set_xlim(0.0, 2.6)
-  #   xticks = np.arange(0.0, 2.75, 0.5)
-  #   ax.set_xticks(xticks)
-  #   yticks = np.arange(0.003, 0.0135, 0.003)
-  #   ax.set_yticks(yticks)
-  #   ax.set_yticklabels([('%.3f' % ytick)[1:] for ytick in yticks])
-  # else:
-  #   ax.set_xlim(0.0, 3.2)
-  #   xticks = np.arange(0.0, 3.5, 1.0)
-  #   ax.set_xticks(xticks)
-  #   ax.set_xticklabels(['%.1f' % xtick for xtick in xticks])
-  #   yticks = np.arange(0.01, 0.055, 0.01)
-  #   ax.set_yticks(yticks)
-  #   ax.set_yticklabels([('%.2f' % ytick)[1:] for ytick in yticks])
+  ax.set_xlim(-2.0, 2.0)
+  xticks = np.arange(-2.0, 2.25, 1.0)
+  ax.set_xticks(xticks)
+  xticklabels = ['%.1f' % xtick for xtick in np.arange(1.0, 5.25, 1.0)]
+  ax.set_xticklabels(xticklabels)
+  if risk_name == 'mae':
+    ax.legend(loc='center', bbox_to_anchor=(0.73, 0.70), prop={'size':legend_size})
+    yticks = np.arange(0.0020, 0.0065, 0.0010)
+    ax.set_yticks(yticks)
+    ax.set_yticklabels([('%.3f' % ytick)[1:] for ytick in yticks])
+  else:
+    ax.legend(loc='upper left', prop={'size':legend_size})
+    yticks = np.arange(0.0050, 0.0275, 0.0050)
+    ax.set_yticks(yticks)
+    ax.set_yticklabels([('%.3f' % ytick)[1:] for ytick in yticks])
 
   eps_file = path.join(figure_dir, '%s_gamma.eps' % risk_name)
   config.make_file_dir(eps_file)

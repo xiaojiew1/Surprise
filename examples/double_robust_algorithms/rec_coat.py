@@ -21,6 +21,7 @@ if len(err_kwargs) == 0:
 
 kwargs_str = err_kwargs[0][2]
 algo_kwargs = config.dictify(kwargs_str)
+algo_kwargs['reg_all'] = 0.0
 
 s_time = time.time()
 

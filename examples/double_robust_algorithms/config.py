@@ -84,6 +84,7 @@ tmp_dir = 'tmp'
 dnld_dir = path.expanduser('~/Downloads')
 data_dir = 'data'
 rec_coat_file = path.join(data_dir, 'rec_coat.p')
+rec_song_file = path.join(data_dir, 'rec_song.p')
 
 separator = '_'
 concatenator = '-'

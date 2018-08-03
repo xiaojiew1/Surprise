@@ -182,15 +182,14 @@ def eval_wo_error(recom, dataset, cmpl_props, risk, beta=0.0):
   n_users, n_items, n_rates, cmpl_rates, cmpl_cnt, t_risk = dataset
   risk_name, risk = risk
   t_rates = n_users * n_items
+  gamma = np.mean(cmpl_rates)
+  omega = risk(pred_rates-cmpl_rates).sum() / risk(pred_rates-gamma).sum()
   # print('#user=%d #item=%d #rating=%d' % (n_users, n_items, n_rates))
 
   n_risks = np.zeros(n_trials)
   p_risks = np.zeros(n_trials)
   s_risks = np.zeros(n_trials)
   d_risks = np.zeros(n_trials)
-
-  gamma = np.mean(cmpl_rates)
-  omega = risk(pred_rates-cmpl_rates).sum() / risk(pred_rates-gamma).sum()
   for trial in range(n_trials):
     train_obs = sample_train(cmpl_props)
 
@@ -244,6 +243,8 @@ def eval_wt_omega(recom, dataset, cmpl_props, risk, omegas):
   n_users, n_items, n_rates, cmpl_rates, cmpl_cnt, t_risk = dataset
   risk_name, risk = risk
   t_rates = n_users * n_items
+  gamma = np.mean(cmpl_rates)
+  
   # print('#user=%d #item=%d #rating=%d' % (n_users, n_items, n_rates))
 
   n_risks = np.zeros(n_trials)

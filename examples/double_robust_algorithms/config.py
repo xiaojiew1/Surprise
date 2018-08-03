@@ -53,7 +53,12 @@ def dictify(kwargs_str):
     elif k == 'n_epochs':
       v = int(v)
     elif k == 'biased':
-      v == bool(v)
+      if v == 'true':
+        v = True
+      elif v == 'false':
+        v = False
+      else:
+        raise Exception('unknown value %s' % v)
     elif k == 'reg_all':
       v = float(v)
     elif k == 'lr_all':
@@ -83,8 +88,8 @@ def write_gsearch(err_kwargs, outfile):
 tmp_dir = 'tmp'
 dnld_dir = path.expanduser('~/Downloads')
 data_dir = 'data'
-rec_coat_file = path.join(data_dir, 'rec_coat.p')
-rec_song_file = path.join(data_dir, 'rec_song.p')
+rec_coat_file = path.join(data_dir, 'dev_coat.p')
+rec_song_file = path.join(data_dir, 'dev_song.p')
 
 separator = '_'
 concatenator = '-'

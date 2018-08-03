@@ -91,6 +91,7 @@ def write_gsearch(err_kwargs, outfile):
 tmp_dir = 'tmp'
 dnld_dir = path.expanduser('~/Downloads')
 data_dir = 'data'
+figure_dir = path.join(data_dir, 'figure')
 # rec_coat_file = path.join(data_dir, 'dev_coat.p')
 # rec_song_file = path.join(data_dir, 'dev_song.p')
 rec_coat_file = path.join(data_dir, 'rec_coat.p')
@@ -98,6 +99,15 @@ rec_song_file = path.join(data_dir, 'rec_song.p')
 
 separator = '_'
 concatenator = '-'
+
+#### draw
+width, height = 6.4, 4.8
+legend_size = 26
+label_size = 20
+line_width = 2.0
+marker_size = 20
+tick_size = 18
+pad_inches = 0.10
 
 if __name__ == '__main__':
   print(sciformat(7.123456))

@@ -67,6 +67,7 @@ def given_beta(alpha, beta, dataset, recom_list, risk):
   print('  n=%.4f p=%.4f s=%.4f d=%.4f' % (n_rmse, p_rmse, s_rmse, d_rmse))
   print('\n' + '#'*n_hashtag + '\n')
 
+  return
   config.make_file_dir(outfile)
   data = {
     'a': alpha,

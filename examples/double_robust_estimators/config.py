@@ -244,7 +244,6 @@ def eval_wt_omega(recom, dataset, cmpl_props, risk, omegas):
   risk_name, risk = risk
   t_rates = n_users * n_items
   gamma = np.mean(cmpl_rates)
-  
   # print('#user=%d #item=%d #rating=%d' % (n_users, n_items, n_rates))
 
   n_risks = np.zeros(n_trials)
@@ -265,7 +264,7 @@ def eval_wt_omega(recom, dataset, cmpl_props, risk, omegas):
 
     for i in range(len(omegas)):
       omega = omegas[i]
-      d_risk = estimate_d(cmpl_rates, pred_rates, train_obs, cmpl_props, omega, risk)
+      d_risk = estimate_d(cmpl_rates, pred_rates, train_obs, cmpl_props, risk, omega, gamma)
       d_risks[i][trial] = d_risk
   t_risks = np.ones(n_trials) * t_risk
   n_mse = metrics.mean_squared_error(t_risks, n_risks)

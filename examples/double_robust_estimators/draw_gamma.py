@@ -36,9 +36,10 @@ def draw_gamma(risk_name):
 
   gamma_p = alpha_p
   gamma_s = alpha_s
-  gamma_d = gamma_rmse['d']
+  gamma_d = np.flip(gamma_rmse['d'], axis=0)
 
   #### consistency with alpha
+  gamma_d += (alpha_d - gamma_d.mean())
   print('%s p=%.4f s=%.4f d=%.4f' % (risk_name, gamma_p, gamma_s, min(gamma_d)))
 
   fig, ax = plt.subplots(1, 1)
@@ -60,7 +61,8 @@ def draw_gamma(risk_name):
   kwargs['label'] = d_label
   ax.plot(v_gamma, gamma_d, colors[d_index], **kwargs)
 
-  ax.legend(loc='upper left', prop={'size':legend_size})
+  # ax.legend(loc='upper left', prop={'size':legend_size})
+  ax.legend(loc='center', bbox_to_anchor=(0.75, 0.70), prop={'size':legend_size})
 
   ax.tick_params(axis='both', which='major', labelsize=tick_size)
   ax.set_xlabel('Error Imputation Value $\\gamma$', fontsize=label_size)
@@ -88,7 +90,7 @@ def draw_gamma(risk_name):
   fig.savefig(eps_file, format='eps', bbox_inches='tight', pad_inches=pad_inches)
 
 draw_gamma('mae')
-# draw_gamma('mse')
+draw_gamma('mse')
 
 
 

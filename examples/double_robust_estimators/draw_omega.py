@@ -15,7 +15,7 @@ import numpy as np
 import os
 import pickle
 
-def draw_gamma(risk_name):
+def draw_omega(risk_name):
   alpha_file = path.join(alpha_dir, '%s_%.1f.p' % (risk_name, f_alpha))
   alpha_rmse = pickle.load(open(alpha_file, 'rb'))
   alpha_p = alpha_rmse['p']
@@ -105,8 +105,8 @@ def draw_gamma(risk_name):
   config.make_file_dir(eps_file)
   fig.savefig(eps_file, format='eps', bbox_inches='tight', pad_inches=pad_inches)
 
-draw_gamma('mae')
-draw_gamma('mse')
+draw_omega('mae')
+draw_omega('mse')
 
 
 

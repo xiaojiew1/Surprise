@@ -28,11 +28,11 @@ reg_all_opt = [0.005, 0.01, 0.05, 0.1, 0.5, 1.0]
 lr_all_opt = [0.0005, 0.001, 0.005, 0.01, 0.05]
 
 #### develop
-n_factors_opt = [100,]
-n_epochs_opt = [20,]
-biased_opt = [True, False,]
-reg_all_opt = [0.02,]
-lr_all_opt = [0.005,]
+# n_factors_opt = [100,]
+# n_epochs_opt = [20,]
+# biased_opt = [True, False,]
+# reg_all_opt = [0.02,]
+# lr_all_opt = [0.005,]
 
 gsearch_file = tune_song_file
 err_kwargs, kwargs_set = config.read_gsearch(gsearch_file)

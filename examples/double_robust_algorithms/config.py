@@ -1,6 +1,8 @@
 from decimal import Decimal
 from os import path
 
+import numpy as np
+import operator
 import os
 
 def make_dir(dirpath):
@@ -88,25 +90,61 @@ def write_gsearch(err_kwargs, outfile):
     for mae, mse, kwargs_str in err_kwargs:
       fout.write('%.16f %.16f %s\n' % (mae, mse, kwargs_str))
 
-def get_p_file(alg_kwargs):
+def min_kwargs(alg_kwargs, err_kwargs):
+  kwargs_strs = []
+  for k, v in alg_kwargs.items():
+    tmp_kwargs = {k:v,}
+    kwargs_str = stringify(tmp_kwargs)
+    kwargs_strs.append(kwargs_str)
+  tmp_kwargs = []
+  for alg_kwargs in err_kwargs:
+    skip = False
+    for kwargs_str in kwargs_strs:
+      if kwargs_str not in alg_kwargs[2]:
+        skip = True
+        break
+    if not skip:
+      tmp_kwargs.append(alg_kwargs)
+  tmp_kwargs = sorted(tmp_kwargs, key=operator.itemgetter(0))
+  kwargs_str = tmp_kwargs[0][2]
+  alg_kwargs = dictify(kwargs_str)
+  print('mae=%.4f %s' % (tmp_kwargs[0][0], alg_kwargs['n_epochs']))
+  return alg_kwargs
+
+def get_coat_file(alg_kwargs):
   kwargs_str = stringify(alg_kwargs)
   kwargs_file = path.join(curve_dir, 'COAT_%s.p' % kwargs_str)
   return kwargs_file
+
+def get_song_file(alg_kwargs):
+  kwargs_str = stringify(alg_kwargs)
+  kwargs_file = path.join(curve_dir, 'SONG_%s.p' % kwargs_str)
+  return kwargs_file
+
+def load_error(kwargs_file):
+  errors = []
+  with open(kwargs_file) as fin:
+    for line in fin.readlines():
+      error = line.split()[1]
+      errors.append(float(error))
+  errors = np.asarray(errors)
+  return errors
 
 tmp_dir = 'tmp'
 dnld_dir = path.expanduser('~/Downloads')
 data_dir = 'data'
 figure_dir = path.join(data_dir, 'figure')
 curve_dir = path.join(data_dir, 'curve')
-# tune_coat_file = path.join(data_dir, 'dev_coat.p')
-# tune_song_file = path.join(data_dir, 'dev_song.p')
 tune_coat_file = path.join(data_dir, 'tune_coat.p')
 tune_song_file = path.join(data_dir, 'tune_song.p')
+coat_n_epochs = 1024
+song_n_epochs = 64
+n_points = 512
 
 separator = '_'
 concatenator = '-'
 
-#### draw
+#### draw common
 width, height = 6.4, 4.8
 legend_size = 26
 label_size = 20
@@ -114,6 +152,17 @@ line_width = 2.0
 marker_size = 20
 tick_size = 18
 pad_inches = 0.10
+#### draw custom
+bpmf_label = 'BPMF'
+ips_label = 'MF-IPS'
+ml_label = 'MF-DR-ERM'
+mb_label = 'MF-DR'
+bpmf_index = 0
+ips_index = 1
+ml_index = 2
+mb_index = 3
+colors = ['m', 'g', 'r', 'b',]
+linestyles = [':', '-.', '--', '-']
 
 if __name__ == '__main__':
   print(sciformat(7.123456))

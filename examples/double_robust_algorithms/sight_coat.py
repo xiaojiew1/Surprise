@@ -1,7 +1,5 @@
-from config import data_dir, curve_dir, figure_dir, tune_coat_file
+from config import figure_dir, tune_coat_file
 from config import coat_n_epochs
-from config import width, height, pad_inches
-from config import line_width, marker_size, legend_size, tick_size, label_size
 
 from os import path
 from sys import stdout

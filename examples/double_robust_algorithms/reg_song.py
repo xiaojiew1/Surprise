@@ -17,8 +17,8 @@ import time
 
 def reg_song(alg_kwargs, err_kwargs):
   kwargs_file = config.get_song_file(alg_kwargs)
-  # if path.isfile(kwargs_file):
-  #   return
+  if path.isfile(kwargs_file):
+    return
   config.make_file_dir(kwargs_file)
 
   alg_kwargs = config.min_kwargs(alg_kwargs, err_kwargs)

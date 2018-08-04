@@ -108,7 +108,7 @@ ax.set_ylabel('MAE', fontsize=label_size)
 ax.set_xlim(0, n_samples)
 
 
-eps_file = path.join(figure_dir, 'coat_var_all.eps')
+eps_file = path.join(figure_dir, 'coat_var.eps')
 config.make_file_dir(eps_file)
 fig.savefig(eps_file, format='eps', bbox_inches='tight')
 

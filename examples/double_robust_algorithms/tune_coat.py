@@ -2,6 +2,7 @@ from config import tune_coat_file
 from util_coat import trainset, testset
 from surprise import accuracy
 from surprise import MFREC
+from surprise import SVD
 
 from os import path
 from sys import stdout
@@ -53,6 +54,8 @@ for n_factors, n_epochs, biased, reg_all, lr_all in itertools.product(
 
   algo = MFREC(**algo_kwargs)
   algo.fit(trainset, testset)
+  # algo = SVD(**algo_kwargs)
+  # algo.fit(trainset)
 
   predictions = algo.test(testset)
   eval_kwargs = {'verbose':False}

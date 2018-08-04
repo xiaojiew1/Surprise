@@ -108,7 +108,10 @@ def min_kwargs(alg_kwargs, err_kwargs):
   tmp_kwargs = sorted(tmp_kwargs, key=operator.itemgetter(0))
   kwargs_str = tmp_kwargs[0][2]
   alg_kwargs = dictify(kwargs_str)
-  print('mae=%.4f %s' % (tmp_kwargs[0][0], alg_kwargs['n_epochs']))
+  n_epochs = alg_kwargs['n_epochs']
+  reg_all = alg_kwargs['reg_all']
+  lr_all = alg_kwargs['lr_all']
+  print('%.4f %d %.4f %.4f' % (tmp_kwargs[0][0], n_epochs, reg_all, lr_all))
   return alg_kwargs
 
 def get_coat_file(alg_kwargs):
@@ -138,8 +141,8 @@ curve_dir = path.join(data_dir, 'curve')
 tune_coat_file = path.join(data_dir, 'tune_coat.p')
 tune_song_file = path.join(data_dir, 'tune_song.p')
 coat_n_epochs = 1024
-song_n_epochs = 64
-n_points = 512
+song_n_points = 512
+song_lr_count = 2
 
 separator = '_'
 concatenator = '-'

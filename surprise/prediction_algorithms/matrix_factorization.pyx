@@ -323,7 +323,7 @@ class MFREC(AlgoBase):
           mae = accuracy.mae(predictions, **{'verbose':False,})
           mse = pow(accuracy.rmse(predictions, **{'verbose':False,}), 2.0)
           index = n_sample // self.eval_space - 1
-          print('#sample=%d mae=%.4f mse=%.4f' % (n_sample, mae, mse))
+          # print('#sample=%d mae=%.4f mse=%.4f' % (n_sample, mae, mse))
           maes[index] = mae
           mses[index] = mse
           counts[index] = n_sample

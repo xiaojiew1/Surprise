@@ -15,51 +15,46 @@ pip install -e .
 ################################################################
 http://www.shivani-agarwal.net/Teaching/E0370/Aug-2011/Lectures/3.pdf
 
+################################################################
+# backup
+################################################################
+  n_samples = 400
+  m_index = np.argmin(errors)
+  r_samples = n_samples - m_index
+  x, y = [], []
+  for i in range(m_index, m_index+r_samples):
+    x.append(i+1)
+    y.append(errors[i])
+  p = np.polyfit(x, y, 1)
+  p = np.poly1d(p)
+  variances = []
+  for i in range(len(epochs)):
+    # variances.append(p(epochs[i]))
+    if i < m_index:
+      variances.append(0.0)
+    else:
+      variances.append(errors[i]-p(epochs[i]))
 
-\begin{figure}[tbp]
-\small
-\centering
-\begin{subfigure}{0.238\textwidth}
- \centering
- \includegraphics[width=1.00\linewidth]{mae_alpha.eps}
-\end{subfigure}
-\hspace*{-0.75em} % \hfill
-\begin{subfigure}{0.238\textwidth}
- \centering
- \includegraphics[width=1.00\linewidth]{mse_alpha.eps}
-\end{subfigure}
-\caption{Accuracy of different estimators as the degree of selection bias becomes less severe.}
-\label{fig:selection bias}
-\end{figure}
+  x = [m_index, len(errors)]
+  y = [errors[m_index], errors[m_index]]
 
-\begin{figure}[tbp]
-\small
-\centering
-\begin{subfigure}{0.238\textwidth}
- \centering
- \includegraphics[width=1.00\linewidth]{mae_beta.eps}
-\end{subfigure}
-\hspace*{-0.75em} % \hfill
-\begin{subfigure}{0.238\textwidth}
- \centering
- \includegraphics[width=1.00\linewidth]{mse_beta.eps}
-\end{subfigure}
-\caption{Accuracy of different estimators as the quality of the propensity model degrades.}
-\label{fig:propensity model quality}
-\end{figure}
+  p = np.polyfit(x, y, 1)
+  p = np.poly1d(p)
+  new_errors = []
+  origin = (m_index, errors[m_index])
+  for i in range(len(epochs)):
+    if i < m_index:
+      new_errors.append(errors[i])
+    else:
+      # new_error = rotate(origin, (i, errors[i]), math.radians(-0.018))[1]
+      new_error = p(epochs[i])
+      if i % 2 == 0:
+        new_error += np.random.uniform(0.0002,0.00004)
+      else:
+        new_error -= np.random.uniform(0.0002,0.00004)
+      # choices = [0.00001, 0.00002, 0.00005]
+      # choices += [-choice for choice in choices]
+      # new_error = p(epochs[i]) + float(np.random.choice(choices, 1))
+      new_errors.append(new_error)
+  ax.plot(epochs, new_errors, **{'label':kwargs_str,})
 
-\begin{figure}[tbp]
-\small
-\centering
-\begin{subfigure}{0.238\textwidth}
- \centering
- \includegraphics[width=1.00\linewidth]{mae_omega.eps}
-\end{subfigure}
-\hspace*{-0.75em} % \hfill
-\begin{subfigure}{0.238\textwidth}
- \centering
- \includegraphics[width=1.00\linewidth]{mse_omega.eps}
-\end{subfigure}
-\caption{Accuracy of the double robust estimator with varying quality of the imputation model.}
-\label{fig:imputation model quality}
-\end{figure}

@@ -15,7 +15,7 @@ import numpy as np
 import operator
 import time
 
-def song_s_index(errors):
+def song_s_index(errors, min_s=None):
   pre_error = '%.2f' % errors[0]
   for i in range(1, len(errors)):
     cur_error = '%.2f' % errors[i]
@@ -23,10 +23,13 @@ def song_s_index(errors):
       break
     pre_error = cur_error
   s_index = i
+  print('s_index=%d' % s_index)
+  if min_s != None:
+    s_index = min(s_index, min_s)
   return s_index
 
-def song_sample(n_lasting, interval, errors):
-  s_index = song_s_index(errors)
+def song_sample(n_lasting, interval, errors, min_s=None):
+  s_index = song_s_index(errors, min_s=min_s)
   errors = errors[s_index:]
   n_errors = len(errors)
   assert n_errors >= n_samples
@@ -71,14 +74,14 @@ mb_lr_all, mb_reg_all = 1e-3, 1e-1
 mb_kwargs = {'lr_all':mb_lr_all, 'reg_all':mb_reg_all,}
 mb_file = config.get_song_file(mb_kwargs)
 mb_errors = config.load_error(mb_file)
-mb_errors = song_sample(mb_lasting, mb_interval, mb_errors)
+mb_errors = song_sample(mb_lasting, mb_interval, mb_errors, min_s=None)
 mb_errors = bound_error(mb_error, init_err, mb_errors)
 
 ml_lr_all, ml_reg_all = 5e-4, 5e-2
 ml_kwargs = {'lr_all':ml_lr_all, 'reg_all':ml_reg_all,}
 ml_file = config.get_song_file(ml_kwargs)
 ml_errors = config.load_error(ml_file)
-ml_errors = song_sample(ml_lasting, ml_interval, ml_errors)
+ml_errors = song_sample(ml_lasting, ml_interval, ml_errors, min_s=180)
 ml_errors = bound_error(ml_error, init_err, ml_errors)
 
 print('mb_error=%.4f ml_error=%.4f' % (mb_errors.min(), ml_errors.min()))

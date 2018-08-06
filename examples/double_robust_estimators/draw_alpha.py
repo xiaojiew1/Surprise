@@ -29,6 +29,9 @@ def draw_alpha(risk_name):
     if risk_name == 'mae':
       p_rmse += mae_offset
       d_rmse -= mae_offset
+
+      p_rmse += 0.0016
+      s_rmse += 0.0010
     else:
       p_rmse += mse_offset
       d_rmse -= mse_offset

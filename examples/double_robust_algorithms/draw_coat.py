@@ -2,8 +2,8 @@ from config import data_dir, curve_dir, figure_dir, tune_coat_file
 from config import coat_n_epochs
 from config import width, height, pad_inches
 from config import line_width, marker_size, legend_size, tick_size, label_size
-from config import bpmf_label, ips_label, ml_label, mb_label
-from config import bpmf_index, ips_index, ml_index, mb_index, colors, linestyles
+from config import ips_label, ml_label, mb_label
+from config import ips_index, ml_index, mb_index, colors, linestyles
 
 from os import path
 from sys import stdout
@@ -16,9 +16,9 @@ import numpy as np
 import operator
 import time
 
-def find_s_index(errors):
+def coat_s_index(errors):
   pre_error = '%.2f' % errors[0]
-  for i in range(1, n_samples):
+  for i in range(1, len(errors)):
     cur_error = '%.2f' % errors[i]
     if cur_error != pre_error:
       break
@@ -33,7 +33,7 @@ def find_e_index(error, errors):
   e_index = i + 1
   return e_index
 
-def sample_error(s_index, e_index, errors):
+def coat_sample(s_index, e_index, errors):
   errors = errors[s_index:e_index]
   n_errors = len(errors)
   assert n_errors >= n_samples
@@ -46,7 +46,6 @@ def sample_error(s_index, e_index, errors):
 
 n_samples = 400
 mb_offset = 6 # larger better
-bpmf = 0.903
 mf_ips = 0.860
 mb_error = 0.761
 ml_error = (mf_ips - mb_error) / 3.31 + mb_error
@@ -58,20 +57,20 @@ mb_lr_all, mb_reg_all = 5e-3, 1e-2
 mb_kwargs = {'lr_all':mb_lr_all, 'reg_all':mb_reg_all,}
 mb_file = config.get_coat_file(mb_kwargs)
 mb_errors = config.load_error(mb_file)
-mb_s_index = find_s_index(mb_errors)
+mb_s_index = coat_s_index(mb_errors)
 mb_e_index = find_e_index(mb_error, mb_errors)
 print('mb_s_index=%d mb_e_index=%d' % (mb_s_index, mb_e_index))
-mb_errors = sample_error(mb_s_index, mb_e_index, mb_errors)
+mb_errors = coat_sample(mb_s_index, mb_e_index, mb_errors)
 
 ml_lr_all, ml_reg_all = 1e-3, 5e-4
 ml_kwargs = {'lr_all':ml_lr_all, 'reg_all':ml_reg_all,}
 ml_file = config.get_coat_file(ml_kwargs)
 ml_errors = config.load_error(ml_file)
 # print(ml_errors[:50])
-ml_s_index = find_s_index(ml_errors)
+ml_s_index = coat_s_index(ml_errors)
 ml_e_index = find_e_index(ml_error, ml_errors)
 print('ml_s_index=%d ml_e_index=%d' % (ml_s_index, ml_e_index))
-ml_errors = sample_error(ml_s_index, ml_e_index, ml_errors)
+ml_errors = coat_sample(ml_s_index, ml_e_index, ml_errors)
 
 print('mb_error=%.4f ml_error=%.4f' % (mb_errors.min(), ml_errors.min()))
 # print(len(epochs), len(mb_errors), len(ml_errors))
@@ -79,11 +78,6 @@ print('mb_error=%.4f ml_error=%.4f' % (mb_errors.min(), ml_errors.min()))
 fig, ax = plt.subplots(1, 1)
 fig.set_size_inches(width, height, forward=True)
 kwargs = {'linewidth': line_width, 'markersize': marker_size,}
-
-kwargs['label'] = bpmf_label
-kwargs['color'] = colors[bpmf_index]
-kwargs['linestyle'] = linestyles[bpmf_index]
-ax.plot(epochs, bpmf * np.ones_like(epochs), **kwargs)
 
 kwargs['label'] = ips_label
 kwargs['color'] = colors[ips_index]

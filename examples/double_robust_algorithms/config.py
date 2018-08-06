@@ -151,21 +151,21 @@ concatenator = '-'
 width, height = 6.4, 4.8
 legend_size = 26
 label_size = 20
-line_width = 2.0
+line_width = 3.0
 marker_size = 20
 tick_size = 18
 pad_inches = 0.10
 #### draw custom
-bpmf_label = 'BPMF'
 ips_label = 'MF-IPS'
+cpt_label = 'CPT-v'
 ml_label = 'MF-DR-ERM'
 mb_label = 'MF-DR'
-bpmf_index = 0
-ips_index = 1
-ml_index = 2
-mb_index = 3
-colors = ['m', 'g', 'r', 'b',]
-linestyles = [':', '-.', '--', '-']
+ips_index = 0
+cpt_index = 0
+ml_index = 1
+mb_index = 2
+colors = ['g', 'r', 'b',]
+linestyles = ['-.', '--', '-']
 
 if __name__ == '__main__':
   print(sciformat(7.123456))

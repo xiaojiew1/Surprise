@@ -390,13 +390,13 @@ mse_v_gamma = np.arange(-2.00, 2.25, 0.50)
 width, height = 6.4, 4.8
 legend_size = 26
 label_size = 20
-line_width = 2.0
+line_width = 3.0
 marker_size = 20
 tick_size = 18
 pad_inches = 0.10
 markers = [(4, 2, 45), (6, 2, 0), (8, 2, 22.5)]
 colors = ['r', 'g', 'b']
-linestyles = ['-', ':', '-']
+linestyles = ['-.', '--', '-']
 p_index, s_index, d_index = 0, 1, 2
 p_label, s_label, d_label = 'IPS', 'SNIPS', 'DR'
 

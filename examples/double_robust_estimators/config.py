@@ -60,11 +60,11 @@ def provide_skewed(cmpl_rates):
 
 def provide_coarsened(cmpl_rates):
   coarsened = np.copy(cmpl_rates)
-  coarsened[coarsened<1.5] = 1
-  coarsened[coarsened>1.5] = 5
+  # coarsened[coarsened<1.5] = 1
+  # coarsened[coarsened>1.5] = 5
   #### icml2016
-  # coarsened[coarsened<3.5] = 3
-  # coarsened[coarsened>3.5] = 4
+  coarsened[coarsened<3.5] = 3
+  coarsened[coarsened>3.5] = 4
   return coarsened
 
 def provide_recom(indexes, cmpl_rates):
@@ -187,7 +187,7 @@ def eval_wo_error(recom, dataset, cmpl_props, risk, beta=0.0):
   gamma = np.mean(cmpl_rates)
   omega = risk(pred_rates-cmpl_rates).sum() / risk(pred_rates-gamma).sum()
   # print('#user=%d #item=%d #rating=%d' % (n_users, n_items, n_rates))
-  # print('gamma=%.4f omega=%.4f' % (gamma, omega))
+  print('gamma=%.4f omega=%.4f' % (gamma, omega))
 
   n_risks = np.zeros(n_trials)
   p_risks = np.zeros(n_trials)

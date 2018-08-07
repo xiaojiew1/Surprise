@@ -80,7 +80,7 @@ cmpl_cnt = config.count_index(indexes)
 cmpl_dist = cmpl_cnt / cmpl_cnt.sum()
 k = config.solve_k(alpha, n_users, n_items, n_rates, cmpl_cnt)
 cmpl_props = config.complete_prop(alpha, k, indexes)
-betas = [0.0, 1.0,]
+betas = [0.0, 0.8,]
 
 e_rmse = 0.0
 d_rmses = np.zeros(len(betas))

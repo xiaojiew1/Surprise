@@ -145,31 +145,6 @@ def estimate_s(cmpl_rates, pred_rates, train_obs, propensities, risk):
   normalizer = np.multiply(1.0 / propensities, train_obs).sum()
   return true_errors.sum() / normalizer
 
-def d(cmpl_rates, pred_rates, train_obs, propensities, risk, omega, gamma):
-  true_errors = risk(pred_rates - cmpl_rates)
-
-  #### true error for beta
-  # pred_errors = 0.666 * np.copy(true_errors)
-  pred_errors = omega * np.copy(true_errors)
-  #### mean error
-  # pred_errors = np.mean(true_errors) * np.ones_like(true_errors)
-  #### pred omega
-  # omega = true_errors.sum() / risk(pred_rates - np.mean(cmpl_rates)).sum()
-  #### mean rate for alpha, gamma, omega
-  # pred_errors = omega * risk(pred_rates - gamma)
-  pred_errors = np.multiply(propensities-train_obs, pred_errors)
-  pred_errors = np.divide(pred_errors, propensities)
-
-  true_errors = np.multiply(train_obs, true_errors)
-  true_errors = np.divide(true_errors, propensities)
-
-  tot_errors = true_errors + pred_errors
-  return tot_errors
-
-def estimate_d(cmpl_rates, pred_rates, train_obs, propensities, omega, risk, gamma=None):
-  tot_errors = d(cmpl_rates, pred_rates, train_obs, propensities, omega, risk, gamma=gamma)
-  return tot_errors.sum() / len(cmpl_rates)
-
 def format_float(f):
   if -1.0 < f < 1.0:
     # f = '%.4f' % f
@@ -178,6 +153,39 @@ def format_float(f):
   else:
     f = '%.3f' % f
   return f
+
+def estimate_e(cmpl_rates, pred_rates, train_obs, risk, omega, gamma):
+  true_errors = risk(pred_rates - cmpl_rates)
+
+  # pred_errors = omega * np.copy(true_errors)
+  pred_errors = omega * risk(pred_rates - gamma)
+
+  true_errors = np.multiply(train_obs, true_errors)
+  pred_errors = np.multiply(1-train_obs, pred_errors)
+
+  tot_errors = true_errors + pred_errors
+  return tot_errors.sum() / len(cmpl_rates)
+
+def estimate_d(cmpl_rates, pred_rates, train_obs, propensities, risk, omega, gamma):
+  true_errors = risk(pred_rates - cmpl_rates)
+
+  #### true error for beta
+  # pred_errors = 0.666 * np.copy(true_errors)
+  # pred_errors = omega * np.copy(true_errors)
+  #### mean error
+  # pred_errors = np.mean(true_errors) * np.ones_like(true_errors)
+  #### pred omega
+  # omega = true_errors.sum() / risk(pred_rates - np.mean(cmpl_rates)).sum()
+  #### mean rate for alpha, gamma, omega
+  pred_errors = omega * risk(pred_rates - gamma)
+  pred_errors = np.multiply(propensities-train_obs, pred_errors)
+  pred_errors = np.divide(pred_errors, propensities)
+
+  true_errors = np.multiply(train_obs, true_errors)
+  true_errors = np.divide(true_errors, propensities)
+
+  tot_errors = true_errors + pred_errors
+  return tot_errors.sum() / len(cmpl_rates)
 
 def eval_wo_error(recom, dataset, cmpl_props, risk, beta=0.0):
   recom_name, pred_rates = recom
@@ -244,6 +252,37 @@ def eval_wo_error(recom, dataset, cmpl_props, risk, beta=0.0):
   s_mse = metrics.mean_squared_error(t_risks, s_risks)
   d_mse = metrics.mean_squared_error(t_risks, d_risks)
   return n_mse, p_mse, s_mse, d_mse, rerun
+
+def eval_wt_beta(recom, dataset, cmpl_props, risk, omega, betas):
+  recom_name, pred_rates = recom
+  n_users, n_items, n_rates, cmpl_rates, cmpl_cnt, t_risk = dataset
+  risk_name, risk = risk
+  t_rates = n_users * n_items
+  gamma = np.mean(cmpl_rates)
+  # print('#user=%d #item=%d #rating=%d' % (n_users, n_items, n_rates))
+
+  e_risks = np.zeros(n_trials)
+  d_risks = [np.zeros(n_trials) for beta in betas]
+  for trial in range(n_trials):
+    train_obs = sample_train(cmpl_props)
+
+    e_risk = estimate_e(cmpl_rates, pred_rates, train_obs, risk, omega, gamma)
+    e_risks[trial] = e_risk
+
+    for i in range(len(betas)):
+      beta = betas[i]
+
+      even_props = (train_obs.sum() / t_rates) * np.ones(t_rates)
+      propensities = beta * even_props + (1.0 - beta) * cmpl_props
+      propensities *= sum(train_obs / propensities) / (n_users * n_items)
+      # print(sum(train_obs / propensities), n_users * n_items)
+      # propensities = 1.0 / (beta / even_props + (1.0 - beta) / cmpl_props)
+      d_risk = estimate_d(cmpl_rates, pred_rates, train_obs, propensities, risk, omega, gamma)
+      d_risks[i][trial] = d_risk
+  t_risks = np.ones(n_trials) * t_risk
+  e_mse = metrics.mean_squared_error(t_risks, e_risks)
+  d_mses = [metrics.mean_squared_error(t_risks, d_risk) for d_risk in d_risks]
+  return e_mse, d_mses
 
 def eval_wt_omega(recom, dataset, cmpl_props, risk, omegas):
   recom_name, pred_rates = recom
@@ -411,20 +450,16 @@ p_index, s_index, d_index = 0, 1, 2
 p_label, s_label, d_label = 'IPS', 'SNIPS', 'DR'
 
 if __name__ == '__main__':
+  #### table
   n_users, n_items, n_rates, indexes = read_data(song_file)
-
   cmpl_rates = complete_rate(indexes)
-
   dataset = n_users, n_items, n_rates, indexes, cmpl_rates
   recom_list = provide_recom(indexes, cmpl_rates)
-
   alpha = 0.50
   #### ml100k
   # alpha = 0.25
-
   risk = 'mae', np.absolute
   cmpt_bias(alpha, dataset, recom_list, risk)
-
   risk = 'mse', np.square
   cmpt_bias(alpha, dataset, recom_list, risk)
 

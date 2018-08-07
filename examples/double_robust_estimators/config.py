@@ -149,13 +149,14 @@ def d(cmpl_rates, pred_rates, train_obs, propensities, risk, omega, gamma):
   true_errors = risk(pred_rates - cmpl_rates)
 
   #### true error for beta
-  pred_errors = 0.666 * np.copy(true_errors)
+  # pred_errors = 0.666 * np.copy(true_errors)
+  pred_errors = omega * np.copy(true_errors)
   #### mean error
   # pred_errors = np.mean(true_errors) * np.ones_like(true_errors)
   #### pred omega
   # omega = true_errors.sum() / risk(pred_rates - np.mean(cmpl_rates)).sum()
   #### mean rate for alpha, gamma, omega
-  pred_errors = omega * risk(pred_rates - gamma)
+  # pred_errors = omega * risk(pred_rates - gamma)
   pred_errors = np.multiply(propensities-train_obs, pred_errors)
   pred_errors = np.divide(pred_errors, propensities)
 
@@ -171,10 +172,11 @@ def estimate_d(cmpl_rates, pred_rates, train_obs, propensities, omega, risk, gam
 
 def format_float(f):
   if -1.0 < f < 1.0:
-    f = '%.4f' % f
-    f = f.replace('0', '', 1)
+    # f = '%.4f' % f
+    f = '%.3f' % f
+    # f = f.replace('0', '', 1)
   else:
-    f = ('%.3f' % f)
+    f = '%.3f' % f
   return f
 
 def eval_wo_error(recom, dataset, cmpl_props, risk, beta=0.0):
@@ -185,6 +187,7 @@ def eval_wo_error(recom, dataset, cmpl_props, risk, beta=0.0):
   gamma = np.mean(cmpl_rates)
   omega = risk(pred_rates-cmpl_rates).sum() / risk(pred_rates-gamma).sum()
   # print('#user=%d #item=%d #rating=%d' % (n_users, n_items, n_rates))
+  # print('gamma=%.4f omega=%.4f' % (gamma, omega))
 
   n_risks = np.zeros(n_trials)
   p_risks = np.zeros(n_trials)
@@ -224,11 +227,15 @@ def eval_wo_error(recom, dataset, cmpl_props, risk, beta=0.0):
   rerun = False
   if p_mean < d_mean or s_mean < d_mean:
     rerun = True
-  if not rerun:
+  # if not rerun:
+  if True:
     stdout.write('%s %s & %.3f' % (risk_name, recom_name, t_risk))
+    stdout.write(' & %s$\\pm$%s' % (format_float(n_mean), format_float(n_std)))
     stdout.write(' & %s$\\pm$%s' % (format_float(p_mean), format_float(p_std)))
     stdout.write(' & %s$\\pm$%s' % (format_float(s_mean), format_float(s_std)))
     stdout.write(' & %s$\\pm$%s' % (format_float(d_mean), format_float(d_std)))
+    if risk_name == 'mse':
+      stdout.write(' \\\\')
     stdout.write('\n')
 
   t_risks = np.ones(n_trials) * t_risk
@@ -311,6 +318,7 @@ def eval_wt_gamma(recom, dataset, cmpl_props, risk, gammas):
 def cmpt_bias(alpha, dataset, recom_list, risk):
   n_users, n_items, n_rates, indexes, cmpl_rates= dataset
   risk_name, risk = risk
+  beta = 0.8
 
   cmpl_cnt = count_index(indexes)
   cmpl_dist = cmpl_cnt / cmpl_cnt.sum()
@@ -355,8 +363,9 @@ def cmpt_bias(alpha, dataset, recom_list, risk):
     t_risk = compute_t(pred_rates, cmpl_rates, risk)
     dataset = n_users, n_items, n_rates, cmpl_rates, cmpl_cnt, t_risk
     while True:
-      res = eval_wo_error(recom, dataset, cmpl_props, (risk_name, risk))
+      res = eval_wo_error(recom, dataset, cmpl_props, (risk_name, risk), beta=beta)
       _, _, _, _, rerun = res
+      break
       if not rerun:
         break
       else:

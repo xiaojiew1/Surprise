@@ -167,13 +167,15 @@ def estimate_e(cmpl_rates, pred_rates, train_obs, risk, omega, gamma):
   true_errors = risk(pred_rates - cmpl_rates)
 
   pred_errors = omega * np.copy(true_errors)
-  # pred_errors = omega * risk(pred_rates - gamma)
+  pred_errors = omega * risk(pred_rates - gamma)
 
   true_errors = np.multiply(train_obs, true_errors)
   pred_errors = np.multiply(1-train_obs, pred_errors)
 
   tot_errors = true_errors + pred_errors
-  return tot_errors.sum() / len(cmpl_rates)
+  # normalizer = train_obs.sum() +  omega * (len(cmpl_rates) - train_obs.sum())
+  normalizer = len(cmpl_rates)
+  return tot_errors.sum() / normalizer
 
 def estimate_d(cmpl_rates, pred_rates, train_obs, propensities, risk, omega, gamma):
   true_errors = risk(pred_rates - cmpl_rates)
@@ -185,7 +187,7 @@ def estimate_d(cmpl_rates, pred_rates, train_obs, propensities, risk, omega, gam
   #### pred omega
   # omega = true_errors.sum() / risk(pred_rates - np.mean(cmpl_rates)).sum()
   #### mean rate for alpha, gamma, omega
-  # pred_errors = omega * risk(pred_rates - gamma)
+  pred_errors = omega * risk(pred_rates - gamma)
   pred_errors = np.multiply(propensities-train_obs, pred_errors)
   pred_errors = np.divide(pred_errors, propensities)
 

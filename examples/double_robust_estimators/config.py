@@ -167,7 +167,7 @@ def estimate_e(cmpl_rates, pred_rates, train_obs, risk, omega, gamma):
   true_errors = risk(pred_rates - cmpl_rates)
 
   pred_errors = omega * np.copy(true_errors)
-  pred_errors = omega * risk(pred_rates - gamma)
+  # pred_errors = omega * risk(pred_rates - gamma)
 
   true_errors = np.multiply(train_obs, true_errors)
   pred_errors = np.multiply(1-train_obs, pred_errors)
@@ -179,14 +179,13 @@ def estimate_d(cmpl_rates, pred_rates, train_obs, propensities, risk, omega, gam
   true_errors = risk(pred_rates - cmpl_rates)
 
   #### true error for beta
-  # pred_errors = 0.666 * np.copy(true_errors)
   pred_errors = omega * np.copy(true_errors)
   #### mean error
   # pred_errors = np.mean(true_errors) * np.ones_like(true_errors)
   #### pred omega
   # omega = true_errors.sum() / risk(pred_rates - np.mean(cmpl_rates)).sum()
   #### mean rate for alpha, gamma, omega
-  pred_errors = omega * risk(pred_rates - gamma)
+  # pred_errors = omega * risk(pred_rates - gamma)
   pred_errors = np.multiply(propensities-train_obs, pred_errors)
   pred_errors = np.divide(pred_errors, propensities)
 
@@ -262,7 +261,7 @@ def eval_wo_error(recom, dataset, cmpl_props, risk, beta=0.0):
   d_mse = metrics.mean_squared_error(t_risks, d_risks)
   return n_mse, p_mse, s_mse, d_mse, rerun
 
-def eval_wt_beta(recom, dataset, cmpl_props, risk, omega, betas):
+def eval_wt_mcar(recom, dataset, cmpl_props, rate_props, risk, omega):
   recom_name, pred_rates = recom
   n_users, n_items, n_rates, cmpl_rates, cmpl_cnt, t_risk = dataset
   risk_name, risk = risk
@@ -271,27 +270,19 @@ def eval_wt_beta(recom, dataset, cmpl_props, risk, omega, betas):
   # print('#user=%d #item=%d #rating=%d' % (n_users, n_items, n_rates))
 
   e_risks = np.zeros(n_trials)
-  d_risks = [np.zeros(n_trials) for beta in betas]
+  d_risks = np.zeros(n_trials)
   for trial in range(n_trials):
     train_obs = sample_train(cmpl_props)
 
     e_risk = estimate_e(cmpl_rates, pred_rates, train_obs, risk, omega, gamma)
     e_risks[trial] = e_risk
 
-    for i in range(len(betas)):
-      beta = betas[i]
-
-      even_props = (train_obs.sum() / t_rates) * np.ones(t_rates)
-      propensities = beta * even_props + (1.0 - beta) * cmpl_props
-      propensities *= sum(train_obs / propensities) / (n_users * n_items)
-      # print(sum(train_obs / propensities), n_users * n_items)
-      # propensities = 1.0 / (beta / even_props + (1.0 - beta) / cmpl_props)
-      d_risk = estimate_d(cmpl_rates, pred_rates, train_obs, propensities, risk, omega, gamma)
-      d_risks[i][trial] = d_risk
+    d_risk = estimate_d(cmpl_rates, pred_rates, train_obs, rate_props, risk, omega, gamma)
+    d_risks[trial] = d_risk
   t_risks = np.ones(n_trials) * t_risk
   e_mse = metrics.mean_squared_error(t_risks, e_risks)
-  d_mses = [metrics.mean_squared_error(t_risks, d_risk) for d_risk in d_risks]
-  return e_mse, d_mses
+  d_mse = metrics.mean_squared_error(t_risks, d_risks)
+  return e_mse, d_mse
 
 def eval_wt_omega(recom, dataset, cmpl_props, risk, omegas):
   recom_name, pred_rates = recom
@@ -425,6 +416,7 @@ alpha_dir = path.join(data_dir, 'alpha')
 beta_dir = path.join(data_dir, 'beta')
 gamma_dir = path.join(data_dir, 'gamma')
 omega_dir = path.join(data_dir, 'omega')
+error_dir = path.join(data_dir, 'error')
 figure_dir = path.join(data_dir, 'figure')
 
 min_rate = 1

@@ -1,4 +1,4 @@
-from config import song_file, alpha_dir
+from config import song_file, alpha_dir, error_dir
 from config import n_hashtag, v_alpha
 from config import min_rate, max_rate
 
@@ -72,7 +72,6 @@ dataset = n_users, n_items, n_rates, indexes, cmpl_rates
 recom_list = config.provide_recom(indexes, cmpl_rates)
 
 from config import f_alpha
-omega = 1.0
 n_mcar = 50
 risk = 'mae', np.absolute
 alpha = f_alpha
@@ -82,7 +81,7 @@ cmpl_cnt = config.count_index(indexes)
 cmpl_dist = cmpl_cnt / cmpl_cnt.sum()
 k = config.solve_k(alpha, n_users, n_items, n_rates, cmpl_cnt)
 
-# cmpl_props = config.complete_prop(alpha, k, indexes)
+cmpl_props = config.complete_prop(alpha, k, indexes)
 # [stdout.write('%.4f ' % p) for p in set(cmpl_props)]
 # stdout.write('\n')
 
@@ -128,32 +127,42 @@ stdout.write('p_o_r:')
 [stdout.write(' %.4f' % p) for p in p_o_r]
 stdout.write('\n')
 
-cmpl_props = config.complete_prop(alpha, k, indexes, rate_props=p_o_r)
-[stdout.write('%.4f ' % p) for p in set(cmpl_props)]
+rate_props = config.complete_prop(alpha, k, indexes, rate_props=p_o_r)
+[stdout.write('%.4f ' % p) for p in set(rate_props)]
 stdout.write('\n')
-betas = [0.0, 1.0,]
 
-e_rmse = 0.0
-d_rmses = np.zeros(len(betas))
-for recom in recom_list:
-  recom_name, pred_rates = recom
-  t_risk = config.compute_t(pred_rates, cmpl_rates, risk)
-  dataset = n_users, n_items, n_rates, cmpl_rates, cmpl_cnt, t_risk
+e_rmses, d_rmses, omegas = [], [], []
+for omega in np.arange(0.0, 1.05, 0.1):
+  e_rmse = 0.0
+  d_rmse = 0.0
+  for recom in recom_list:
+    recom_name, pred_rates = recom
+    t_risk = config.compute_t(pred_rates, cmpl_rates, risk)
+    dataset = n_users, n_items, n_rates, cmpl_rates, cmpl_cnt, t_risk
 
-  res = config.eval_wt_beta(recom, dataset, cmpl_props, (risk_name, risk), omega, betas)
-  e_mse, d_mses = res
+    res = config.eval_wt_mcar(recom, dataset, cmpl_props, rate_props, (risk_name, risk), omega)
+    e_mse, d_mse = res
 
-  e_rmse += e_mse
-  d_rmses += d_mses
-n_recoms = len(recom_list)
-e_rmse = math.sqrt(e_rmse / n_recoms)
-d_rmses = np.sqrt(d_rmses / n_recoms)
-print('%s alpha=%.1f k=%.4f' % (risk_name, alpha, k))
-print('  e=%.4f' % (e_rmse))
-for beta, d_rmse in zip(betas, d_rmses):
-  print('  beta=%.1f d=%.4f' % (beta, d_rmse))
-print('\n' + '#'*n_hashtag + '\n')
-
+    e_rmse += e_mse
+    d_rmse += d_mse
+  n_recoms = len(recom_list)
+  e_rmse = math.sqrt(e_rmse / n_recoms)
+  d_rmse = math.sqrt(d_rmse / n_recoms)
+  print('%s alpha=%.1f k=%.4f' % (risk_name, alpha, k))
+  print('  e=%.4f d=%.4f' % (e_rmse, d_rmse))
+  print('\n' + '#'*n_hashtag + '\n')
+  e_rmses.append(e_rmse)
+  d_rmses.append(d_rmse)
+  omegas.append(omega)
+  break
+data = {
+  'e': e_rmses,
+  'd': d_rmses,
+  'o': omegas,
+}
+outfile = path.join(error_dir, '%s_%03d.p' % (risk_name, n_mcar))
+config.make_file_dir(outfile)
+pickle.dump(data, open(outfile, 'wb'))
 exit()
 alphas = v_alpha
 print('\n' + '#'*n_hashtag + '\n')

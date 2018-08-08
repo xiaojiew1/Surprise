@@ -20,6 +20,11 @@ def vary_error(n_mcar, dataset, recom_list, risk):
   cmpl_props = config.complete_prop(alpha, k, indexes)
   # [stdout.write('%.4f ' % p) for p in set(cmpl_props)]
   # stdout.write('\n')
+  
+  outfile = path.join(error_dir, '%s_%03d.p' % (risk_name, n_mcar))
+  if path.isfile(outfile):
+    print('%s exists' % path.basename(outfile))
+    return
 
   p_o = n_rates / (n_users * n_items)
   # print('p_o: %.4f' % p_o)
@@ -35,9 +40,7 @@ def vary_error(n_mcar, dataset, recom_list, risk):
   # stdout.write('p_r_o:')
   # [stdout.write(' %.4f' % p) for p in p_r_o]
   # stdout.write('\n')
-  if n_mcar == 20:
-    # np.random.seed(666666)
-    np.random.seed(88888888)
+  np.random.seed(0)
   while True:
     mcar_rates = np.random.choice(max_rate-min_rate+1, n_mcar, p=list(p_r))
     p_r = np.zeros(max_rate-min_rate+1)
@@ -65,13 +68,14 @@ def vary_error(n_mcar, dataset, recom_list, risk):
   [stdout.write(' %.4f' % p) for p in p_r]
   stdout.write('\n')
   p_o_r = p_r_o * p_o / p_r
+  # p_o_r = np.asarray([0.0163, 0.0697, 0.1140, 0.0268, 0.0113])
   stdout.write('p_o_r:')
   [stdout.write(' %.4f' % p) for p in p_o_r]
   stdout.write('\n')
 
   rate_props = config.complete_prop(alpha, k, indexes, rate_props=p_o_r)
-  [stdout.write('%.4f ' % p) for p in set(rate_props)]
-  stdout.write('\n')
+  # [stdout.write('%.4f ' % p) for p in set(rate_props)]
+  # stdout.write('\n')
 
   e_rmses, d_rmses, omegas = [], [], []
   for omega in v_omegas:
@@ -102,7 +106,6 @@ def vary_error(n_mcar, dataset, recom_list, risk):
     'd': d_rmses,
     'o': omegas,
   }
-  outfile = path.join(error_dir, '%s_%03d.p' % (risk_name, n_mcar))
   config.make_file_dir(outfile)
   pickle.dump(data, open(outfile, 'wb'))
 
@@ -113,8 +116,11 @@ dataset = n_users, n_items, n_rates, indexes, cmpl_rates
 recom_list = config.provide_recom(indexes, cmpl_rates)
 
 alpha = f_alpha
-v_omegas = np.arange(0.5, 1.55, 0.1)
+# v_omegas = np.arange(0.5, 1.55, 0.1)
+v_omegas = np.arange(1.0, -0.05, -0.1)
 
 risk = 'mae', np.absolute
+n_mcar = 500
+vary_error(n_mcar, dataset, recom_list, risk)
 n_mcar = 50
 vary_error(n_mcar, dataset, recom_list, risk)

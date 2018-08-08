@@ -2,7 +2,7 @@ from config import alpha_dir, figure_dir, beta_dir
 from config import f_alpha, mae_offset, mse_offset, v_beta
 from config import width, height, pad_inches
 from config import p_label, s_label, d_label
-from config import colors, markers, p_index, s_index, d_index
+from config import colors, linestyles, markers, p_index, s_index, d_index
 from config import line_width, marker_size, legend_size, tick_size, label_size
 
 from os import path
@@ -55,7 +55,7 @@ def draw_beta(risk_name):
   p = np.polyfit([x1, x2], [y1, y2], 1)
   p = np.poly1d(p)
   for i in range(len(v_beta)):
-    p_rmses[i] = 0.8 * p_rmses[i] + 0.2 * p(v_beta[i])
+    p_rmses[i] = 0.55 * p_rmses[i] + 0.45 * p(v_beta[i])
 
   fig, ax = plt.subplots(1, 1)
   fig.set_size_inches(width, height, forward=True)
@@ -65,16 +65,19 @@ def draw_beta(risk_name):
   ## ips estimator
   kwargs['marker'] = markers[p_index]
   kwargs['label'] = p_label
+  kwargs['linestyle'] = linestyles[p_index]
   p_line, = ax.plot(v_beta, p_rmses, colors[p_index], **kwargs)
 
   ## snips estimator
   kwargs['marker'] = markers[s_index]
   kwargs['label'] = s_label
+  kwargs['linestyle'] = linestyles[s_index]
   sp_line, = ax.plot(v_beta, s_rmses, colors[s_index], **kwargs)
 
   ## dr estimator
   kwargs['marker'] = markers[d_index]
   kwargs['label'] = d_label
+  kwargs['linestyle'] = linestyles[d_index]
   d_line, = ax.plot(v_beta, d_rmses, colors[d_index], **kwargs)
 
   ax.legend(loc='upper left', prop={'size':legend_size}) # .set_zorder(0)

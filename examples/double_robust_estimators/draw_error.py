@@ -10,6 +10,7 @@ from sys import stdout
 
 import config
 
+import copy
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -33,6 +34,8 @@ def draw_omega(risk_name):
   # for e50_e_rmse, e5h_e_rmse in zip(e50_e_rmses, e5h_e_rmses):
   #   print('e50_e_rmse=%.4f e5h_e_rmse=%.4f' % (e50_e_rmse, e5h_e_rmse))
   e_rmses = e50_e_rmses = e5h_e_rmses
+  # e_rmses += (e50_d_rmses.min() - e_rmses.min())
+  # e_rmses *= (0.03 / e_rmses.max())
 
   print('max e=%.4f 50=%.4f 5h=%.4f' % (e_rmses.max(), e50_d_rmses.max(), e5h_d_rmses.max()))
 
@@ -40,7 +43,7 @@ def draw_omega(risk_name):
   fig.set_size_inches(width, height, forward=True)
   kwargs = {'linewidth': line_width, 'markersize': marker_size,}
 
-  ax.plot(omegas, e_rmses, colors[p_index], **kwargs)
+  # ax.plot(omegas, e_rmses, colors[p_index], **kwargs)
 
   ax.plot(omegas, e50_d_rmses, colors[s_index], **kwargs)
 

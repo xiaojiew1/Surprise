@@ -2,7 +2,7 @@ from config import alpha_dir, figure_dir
 from config import v_alpha, mae_offset, mse_offset
 from config import width, height, pad_inches
 from config import p_label, s_label, d_label
-from config import colors, markers, p_index, s_index, d_index
+from config import colors, markers, linestyles, p_index, s_index, d_index
 from config import line_width, marker_size, legend_size, tick_size, label_size
 
 from os import path
@@ -48,16 +48,19 @@ def draw_alpha(risk_name):
   ## ips estimator
   kwargs['marker'] = markers[p_index]
   kwargs['label'] = p_label
+  kwargs['linestyle'] = linestyles[p_index]
   ax.plot(v_alpha, p_rmses, colors[p_index], **kwargs)
 
   ## snips estimator
   kwargs['marker'] = markers[s_index]
   kwargs['label'] = s_label
+  kwargs['linestyle'] = linestyles[s_index]
   ax.plot(v_alpha, s_rmses, colors[s_index], **kwargs)
 
   ## dr estimator
   kwargs['marker'] = markers[d_index]
   kwargs['label'] = d_label
+  kwargs['linestyle'] = linestyles[d_index]
   ax.plot(v_alpha, d_rmses, colors[d_index], **kwargs)
 
   ax.legend(loc='upper right', prop={'size':legend_size})

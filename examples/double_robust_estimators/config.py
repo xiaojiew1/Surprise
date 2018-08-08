@@ -187,7 +187,7 @@ def estimate_d(cmpl_rates, pred_rates, train_obs, propensities, risk, omega, gam
   #### pred omega
   # omega = true_errors.sum() / risk(pred_rates - np.mean(cmpl_rates)).sum()
   #### mean rate for alpha, gamma, omega
-  pred_errors = omega * risk(pred_rates - gamma)
+  # pred_errors = omega * risk(pred_rates - gamma)
   pred_errors = np.multiply(propensities-train_obs, pred_errors)
   pred_errors = np.divide(pred_errors, propensities)
 
@@ -269,7 +269,9 @@ def eval_wt_mcar(recom, dataset, cmpl_props, rate_props, risk, omega):
   risk_name, risk = risk
   t_rates = n_users * n_items
   gamma = np.mean(cmpl_rates)
+  gamma = 2.0
   # print('#user=%d #item=%d #rating=%d' % (n_users, n_items, n_rates))
+  # print('gamma=%.4f' % (gamma))
 
   e_risks = np.zeros(n_trials)
   d_risks = np.zeros(n_trials)
@@ -441,14 +443,15 @@ mse_v_gamma = np.arange(-2.00, 2.25, 0.50)
 width, height = 6.4, 4.8
 legend_size = 26
 label_size = 20
-line_width = 3.0
-marker_size = 8
+line_width = 1.5
+marker_size = 10
+s_marker_size = 150
 tick_size = 18
 pad_inches = 0.10
 markers = [(4, 2, 45), (6, 2, 0), (8, 2, 22.5)]
 markers = ['o', 's', 'v',]
 colors = ['r', 'g', 'b']
-linestyles = ['-.', '--', '-']
+linestyles = ['--', '-', '-.',]
 p_index, s_index, d_index = 0, 1, 2
 p_label, s_label, d_label = 'IPS', 'SNIPS', 'DR'
 

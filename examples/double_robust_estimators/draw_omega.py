@@ -4,12 +4,16 @@ from config import width, height, pad_inches
 from config import p_label, s_label, d_label
 from config import colors, markers, linestyles, p_index, s_index, d_index
 from config import line_width, marker_size, legend_size, tick_size, label_size
+from config import s_marker_size
 
+from matplotlib.patches import Patch
+from matplotlib.lines import Line2D
 from os import path
 from sys import stdout
 
 import config
 
+import copy
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -61,25 +65,36 @@ def draw_omega(risk_name):
 
   fig, ax = plt.subplots(1, 1)
   fig.set_size_inches(width, height, forward=True)
-  kwargs = {'linewidth': line_width, 'markersize': marker_size,}
+  c_kwargs = {'linewidth': line_width, 'markersize': marker_size,}
 
   # ips estimator
-  kwargs['label'] = p_label
-  kwargs['linestyle'] = linestyles[p_index]
+  n_kwargs = copy.deepcopy(c_kwargs)
+  n_kwargs['label'] = p_label
+  n_kwargs['linestyle'] = linestyles[p_index]
   omega_p = np.ones_like(v_omega) * omega_p
-  ax.plot(v_omega, omega_p, colors[p_index], **kwargs)
+  ax.plot(v_omega, omega_p, colors[p_index], **n_kwargs)
 
   # snips estimator
-  kwargs['label'] = s_label
-  kwargs['linestyle'] = linestyles[s_index]
+  n_kwargs = copy.deepcopy(c_kwargs)
+  n_kwargs['label'] = s_label
+  n_kwargs['linestyle'] = linestyles[s_index]
   omega_s = np.ones_like(v_omega) * omega_s
-  ax.plot(v_omega, omega_s, colors[s_index], **kwargs)
+  ax.plot(v_omega, omega_s, colors[s_index], **n_kwargs)
 
   # dr estimator
-  kwargs['marker'] = markers[d_index]
-  kwargs['label'] = d_label
-  kwargs['linestyle'] = linestyles[d_index]
-  ax.plot(v_omega, omega_d, colors[d_index], **kwargs)
+  n_kwargs = copy.deepcopy(c_kwargs)
+  n_kwargs['label'] = d_label
+  n_kwargs['linestyle'] = linestyles[d_index]
+  n_kwargs['marker'] = markers[d_index]
+  ax.plot(v_omega, omega_d, colors[d_index], **n_kwargs)
+  n_kwargs = {
+    'linewidth': line_width,
+    'marker': markers[d_index],
+    'edgecolors': colors[d_index],
+    'facecolors': 'none',
+    's': s_marker_size,
+  }
+  # ax.scatter(v_omega, omega_d, **n_kwargs)
 
   ax.legend(loc='upper left', prop={'size':legend_size})
 

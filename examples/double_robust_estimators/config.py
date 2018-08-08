@@ -107,11 +107,20 @@ def cmpt_propensity(rate, alpha, k):
   decay = compute_decay(rate, alpha)
   return k * decay
 
-def complete_prop(alpha, k, indexes):
-  cmpl_props = []
+def compute_prop(alpha, k):
+  rate_props = []
   for rate in range(min_rate, min_rate+max_rate):
-    n_rates = indexes[rate] - indexes[rate-1]
     prop = cmpt_propensity(rate, alpha, k)
+    rate_props.append(prop)
+  return np.asarray(rate_props)
+
+def complete_prop(alpha, k, indexes, rate_props=None):
+  cmpl_props = []
+  if rate_props is None:
+    rate_props = compute_prop(alpha, k)
+  for rate in range(min_rate, min_rate+max_rate):
+    prop = rate_props[rate-1]
+    n_rates = indexes[rate] - indexes[rate-1]
     cmpl_props.append(np.ones(n_rates, dtype=int) * prop)
   cmpl_props = np.concatenate(cmpl_props)
   return cmpl_props
@@ -157,7 +166,7 @@ def format_float(f):
 def estimate_e(cmpl_rates, pred_rates, train_obs, risk, omega, gamma):
   true_errors = risk(pred_rates - cmpl_rates)
 
-  # pred_errors = omega * np.copy(true_errors)
+  pred_errors = omega * np.copy(true_errors)
   pred_errors = omega * risk(pred_rates - gamma)
 
   true_errors = np.multiply(train_obs, true_errors)
@@ -171,7 +180,7 @@ def estimate_d(cmpl_rates, pred_rates, train_obs, propensities, risk, omega, gam
 
   #### true error for beta
   # pred_errors = 0.666 * np.copy(true_errors)
-  # pred_errors = omega * np.copy(true_errors)
+  pred_errors = omega * np.copy(true_errors)
   #### mean error
   # pred_errors = np.mean(true_errors) * np.ones_like(true_errors)
   #### pred omega

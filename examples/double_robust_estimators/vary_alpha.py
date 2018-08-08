@@ -1,5 +1,6 @@
 from config import song_file, alpha_dir
 from config import n_hashtag, v_alpha
+from config import min_rate, max_rate
 
 from os import path
 from sys import stdout
@@ -72,6 +73,7 @@ recom_list = config.provide_recom(indexes, cmpl_rates)
 
 from config import f_alpha
 omega = 1.0
+n_mcar = 50
 risk = 'mae', np.absolute
 alpha = f_alpha
 n_users, n_items, n_rates, indexes, cmpl_rates= dataset
@@ -79,8 +81,57 @@ risk_name, risk = risk
 cmpl_cnt = config.count_index(indexes)
 cmpl_dist = cmpl_cnt / cmpl_cnt.sum()
 k = config.solve_k(alpha, n_users, n_items, n_rates, cmpl_cnt)
-cmpl_props = config.complete_prop(alpha, k, indexes)
-betas = [0.0, 0.8,]
+
+# cmpl_props = config.complete_prop(alpha, k, indexes)
+# [stdout.write('%.4f ' % p) for p in set(cmpl_props)]
+# stdout.write('\n')
+
+p_o = n_rates / (n_users * n_items)
+# print('p_o: %.4f' % p_o)
+p_r = np.copy(cmpl_dist)
+stdout.write('p_r:')
+[stdout.write(' %.4f' % p) for p in p_r]
+stdout.write('\n')
+p_o_r = config.compute_prop(alpha, k)
+stdout.write('p_o_r:')
+[stdout.write(' %.4f' % p) for p in p_o_r]
+stdout.write('\n')
+p_r_o = p_o_r * p_r / p_o
+# stdout.write('p_r_o:')
+# [stdout.write(' %.4f' % p) for p in p_r_o]
+# stdout.write('\n')
+np.random.seed(0)
+while True:
+  mcar_rates = np.random.choice(max_rate-min_rate+1, n_mcar, p=list(p_r))
+  p_r = np.zeros(max_rate-min_rate+1)
+  for rid in mcar_rates:
+    p_r[rid] += 1
+  p_r /= p_r.sum()
+  success = True
+  if p_r.min() == 0.0:
+    success = False
+  if p_r[0] <= p_r[1]:
+    success = False
+  if p_r[1] <= p_r[2]:
+    success = False
+  if p_r[2] <= p_r[3]:
+    success = False
+  if p_r[3] <= p_r[4]:
+    success = False
+  if success:
+    break
+stdout.write('p_r:')
+[stdout.write(' %.4f' % p) for p in p_r]
+stdout.write('\n')
+p_o_r = p_r_o * p_o / p_r
+stdout.write('p_o_r:')
+[stdout.write(' %.4f' % p) for p in p_o_r]
+stdout.write('\n')
+
+cmpl_props = config.complete_prop(alpha, k, indexes, rate_props=p_o_r)
+[stdout.write('%.4f ' % p) for p in set(cmpl_props)]
+stdout.write('\n')
+betas = [0.0, 1.0,]
 
 e_rmse = 0.0
 d_rmses = np.zeros(len(betas))

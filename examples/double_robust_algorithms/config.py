@@ -149,10 +149,10 @@ concatenator = '-'
 
 #### draw common
 width, height = 6.4, 4.8
-legend_size = 26
+legend_size = 24
 label_size = 20
-line_width = 2.0
-marker_size = 20
+line_width = 1.5
+marker_size = 10
 tick_size = 18
 pad_inches = 0.10
 #### draw custom

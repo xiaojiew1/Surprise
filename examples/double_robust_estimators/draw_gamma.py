@@ -80,7 +80,7 @@ def draw_gamma(risk_name):
   ax.set_xticklabels(xticklabels)
   if risk_name == 'mae':
     ax.legend(loc='center', bbox_to_anchor=(0.73, 0.70), prop={'size':legend_size})
-    yticks = np.arange(0.0020, 0.0065, 0.0010)
+    yticks = np.arange(0.0010, 0.0065, 0.0010)
     ax.set_yticks(yticks)
     ax.set_yticklabels([('%.3f' % ytick)[1:] for ytick in yticks])
   else:

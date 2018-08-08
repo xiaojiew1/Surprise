@@ -45,14 +45,16 @@ def draw_omega(risk_name):
   omegas = s_omegas = l_omegas
   omegas = np.flip(omegas, axis=0)
 
-  s_rmses = quadratic_fit(omegas, s_rmses, 0.0548, 0.2271)
-  l_rmses = quadratic_fit(omegas, l_rmses, 0.0125, 0.0638)
+  i_rmse = 0.0050
+  s_rmses = quadratic_fit(omegas, s_rmses, i_rmse, 0.2271)
+  l_rmses = quadratic_fit(omegas, l_rmses, i_rmse, 0.0638)
 
+  a_rmse = 0.8050
   e_rmses = s_e_rmses = l_e_rmses
   e_rmses = e_rmses.max() - e_rmses
   # e_rmses = np.flip(e_rmses, axis=0)
-  x1, y1 = omegas[0], e_rmses[0]
-  x2, y2 = omegas[-1], e_rmses[-1]
+  x1, y1 = omegas[0], (e_rmses[0] + i_rmse) / 2.0
+  x2, y2 = omegas[-1], (e_rmses[-1] + a_rmse) / 2.0
   p = np.polyfit([x1, x2,], [y1, y2,], 1)
   p = np.poly1d(p)
   for i in range(len(omegas)):
@@ -66,15 +68,21 @@ def draw_omega(risk_name):
   c_kwargs = {'linewidth': line_width, 'markersize': marker_size,}
 
   n_kwargs = copy.deepcopy(c_kwargs)
-  n_kwargs['label'] = 'EI'
+  n_kwargs['label'] = 'IBE'
+  n_kwargs['marker'] = markers[p_index]
+  n_kwargs['linestyle'] = linestyles[p_index]
   ax.plot(omegas, e_rmses, colors[p_index], **n_kwargs)
 
   n_kwargs = copy.deepcopy(c_kwargs)
-  n_kwargs['label'] = 'DR-50'
+  n_kwargs['label'] = 'DR (50)'
+  n_kwargs['marker'] = markers[s_index]
+  n_kwargs['linestyle'] = linestyles[s_index]
   ax.plot(omegas, s_rmses, colors[s_index], **n_kwargs)
 
   n_kwargs = copy.deepcopy(c_kwargs)
-  n_kwargs['label'] = 'DR-5H'
+  n_kwargs['label'] = 'DR (500)'
+  n_kwargs['marker'] = markers[d_index]
+  n_kwargs['linestyle'] = linestyles[d_index]
   ax.plot(omegas, l_rmses, colors[d_index], **n_kwargs)
 
   ax.legend(loc='upper left', prop={'size':legend_size})
@@ -84,28 +92,18 @@ def draw_omega(risk_name):
 
   ax.set_ylabel('RMSE of %s Estimation' % (risk_name.upper()), fontsize=label_size)
 
-  # if risk_name == 'mae':
-  #   ax.set_xlim(0.0, 2.6)
-  #   xticks = np.arange(0.0, 2.75, 0.5)
-  #   ax.set_xticks(xticks)
-  #   yticks = np.arange(0.003, 0.0135, 0.003)
-  #   ax.set_yticks(yticks)
-  #   ax.set_yticklabels([('%.3f' % ytick)[1:] for ytick in yticks])
-  # else:
-  #   ax.set_xlim(0.0, 3.2)
-  #   xticks = np.arange(0.0, 3.5, 1.0)
-  #   ax.set_xticks(xticks)
-  #   ax.set_xticklabels(['%.1f' % xtick for xtick in xticks])
-  #   yticks = np.arange(0.01, 0.055, 0.01)
-  #   ax.set_yticks(yticks)
-  #   ax.set_yticklabels([('%.2f' % ytick)[1:] for ytick in yticks])
+  ax.set_xlim(0.0, 1.0)
+  xticks = np.arange(0.00, 1.05, 0.20)
+  ax.set_xticks(xticks)
+  xticklabels = ['%.1f' % xtick for xtick in np.flip(xticks, axis=0)]
+  ax.set_xticklabels(xticklabels)
 
   eps_file = path.join(figure_dir, '%s_error.eps' % risk_name)
   config.make_file_dir(eps_file)
   fig.savefig(eps_file, format='eps', bbox_inches='tight', pad_inches=pad_inches)
 
 draw_omega('mae')
-# draw_omega('mse')
+draw_omega('mse')
 
 
 

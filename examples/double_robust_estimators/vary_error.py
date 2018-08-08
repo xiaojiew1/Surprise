@@ -118,18 +118,21 @@ recom_list = config.provide_recom(indexes, cmpl_rates)
 alpha = f_alpha
 # v_omegas = np.arange(0.5, 1.55, 0.1)
 v_omegas = np.arange(1.0, -0.05, -0.1)
-
-risk = 'mse', np.square
-n_mcar = 50
-vary_error(n_mcar, dataset, recom_list, risk)
-n_mcar = 500
-vary_error(n_mcar, dataset, recom_list, risk)
+v_omegas = np.arange(0.80, 1.25, 0.05)
 
 risk = 'mae', np.absolute
 n_mcar = 500
 vary_error(n_mcar, dataset, recom_list, risk)
+exit()
 n_mcar = 50
 vary_error(n_mcar, dataset, recom_list, risk)
+
+risk = 'mse', np.square
+n_mcar = 500
+vary_error(n_mcar, dataset, recom_list, risk)
+n_mcar = 50
+vary_error(n_mcar, dataset, recom_list, risk)
+
 
 
 

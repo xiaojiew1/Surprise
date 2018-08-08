@@ -441,7 +441,7 @@ mse_v_gamma = np.arange(-2.00, 2.25, 0.50)
 # import matplotlib as mpl
 # print(mpl.rcParams['figure.figsize'])
 width, height = 6.4, 4.8
-legend_size = 26
+legend_size = 24
 label_size = 20
 line_width = 1.5
 marker_size = 10

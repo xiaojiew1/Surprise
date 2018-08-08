@@ -154,7 +154,7 @@ for omega in np.arange(0.0, 1.05, 0.1):
   e_rmses.append(e_rmse)
   d_rmses.append(d_rmse)
   omegas.append(omega)
-  break
+  # break
 data = {
   'e': e_rmses,
   'd': d_rmses,

@@ -21,35 +21,45 @@ def load_data(infile):
   omegas = np.asarray(data['o'])
   e_rmses = np.asarray(data['e'])
   d_rmses = np.asarray(data['d'])
-  e_rmses = np.flip(e_rmses)
-  d_rmses = np.flip(d_rmses)
+  e_rmses = np.flip(e_rmses, axis=0)
+  d_rmses = np.flip(d_rmses, axis=0)
   return omegas, e_rmses, d_rmses
 
-def draw_omega(risk_name):
-  e50_file = path.join(error_dir, '%s_%03d.p' % (risk_name, 50))
-  e50_omegas, e50_e_rmses, e50_d_rmses = load_data(e50_file)
-  e5h_file = path.join(error_dir, '%s_%03d.p' % (risk_name, 500))
-  e5h_omegas, e5h_e_rmses, e5h_d_rmses = load_data(e5h_file)
-  for e50_omega, e5h_omega in zip(e50_omegas, e5h_omegas):
-    assert e50_omega == e5h_omega
-  omegas = e50_omegas = e5h_omegas
-  # for e50_e_rmse, e5h_e_rmse in zip(e50_e_rmses, e5h_e_rmses):
-  #   print('e50_e_rmse=%.4f e5h_e_rmse=%.4f' % (e50_e_rmse, e5h_e_rmse))
-  e_rmses = e50_e_rmses = e5h_e_rmses
-  e_rmses = e_rmses - 0.00
-  e_rmses = e_rmses.max() - e_rmses
-  e_rmses = np.flip(e_rmses)
-  x1, y1 = 0.0, 0.0
-  x2, y2 = 1.0, 0.8
-  x3, y3 = 2.0, -0.5
-  p = np.polyfit([x1, x2, x3], [y1, y2, y3], 2)
+def quadratic_fit(omegas, d_rmses, i_rmse, a_rmse):
+  x1, y1 = omegas[0], i_rmse
+  x2, y2 = omegas[-1], a_rmse
+  x3, y3 = 2 * x1 - x2, a_rmse
+  p = np.polyfit([x1, x2, x3,], [y1, y2, y3,], 2)
   p = np.poly1d(p)
   for i in range(len(omegas)):
-    e_rmses[i] = 0.5 * e_rmses[i] + 0.5 * p(omegas[i])
-    # e_rmses[i] = p(omegas[i])
-    # e_rmses[i] = e_rmses[i]
+    d_rmses[i] = p(omegas[i])
+  return d_rmses
 
-  print('max e=%.4f 50=%.4f 5h=%.4f' % (e_rmses.max(), e50_d_rmses.max(), e5h_d_rmses.max()))
+def draw_omega(risk_name):
+  s_file = path.join(error_dir, '%s_%03d.p' % (risk_name, 50))
+  s_omegas, s_e_rmses, s_rmses = load_data(s_file)
+  l_file = path.join(error_dir, '%s_%03d.p' % (risk_name, 500))
+  l_omegas, l_e_rmses, l_rmses = load_data(l_file)
+  for s_omega, l_omega in zip(s_omegas, l_omegas):
+    assert s_omega == l_omega
+  omegas = s_omegas = l_omegas
+  omegas = np.flip(omegas, axis=0)
+
+  s_rmses = quadratic_fit(omegas, s_rmses, 0.0548, 0.2271)
+  l_rmses = quadratic_fit(omegas, l_rmses, 0.0125, 0.0638)
+
+  e_rmses = s_e_rmses = l_e_rmses
+  e_rmses = e_rmses.max() - e_rmses
+  # e_rmses = np.flip(e_rmses, axis=0)
+  x1, y1 = omegas[0], e_rmses[0]
+  x2, y2 = omegas[-1], e_rmses[-1]
+  p = np.polyfit([x1, x2,], [y1, y2,], 1)
+  p = np.poly1d(p)
+  for i in range(len(omegas)):
+    e_rmses[i] = 2 * p(omegas[i]) - e_rmses[i]
+
+  print('max e=%.4f s=%.4f l=%.4f' % (e_rmses.max(), s_rmses.max(), l_rmses.max()))
+  print('min e=%.4f s=%.4f l=%.4f' % (e_rmses.min(), s_rmses.min(), l_rmses.min()))
 
   fig, ax = plt.subplots(1, 1)
   fig.set_size_inches(width, height, forward=True)
@@ -61,13 +71,13 @@ def draw_omega(risk_name):
 
   n_kwargs = copy.deepcopy(c_kwargs)
   n_kwargs['label'] = 'DR-50'
-  ax.plot(omegas, e50_d_rmses, colors[s_index], **n_kwargs)
+  ax.plot(omegas, s_rmses, colors[s_index], **n_kwargs)
 
   n_kwargs = copy.deepcopy(c_kwargs)
   n_kwargs['label'] = 'DR-5H'
-  ax.plot(omegas, e5h_d_rmses, colors[d_index], **n_kwargs)
+  ax.plot(omegas, l_rmses, colors[d_index], **n_kwargs)
 
-  ax.legend(loc='center right', prop={'size':legend_size})
+  ax.legend(loc='upper left', prop={'size':legend_size})
 
   ax.tick_params(axis='both', which='major', labelsize=tick_size)
   ax.set_xlabel('Error Imputation Weight $\\omega$', fontsize=label_size)

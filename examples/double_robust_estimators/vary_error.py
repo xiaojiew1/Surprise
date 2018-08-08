@@ -119,8 +119,18 @@ alpha = f_alpha
 # v_omegas = np.arange(0.5, 1.55, 0.1)
 v_omegas = np.arange(1.0, -0.05, -0.1)
 
+risk = 'mse', np.square
+n_mcar = 50
+vary_error(n_mcar, dataset, recom_list, risk)
+n_mcar = 500
+vary_error(n_mcar, dataset, recom_list, risk)
+
 risk = 'mae', np.absolute
 n_mcar = 500
 vary_error(n_mcar, dataset, recom_list, risk)
 n_mcar = 50
 vary_error(n_mcar, dataset, recom_list, risk)
+
+
+
+

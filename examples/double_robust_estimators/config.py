@@ -166,8 +166,8 @@ def format_float(f):
 def estimate_e(cmpl_rates, pred_rates, train_obs, risk, omega, gamma):
   true_errors = risk(pred_rates - cmpl_rates)
 
-  pred_errors = omega * np.copy(true_errors)
-  # pred_errors = omega * risk(pred_rates - gamma)
+  # pred_errors = omega * np.copy(true_errors)
+  pred_errors = omega * risk(pred_rates - gamma)
 
   true_errors = np.multiply(train_obs, true_errors)
   pred_errors = np.multiply(1-train_obs, pred_errors)

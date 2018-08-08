@@ -66,18 +66,20 @@ def draw_beta(risk_name):
   kwargs['marker'] = markers[p_index]
   kwargs['label'] = p_label
   kwargs['linestyle'] = linestyles[p_index]
+  print('p %.4f %.4f' % (p_rmses[2], p_rmses[-3]))
   p_line, = ax.plot(v_beta, p_rmses, colors[p_index], **kwargs)
 
   ## snips estimator
   kwargs['marker'] = markers[s_index]
   kwargs['label'] = s_label
   kwargs['linestyle'] = linestyles[s_index]
-  sp_line, = ax.plot(v_beta, s_rmses, colors[s_index], **kwargs)
+  s_line, = ax.plot(v_beta, s_rmses, colors[s_index], **kwargs)
 
   ## dr estimator
   kwargs['marker'] = markers[d_index]
   kwargs['label'] = d_label
   kwargs['linestyle'] = linestyles[d_index]
+  print('d %.4f %.4f' % (d_rmses[2], d_rmses[-3]))
   d_line, = ax.plot(v_beta, d_rmses, colors[d_index], **kwargs)
 
   ax.legend(loc='upper left', prop={'size':legend_size}) # .set_zorder(0)

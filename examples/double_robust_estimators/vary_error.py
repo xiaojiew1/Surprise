@@ -22,9 +22,6 @@ def vary_error(n_mcar, dataset, recom_list, risk):
   # stdout.write('\n')
   
   outfile = path.join(error_dir, '%s_%03d.p' % (risk_name, n_mcar))
-  if path.isfile(outfile):
-    print('%s exists' % path.basename(outfile))
-    return
 
   p_o = n_rates / (n_users * n_items)
   # print('p_o: %.4f' % p_o)
@@ -101,6 +98,9 @@ def vary_error(n_mcar, dataset, recom_list, risk):
     d_rmses.append(d_rmse)
     omegas.append(omega)
     # break
+  if path.isfile(outfile):
+    print('%s exists' % path.basename(outfile))
+    return
   data = {
     'e': e_rmses,
     'd': d_rmses,

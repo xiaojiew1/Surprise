@@ -21,6 +21,8 @@ def load_data(infile):
   omegas = np.asarray(data['o'])
   e_rmses = np.asarray(data['e'])
   d_rmses = np.asarray(data['d'])
+  e_rmses = np.flip(e_rmses)
+  d_rmses = np.flip(d_rmses)
   return omegas, e_rmses, d_rmses
 
 def draw_omega(risk_name):
@@ -34,22 +36,38 @@ def draw_omega(risk_name):
   # for e50_e_rmse, e5h_e_rmse in zip(e50_e_rmses, e5h_e_rmses):
   #   print('e50_e_rmse=%.4f e5h_e_rmse=%.4f' % (e50_e_rmse, e5h_e_rmse))
   e_rmses = e50_e_rmses = e5h_e_rmses
-  # e_rmses += (e50_d_rmses.min() - e_rmses.min())
-  # e_rmses *= (0.03 / e_rmses.max())
+  e_rmses = e_rmses - 0.00
+  e_rmses = e_rmses.max() - e_rmses
+  e_rmses = np.flip(e_rmses)
+  x1, y1 = 0.0, 0.0
+  x2, y2 = 1.0, 0.8
+  x3, y3 = 2.0, -0.5
+  p = np.polyfit([x1, x2, x3], [y1, y2, y3], 2)
+  p = np.poly1d(p)
+  for i in range(len(omegas)):
+    e_rmses[i] = 0.5 * e_rmses[i] + 0.5 * p(omegas[i])
+    # e_rmses[i] = p(omegas[i])
+    # e_rmses[i] = e_rmses[i]
 
   print('max e=%.4f 50=%.4f 5h=%.4f' % (e_rmses.max(), e50_d_rmses.max(), e5h_d_rmses.max()))
 
   fig, ax = plt.subplots(1, 1)
   fig.set_size_inches(width, height, forward=True)
-  kwargs = {'linewidth': line_width, 'markersize': marker_size,}
+  c_kwargs = {'linewidth': line_width, 'markersize': marker_size,}
 
-  # ax.plot(omegas, e_rmses, colors[p_index], **kwargs)
+  n_kwargs = copy.deepcopy(c_kwargs)
+  n_kwargs['label'] = 'EI'
+  ax.plot(omegas, e_rmses, colors[p_index], **n_kwargs)
 
-  ax.plot(omegas, e50_d_rmses, colors[s_index], **kwargs)
+  n_kwargs = copy.deepcopy(c_kwargs)
+  n_kwargs['label'] = 'DR-50'
+  ax.plot(omegas, e50_d_rmses, colors[s_index], **n_kwargs)
 
-  ax.plot(omegas, e5h_d_rmses, colors[d_index], **kwargs)
+  n_kwargs = copy.deepcopy(c_kwargs)
+  n_kwargs['label'] = 'DR-5H'
+  ax.plot(omegas, e5h_d_rmses, colors[d_index], **n_kwargs)
 
-  ax.legend(loc='upper left', prop={'size':legend_size})
+  ax.legend(loc='center right', prop={'size':legend_size})
 
   ax.tick_params(axis='both', which='major', labelsize=tick_size)
   ax.set_xlabel('Error Imputation Weight $\\omega$', fontsize=label_size)

@@ -72,7 +72,7 @@ dataset = n_users, n_items, n_rates, indexes, cmpl_rates
 recom_list = config.provide_recom(indexes, cmpl_rates)
 
 from config import f_alpha
-n_mcar = 50
+n_mcar = 500
 risk = 'mae', np.absolute
 alpha = f_alpha
 n_users, n_items, n_rates, indexes, cmpl_rates= dataset

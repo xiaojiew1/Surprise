@@ -3,8 +3,8 @@ from config import f_alpha, mae_offset, mse_offset, mae_v_omega, mse_v_omega
 from config import width, height, pad_inches
 from config import p_label, s_label, d_label
 from config import colors, markers, linestyles, p_index, s_index, d_index
-from config import line_width, marker_size, legend_size, tick_size, label_size
-from config import s_marker_size
+from config import line_width, marker_edge_width
+from config import marker_size, legend_size, tick_size, label_size
 
 from matplotlib.patches import Patch
 from matplotlib.lines import Line2D
@@ -65,7 +65,12 @@ def draw_omega(risk_name):
 
   fig, ax = plt.subplots(1, 1)
   fig.set_size_inches(width, height, forward=True)
-  c_kwargs = {'linewidth': line_width, 'markersize': marker_size,}
+  c_kwargs = {
+    'linewidth': line_width,
+    'markersize': marker_size,
+    'fillstyle': 'none',
+    'markeredgewidth': marker_edge_width,
+  }
 
   # ips estimator
   n_kwargs = copy.deepcopy(c_kwargs)
@@ -87,14 +92,6 @@ def draw_omega(risk_name):
   n_kwargs['linestyle'] = linestyles[d_index]
   n_kwargs['marker'] = markers[d_index]
   ax.plot(v_omega, omega_d, colors[d_index], **n_kwargs)
-  n_kwargs = {
-    'linewidth': line_width,
-    'marker': markers[d_index],
-    'edgecolors': colors[d_index],
-    'facecolors': 'none',
-    's': s_marker_size,
-  }
-  # ax.scatter(v_omega, omega_d, **n_kwargs)
 
   ax.legend(loc='upper left', prop={'size':legend_size})
 

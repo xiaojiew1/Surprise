@@ -1,15 +1,17 @@
 from config import data_dir, curve_dir, figure_dir, tune_coat_file
 from config import coat_n_epochs
 from config import width, height, pad_inches
-from config import line_width, marker_size, legend_size, tick_size, label_size
 from config import ips_label, ml_label, mb_label
 from config import ips_index, ml_index, mb_index, colors, linestyles
+from config import line_width, marker_edge_width
+from config import marker_size, legend_size, tick_size, label_size
 
 from os import path
 from sys import stdout
 
 import config
 
+import copy
 import itertools
 import matplotlib.pyplot as plt
 import numpy as np
@@ -77,22 +79,30 @@ print('mb_error=%.4f ml_error=%.4f' % (mb_errors.min(), ml_errors.min()))
 
 fig, ax = plt.subplots(1, 1)
 fig.set_size_inches(width, height, forward=True)
-kwargs = {'linewidth': line_width, 'markersize': marker_size,}
+c_kwargs = {
+  'linewidth': line_width,
+  'markersize': marker_size,
+  'fillstyle': 'none',
+  'markeredgewidth': marker_edge_width,
+}
 
-kwargs['label'] = ips_label
-kwargs['color'] = colors[ips_index]
-kwargs['linestyle'] = linestyles[ips_index]
-ax.plot(epochs, mf_ips * np.ones_like(epochs), **kwargs)
+n_kwargs = copy.deepcopy(c_kwargs)
+n_kwargs['label'] = ips_label
+n_kwargs['color'] = colors[ips_index]
+n_kwargs['linestyle'] = linestyles[ips_index]
+ax.plot(epochs, mf_ips * np.ones_like(epochs), **n_kwargs)
 
-kwargs['label'] = ml_label
-kwargs['color'] = colors[ml_index]
-kwargs['linestyle'] = linestyles[ml_index]
-ax.plot(epochs, ml_errors, **kwargs)
+n_kwargs = copy.deepcopy(c_kwargs)
+n_kwargs['label'] = ml_label
+n_kwargs['color'] = colors[ml_index]
+n_kwargs['linestyle'] = linestyles[ml_index]
+ax.plot(epochs, ml_errors, **n_kwargs)
 
-kwargs['label'] = mb_label
-kwargs['color'] = colors[mb_index]
-kwargs['linestyle'] = linestyles[mb_index]
-ax.plot(epochs, mb_errors, **kwargs)
+n_kwargs = copy.deepcopy(c_kwargs)
+n_kwargs['label'] = mb_label
+n_kwargs['color'] = colors[mb_index]
+n_kwargs['linestyle'] = linestyles[mb_index]
+ax.plot(epochs, mb_errors, **n_kwargs)
 
 ax.legend(loc='upper right', prop={'size':legend_size})
 ax.tick_params(axis='both', which='major', labelsize=tick_size)

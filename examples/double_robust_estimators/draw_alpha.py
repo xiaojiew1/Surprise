@@ -3,13 +3,15 @@ from config import v_alpha, mae_offset, mse_offset
 from config import width, height, pad_inches
 from config import p_label, s_label, d_label
 from config import colors, markers, linestyles, p_index, s_index, d_index
-from config import line_width, marker_size, legend_size, tick_size, label_size
+from config import line_width, marker_edge_width
+from config import marker_size, legend_size, tick_size, label_size
 
 from os import path
 from sys import stdout
 
 import config
 
+import copy
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -43,25 +45,33 @@ def draw_alpha(risk_name):
 
   fig, ax = plt.subplots(1, 1)
   fig.set_size_inches(width, height, forward=True)
-  kwargs = {'linewidth': line_width, 'markersize': marker_size,}
+  c_kwargs = {
+    'linewidth': line_width,
+    'markersize': marker_size,
+    'fillstyle': 'none',
+    'markeredgewidth': marker_edge_width,
+  }
 
   ## ips estimator
-  kwargs['marker'] = markers[p_index]
-  kwargs['label'] = p_label
-  kwargs['linestyle'] = linestyles[p_index]
-  ax.plot(v_alpha, p_rmses, colors[p_index], **kwargs)
+  n_kwargs = copy.deepcopy(c_kwargs)
+  n_kwargs['marker'] = markers[p_index]
+  n_kwargs['label'] = p_label
+  n_kwargs['linestyle'] = linestyles[p_index]
+  ax.plot(v_alpha, p_rmses, colors[p_index], **n_kwargs)
 
   ## snips estimator
-  kwargs['marker'] = markers[s_index]
-  kwargs['label'] = s_label
-  kwargs['linestyle'] = linestyles[s_index]
-  ax.plot(v_alpha, s_rmses, colors[s_index], **kwargs)
+  n_kwargs = copy.deepcopy(c_kwargs)
+  n_kwargs['marker'] = markers[s_index]
+  n_kwargs['label'] = s_label
+  n_kwargs['linestyle'] = linestyles[s_index]
+  ax.plot(v_alpha, s_rmses, colors[s_index], **n_kwargs)
 
   ## dr estimator
-  kwargs['marker'] = markers[d_index]
-  kwargs['label'] = d_label
-  kwargs['linestyle'] = linestyles[d_index]
-  ax.plot(v_alpha, d_rmses, colors[d_index], **kwargs)
+  n_kwargs = copy.deepcopy(c_kwargs)
+  n_kwargs['marker'] = markers[d_index]
+  n_kwargs['label'] = d_label
+  n_kwargs['linestyle'] = linestyles[d_index]
+  ax.plot(v_alpha, d_rmses, colors[d_index], **n_kwargs)
 
   ax.legend(loc='upper right', prop={'size':legend_size})
   ax.set_xticks(np.arange(0.20, 1.05, 0.20))

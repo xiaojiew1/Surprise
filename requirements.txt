@@ -3,7 +3,8 @@ numpy>=1.11.2
 scipy>=1.0.0
 six>=1.10.0
 
-matplotlib==2.2.2
+# matplotlib==2.2.2 no hollow
+matplotlib==2.0.2
 pandas==0.22.0
 requests==2.19.1
 sklearn==0.0

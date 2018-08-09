@@ -3,13 +3,15 @@ from config import f_alpha, mae_offset, mse_offset, mae_v_gamma, mse_v_gamma
 from config import width, height, pad_inches
 from config import p_label, s_label, d_label
 from config import colors, markers, linestyles, p_index, s_index, d_index
-from config import line_width, marker_size, legend_size, tick_size, label_size
+from config import line_width, marker_edge_width
+from config import marker_size, legend_size, tick_size, label_size
 
 from os import path
 from sys import stdout
 
 import config
 
+import copy
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -47,25 +49,33 @@ def draw_gamma(risk_name):
 
   fig, ax = plt.subplots(1, 1)
   fig.set_size_inches(width, height, forward=True)
-  kwargs = {'linewidth': line_width, 'markersize': marker_size,}
+  c_kwargs = {
+    'linewidth': line_width,
+    'markersize': marker_size,
+    'fillstyle': 'none',
+    'markeredgewidth': marker_edge_width,
+  }
 
   # ips estimator
-  kwargs['label'] = p_label
-  kwargs['linestyle'] = linestyles[p_index]
+  n_kwargs = copy.deepcopy(c_kwargs)
+  n_kwargs['label'] = p_label
+  n_kwargs['linestyle'] = linestyles[p_index]
   gamma_p = np.ones_like(v_gamma) * gamma_p
-  ax.plot(v_gamma, gamma_p, colors[p_index], **kwargs)
+  ax.plot(v_gamma, gamma_p, colors[p_index], **n_kwargs)
 
   # snips estimator
-  kwargs['label'] = s_label
-  kwargs['linestyle'] = linestyles[s_index]
+  n_kwargs = copy.deepcopy(c_kwargs)
+  n_kwargs['label'] = s_label
+  n_kwargs['linestyle'] = linestyles[s_index]
   gamma_s = np.ones_like(v_gamma) * gamma_s
-  ax.plot(v_gamma, gamma_s, colors[s_index], **kwargs)
+  ax.plot(v_gamma, gamma_s, colors[s_index], **n_kwargs)
 
   # dr estimator
-  kwargs['marker'] = markers[d_index]
-  kwargs['label'] = d_label
-  kwargs['linestyle'] = linestyles[d_index]
-  ax.plot(v_gamma, gamma_d, colors[d_index], **kwargs)
+  n_kwargs = copy.deepcopy(c_kwargs)
+  n_kwargs['marker'] = markers[d_index]
+  n_kwargs['label'] = d_label
+  n_kwargs['linestyle'] = linestyles[d_index]
+  ax.plot(v_gamma, gamma_d, colors[d_index], **n_kwargs)
 
 
   ax.tick_params(axis='both', which='major', labelsize=tick_size)

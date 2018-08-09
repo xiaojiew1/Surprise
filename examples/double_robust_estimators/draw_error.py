@@ -3,7 +3,8 @@ from config import f_alpha, mae_offset, mse_offset, mae_v_omega, mse_v_omega
 from config import width, height, pad_inches
 from config import p_label, s_label, d_label
 from config import colors, markers, linestyles, p_index, s_index, d_index
-from config import line_width, marker_size, legend_size, tick_size, label_size
+from config import line_width, marker_edge_width
+from config import marker_size, legend_size, tick_size, label_size
 
 from os import path
 from sys import stdout
@@ -65,7 +66,12 @@ def draw_omega(risk_name):
 
   fig, ax = plt.subplots(1, 1)
   fig.set_size_inches(width, height, forward=True)
-  c_kwargs = {'linewidth': line_width, 'markersize': marker_size,}
+  c_kwargs = {
+    'linewidth': line_width,
+    'markersize': marker_size,
+    'fillstyle': 'none',
+    'markeredgewidth': marker_edge_width,
+  }
 
   n_kwargs = copy.deepcopy(c_kwargs)
   n_kwargs['label'] = 'IBE'

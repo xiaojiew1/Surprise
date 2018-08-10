@@ -76,6 +76,7 @@ def draw_omega(risk_name):
   n_kwargs = copy.deepcopy(c_kwargs)
   n_kwargs['label'] = p_label
   n_kwargs['linestyle'] = linestyles[p_index]
+  n_kwargs['marker'] = markers[p_index]
   omega_p = np.ones_like(v_omega) * omega_p
   ax.plot(v_omega, omega_p, colors[p_index], **n_kwargs)
 
@@ -83,6 +84,7 @@ def draw_omega(risk_name):
   n_kwargs = copy.deepcopy(c_kwargs)
   n_kwargs['label'] = s_label
   n_kwargs['linestyle'] = linestyles[s_index]
+  n_kwargs['marker'] = markers[s_index]
   omega_s = np.ones_like(v_omega) * omega_s
   ax.plot(v_omega, omega_s, colors[s_index], **n_kwargs)
 

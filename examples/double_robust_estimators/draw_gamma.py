@@ -58,6 +58,7 @@ def draw_gamma(risk_name):
 
   # ips estimator
   n_kwargs = copy.deepcopy(c_kwargs)
+  n_kwargs['marker'] = markers[p_index]
   n_kwargs['label'] = p_label
   n_kwargs['linestyle'] = linestyles[p_index]
   gamma_p = np.ones_like(v_gamma) * gamma_p
@@ -65,6 +66,7 @@ def draw_gamma(risk_name):
 
   # snips estimator
   n_kwargs = copy.deepcopy(c_kwargs)
+  n_kwargs['marker'] = markers[s_index]
   n_kwargs['label'] = s_label
   n_kwargs['linestyle'] = linestyles[s_index]
   gamma_s = np.ones_like(v_gamma) * gamma_s

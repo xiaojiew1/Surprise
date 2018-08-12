@@ -17,6 +17,10 @@ import numpy as np
 import os
 import pickle
 
+p_label = 'EIB'
+s_label = 'DR-50'
+d_label = 'DR-500'
+
 def load_data(infile):
   data = pickle.load(open(infile, 'rb'))
   omegas = np.asarray(data['o'])
@@ -74,19 +78,19 @@ def draw_omega(risk_name):
   }
 
   n_kwargs = copy.deepcopy(c_kwargs)
-  n_kwargs['label'] = 'IBE'
+  n_kwargs['label'] = p_label
   n_kwargs['marker'] = markers[p_index]
   n_kwargs['linestyle'] = linestyles[p_index]
   ax.plot(omegas, e_rmses, colors[p_index], **n_kwargs)
 
   n_kwargs = copy.deepcopy(c_kwargs)
-  n_kwargs['label'] = 'DR (50)'
+  n_kwargs['label'] = s_label
   n_kwargs['marker'] = markers[s_index]
   n_kwargs['linestyle'] = linestyles[s_index]
   ax.plot(omegas, s_rmses, colors[s_index], **n_kwargs)
 
   n_kwargs = copy.deepcopy(c_kwargs)
-  n_kwargs['label'] = 'DR (500)'
+  n_kwargs['label'] = d_label
   n_kwargs['marker'] = markers[d_index]
   n_kwargs['linestyle'] = linestyles[d_index]
   ax.plot(omegas, l_rmses, colors[d_index], **n_kwargs)

@@ -16,45 +16,33 @@ pip install -e .
 http://www.shivani-agarwal.net/Teaching/E0370/Aug-2011/Lectures/3.pdf
 
 ################################################################
-# backup
+# latex
 ################################################################
-  n_samples = 400
-  m_index = np.argmin(errors)
-  r_samples = n_samples - m_index
-  x, y = [], []
-  for i in range(m_index, m_index+r_samples):
-    x.append(i+1)
-    y.append(errors[i])
-  p = np.polyfit(x, y, 1)
-  p = np.poly1d(p)
-  variances = []
-  for i in range(len(epochs)):
-    # variances.append(p(epochs[i]))
-    if i < m_index:
-      variances.append(0.0)
-    else:
-      variances.append(errors[i]-p(epochs[i]))
+We use the following two methods for propensity estimation~\cite{schnabel2016recommendations}.
+\begin{enumerate}[leftmargin=*,noitemsep,topsep=0pt]
+\item \mytextbf{Naive Bayes}.
+Suppose propensities are conditioned on the true ratings only, based on Bayes theorem, we have
+\begin{equation*}
+\anEstPropensity
+=P(\anObservation=1|\aTrueRating)
+=\frac{P(\aTrueRating|\anObservation=1)P(\anObservation=1)}{P(\aTrueRating)}
+\text{.}
+\end{equation*}%
+We estimate $P(\aTrueRating|\anObservation=1)$ and $P(\anObservation=1)$ by maximum likelihood on MNAR data.
+To estimate $P(\aTrueRating)$, we need to use a small sample of MAR data.
+\item \mytextbf{Logistic Regression}.
+Given a vector $\observedFeature$ that encodes all observable features about a user-item pair, we estimate propensities based on logistic regression as follows,
+\begin{equation*}
+\anEstPropensity=\sigma(\logRegrFeatWeight^\transpose\observedFeature+\logRegrUserBias+\logRegrItemBias)
+\text{.}
+\end{equation*}%
+Here, $\sigma(\cdot)$ is the sigmoid function. $\logRegrFeatWeight$, $\logRegrUserBias$, and $\logRegrItemBias$ are trainable parameters.
+\end{enumerate}
 
-  x = [m_index, len(errors)]
-  y = [errors[m_index], errors[m_index]]
-
-  p = np.polyfit(x, y, 1)
-  p = np.poly1d(p)
-  new_errors = []
-  origin = (m_index, errors[m_index])
-  for i in range(len(epochs)):
-    if i < m_index:
-      new_errors.append(errors[i])
-    else:
-      # new_error = rotate(origin, (i, errors[i]), math.radians(-0.018))[1]
-      new_error = p(epochs[i])
-      if i % 2 == 0:
-        new_error += np.random.uniform(0.0002,0.00004)
-      else:
-        new_error -= np.random.uniform(0.0002,0.00004)
-      # choices = [0.00001, 0.00002, 0.00005]
-      # choices += [-choice for choice in choices]
-      # new_error = p(epochs[i]) + float(np.random.choice(choices, 1))
-      new_errors.append(new_error)
-  ax.plot(epochs, new_errors, **{'label':kwargs_str,})
-
+the SNIPS estimator~\cite{swaminathan2015self} defined as.
+\begin{equation*}
+\snipsEstimator=
+\frac{1}{\verbSumUsersItems\frac{\anObservation}{\anEstPropensity}}
+\verbSumUsersItems\frac{\anObservation\aTrueError}{\anEstPropensity}
+\text{.}
+\end{equation*}%

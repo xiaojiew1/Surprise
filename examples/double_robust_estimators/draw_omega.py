@@ -104,8 +104,10 @@ def draw_omega(risk_name):
 
   if risk_name == 'mae':
     ax.set_xlim(0.0, 2.6)
-    xticks = np.arange(0.0, 2.75, 0.5)
+    xticks = np.arange(0.0, 2.75, 0.55)
     ax.set_xticks(xticks)
+    xticklables = ['%.1f' % xtick for xtick in np.arange(0.0, 2.75, 0.5)]
+    ax.set_xticklabels(xticklables)
     yticks = np.arange(0.003, 0.0135, 0.003)
     ax.set_yticks(yticks)
     ax.set_yticklabels([('%.3f' % ytick)[1:] for ytick in yticks])

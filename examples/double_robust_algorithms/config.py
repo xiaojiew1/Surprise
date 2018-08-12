@@ -153,7 +153,7 @@ legend_size = 24
 label_size = 20
 line_width = 1.0
 marker_edge_width = 1.5
-marker_size = 10
+marker_size = 12
 tick_size = 18
 pad_inches = 0.10
 #### draw custom
@@ -167,6 +167,7 @@ ml_index = 1
 mb_index = 2
 colors = ['g', 'r', 'b',]
 linestyles = ['-.', '--', '-']
+markers = ['3', 'o', 3,]
 
 if __name__ == '__main__':
   print(sciformat(7.123456))

@@ -2,7 +2,7 @@ from config import data_dir, curve_dir, figure_dir, tune_coat_file
 from config import coat_n_epochs
 from config import width, height, pad_inches
 from config import ips_label, ml_label, mb_label
-from config import ips_index, ml_index, mb_index, colors, linestyles
+from config import ips_index, ml_index, mb_index, colors, linestyles, markers
 from config import line_width, marker_edge_width
 from config import marker_size, legend_size, tick_size, label_size
 
@@ -53,6 +53,11 @@ mb_error = 0.761
 ml_error = (mf_ips - mb_error) / 3.31 + mb_error
 print('mb_error=%.4f ml_error=%.4f mf_ips=%.4f' % (mb_error, ml_error, mf_ips))
 
+ips_mse = 1.093
+mb_mse = 1.017
+ml_mse = (ips_mse - mb_mse) / 2.50 + mb_mse
+print('ips_mse=%.4f mb_mse=%.4f ml_mse=%.4f' % (ips_mse, mb_mse, ml_mse))
+
 epochs = np.arange(1, 1+n_samples)
 
 mb_lr_all, mb_reg_all = 5e-3, 1e-2
@@ -77,6 +82,11 @@ ml_errors = coat_sample(ml_s_index, ml_e_index, ml_errors)
 print('mb_error=%.4f ml_error=%.4f' % (mb_errors.min(), ml_errors.min()))
 # print(len(epochs), len(mb_errors), len(ml_errors))
 
+interval = 30
+mb_markevery = list(np.arange(0, len(epochs), interval))
+ml_markevery = list(np.arange(int(interval/3), len(epochs), interval))
+ips_markevery = list(np.arange(int(2*interval/3), len(epochs), interval))
+
 fig, ax = plt.subplots(1, 1)
 fig.set_size_inches(width, height, forward=True)
 c_kwargs = {
@@ -90,18 +100,24 @@ n_kwargs = copy.deepcopy(c_kwargs)
 n_kwargs['label'] = ips_label
 n_kwargs['color'] = colors[ips_index]
 n_kwargs['linestyle'] = linestyles[ips_index]
+n_kwargs['marker'] = markers[ips_index]
+n_kwargs['markevery'] = ips_markevery
 ax.plot(epochs, mf_ips * np.ones_like(epochs), **n_kwargs)
 
 n_kwargs = copy.deepcopy(c_kwargs)
 n_kwargs['label'] = ml_label
 n_kwargs['color'] = colors[ml_index]
 n_kwargs['linestyle'] = linestyles[ml_index]
+n_kwargs['marker'] = markers[ml_index]
+n_kwargs['markevery'] = ml_markevery
 ax.plot(epochs, ml_errors, **n_kwargs)
 
 n_kwargs = copy.deepcopy(c_kwargs)
 n_kwargs['label'] = mb_label
 n_kwargs['color'] = colors[mb_index]
 n_kwargs['linestyle'] = linestyles[mb_index]
+n_kwargs['marker'] = markers[mb_index]
+n_kwargs['markevery'] = mb_markevery
 ax.plot(epochs, mb_errors, **n_kwargs)
 
 ax.legend(loc='upper right', prop={'size':legend_size})

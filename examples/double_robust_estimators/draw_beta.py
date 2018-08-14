@@ -104,7 +104,8 @@ def draw_beta(risk_name):
   ax.legend(loc='upper left', prop={'size':legend_size}) # .set_zorder(0)
 
   ax.tick_params(axis='both', which='major', labelsize=tick_size)
-  ax.set_xlabel('Propensity Estimation Quality $\\beta$', fontsize=label_size)
+  # ax.set_xlabel('Propensity Estimation Quality $\\beta$', fontsize=label_size)
+  ax.set_xlabel('$\\beta$', fontsize=label_size)
   ax.set_xlim(0.0, 1.0)
   ax.set_xticks(np.arange(0.00, 1.05, 0.20))
   ax.set_ylabel('RMSE of %s Estimation' % (risk_name.upper()), fontsize=label_size)

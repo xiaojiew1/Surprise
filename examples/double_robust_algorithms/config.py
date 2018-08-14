@@ -159,8 +159,8 @@ pad_inches = 0.10
 #### draw custom
 ips_label = 'MF-IPS'
 cpt_label = 'CPT-v'
-ml_label = 'MF-DR-ERM'
-mb_label = 'MF-DR'
+ml_label = 'DRCF-ERM'
+mb_label = 'DRCF'
 ips_index = 0
 cpt_index = 0
 ml_index = 1

@@ -54,7 +54,7 @@ def draw_omega(risk_name):
   s_rmses = quadratic_fit(omegas, s_rmses, i_rmse, 0.2271)
   l_rmses = quadratic_fit(omegas, l_rmses, i_rmse, 0.0638)
 
-  a_rmse = 0.8050
+  a_rmse = 0.9250
   e_rmses = s_e_rmses = l_e_rmses
   e_rmses = e_rmses.max() - e_rmses
   # e_rmses = np.flip(e_rmses, axis=0)

@@ -18,6 +18,24 @@ http://www.shivani-agarwal.net/Teaching/E0370/Aug-2011/Lectures/3.pdf
 ################################################################
 # latex
 ################################################################
+
+Most existing work on rating-based recommender systems does not explicitly considers the MNAR nature of rating data~\cite{adomavicius2005toward,salakhutdinov2007restricted}.
+For example, some of the most successful methods are based on matrix factorization, which predicts ratings by factorizing observed ratings into latent factors for users and items~\cite{bell2007chasing,mnih2008probabilistic}.
+More recently, autoencoders have been adapted for rating prediction by reconstructing a user's ratings given the user's historical ratings as input~\cite{sedhain2015autorec,strub2015collaborative}.
+By comparing against these methods, we show that it is beneficial to model the MNAR nature of rating data but inaccurately modeling MNAR data can lead to an even worse accuracy.
+
+Existing work dealing with MNAR data models missing data with a propensity model that estimates the probability of a rating to be missing~\cite{hernandez2014probabilistic,schnabel2016recommendations}.
+For example, Marlin and Zemel combines a propensity model with a probabilistic model for complete data~\cite{marlin2007collaborative,marlin2009collaborative}
+An alternative method is to model missing data with an imputation model that imputes some rating values for missing data~\cite{lim2015top}.
+For example, Steck considers performance measures that can be estimated without bias from MNAR data based on an imputation model~\cite{steck2010training,steck2011item}.
+Both the propensity and imputation-based methods are vulnerable to inaccurate models of missing data, which is what we aim to deal with in this paper.
+
+In addition to rating prediction, another popular recommendation problem is item ranking~\cite{hu2008collaborative,he2016fast}.
+The problem of item ranking is to provide a ranking list of items to users~\cite{rendle2009bpr,he2017neural}.
+The accuracy for item ranking may suffer with the presence of biased data~\cite{ai2018unbiased,joachims2017unbiased}.
+We leave the problem item ranking with double robustness for future work.
+
+
 We use the following two methods for propensity estimation~\cite{schnabel2016recommendations}.
 \begin{enumerate}[leftmargin=*,noitemsep,topsep=0pt]
 \item \mytextbf{Naive Bayes}.

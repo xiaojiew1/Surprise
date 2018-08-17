@@ -18,6 +18,8 @@ http://www.shivani-agarwal.net/Teaching/E0370/Aug-2011/Lectures/3.pdf
 ################################################################
 # latex
 ################################################################
+https://tex.stackexchange.com/questions/429393/draw-sine-waves
+
 
 Most existing work on rating-based recommender systems does not explicitly considers the MNAR nature of rating data~\cite{adomavicius2005toward,salakhutdinov2007restricted}.
 For example, some of the most successful methods are based on matrix factorization, which predicts ratings by factorizing observed ratings into latent factors for users and items~\cite{bell2007chasing,mnih2008probabilistic}.

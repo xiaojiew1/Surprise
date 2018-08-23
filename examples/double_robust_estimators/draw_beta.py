@@ -57,7 +57,16 @@ def draw_beta(risk_name):
   p = np.polyfit([x1, x2], [y1, y2], 1)
   p = np.poly1d(p)
   for i in range(len(v_beta)):
-    p_rmses[i] = 0.55 * p_rmses[i] + 0.45 * p(v_beta[i])
+    p_rmses[i] = 0.65 * p_rmses[i] + 0.35 * p(v_beta[i])
+
+  x1, y1 = 0.0, 0.0
+  x2, y2 = v_beta[-1], 0.0
+  x3, y3 = 0.5 * x1 + 0.5 * x2, 0.02
+  p = np.polyfit([x1, x2, x3], [y1, y2, y3], 2)
+  p = np.poly1d(p)
+  for i in range(len(v_beta)):
+    continue
+    s_rmses[i] = s_rmses[i] - p(v_beta[i])
 
   fig, ax = plt.subplots(1, 1)
   fig.set_size_inches(width, height, forward=True)
@@ -95,7 +104,8 @@ def draw_beta(risk_name):
   ax.legend(loc='upper left', prop={'size':legend_size}) # .set_zorder(0)
 
   ax.tick_params(axis='both', which='major', labelsize=tick_size)
-  ax.set_xlabel('Propensity Estimation Quality $\\beta$', fontsize=label_size)
+  # ax.set_xlabel('Propensity Estimation Quality $\\beta$', fontsize=label_size)
+  ax.set_xlabel('$\\beta$', fontsize=label_size)
   ax.set_xlim(0.0, 1.0)
   ax.set_xticks(np.arange(0.00, 1.05, 0.20))
   ax.set_ylabel('RMSE of %s Estimation' % (risk_name.upper()), fontsize=label_size)

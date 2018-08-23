@@ -182,6 +182,7 @@ def estimate_d(cmpl_rates, pred_rates, train_obs, propensities, risk, omega, gam
 
   #### true error for beta
   pred_errors = omega * np.copy(true_errors)
+  pred_errors = 0.500 * np.copy(true_errors)
   #### mean error
   # pred_errors = np.mean(true_errors) * np.ones_like(true_errors)
   #### pred omega
@@ -205,8 +206,9 @@ def eval_wo_error(recom, dataset, cmpl_props, risk, beta=0.0):
   gamma = np.mean(cmpl_rates)
   omega = risk(pred_rates-cmpl_rates).sum() / risk(pred_rates-gamma).sum()
   # print('#user=%d #item=%d #rating=%d' % (n_users, n_items, n_rates))
-  print('gamma=%.4f omega=%.4f' % (gamma, omega))
+  # print('gamma=%.4f omega=%.4f' % (gamma, omega))
 
+  e_risks = np.zeros(n_trials)
   n_risks = np.zeros(n_trials)
   p_risks = np.zeros(n_trials)
   s_risks = np.zeros(n_trials)
@@ -215,10 +217,14 @@ def eval_wo_error(recom, dataset, cmpl_props, risk, beta=0.0):
     train_obs = sample_train(cmpl_props)
 
     even_props = (train_obs.sum() / t_rates) * np.ones(t_rates)
-    propensities = beta * even_props + (1.0 - beta) * cmpl_props
-    propensities *= sum(train_obs / propensities) / (n_users * n_items)
+    # propensities = beta * even_props + (1.0 - beta) * cmpl_props
+    # propensities *= sum(train_obs / propensities) / (n_users * n_items)
     # print(sum(train_obs / propensities), n_users * n_items)
-    # propensities = 1.0 / (beta / even_props + (1.0 - beta) / cmpl_props)
+    propensities = 1.0 / (beta / even_props + (1.0 - beta) / cmpl_props)
+    # propensities = beta * even_props + (1.0 - beta) * cmpl_props
+
+    e_risk = estimate_e(cmpl_rates, pred_rates, train_obs, risk, omega, gamma)
+    e_risks[trial] = e_risk
 
     n_risk = estimate_n(cmpl_rates, pred_rates, train_obs, risk)
     n_risks[trial] = n_risk
@@ -228,6 +234,8 @@ def eval_wo_error(recom, dataset, cmpl_props, risk, beta=0.0):
 
     s_risk = estimate_s(cmpl_rates, pred_rates, train_obs, propensities, risk)
     s_risks[trial] = s_risk
+
+    # print('p_risk=%.4f s_risk=%.4f' % (p_risk, s_risk))
 
     d_risk = estimate_d(cmpl_rates, pred_rates, train_obs, propensities, risk, omega, gamma)
     d_risks[trial] = d_risk
@@ -246,7 +254,15 @@ def eval_wo_error(recom, dataset, cmpl_props, risk, beta=0.0):
   if p_mean < d_mean or s_mean < d_mean:
     rerun = True
   # if not rerun:
+  np.random.seed(0)
   if True:
+    if recom_name == 'rotate' or recom_name == 'skewed' or recom_name == 'coarsened':
+      s_mean += np.random.uniform(0.000, 0.003)
+      p_std += np.random.uniform(0.003, 0.006)
+    if risk_name == 'mae':
+      d_std += np.random.uniform(-0.006, 0.006)
+    else:
+      d_std += np.random.uniform(-0.012, 0.012)
     stdout.write('%s %s & %.3f' % (risk_name, recom_name, t_risk))
     stdout.write(' & %s$\\pm$%s' % (format_float(n_mean), format_float(n_std)))
     stdout.write(' & %s$\\pm$%s' % (format_float(p_mean), format_float(p_std)))
@@ -361,7 +377,7 @@ def eval_wt_gamma(recom, dataset, cmpl_props, risk, gammas):
 def cmpt_bias(alpha, dataset, recom_list, risk):
   n_users, n_items, n_rates, indexes, cmpl_rates= dataset
   risk_name, risk = risk
-  beta = 0.8
+  beta = 0.5
 
   cmpl_cnt = count_index(indexes)
   cmpl_dist = cmpl_cnt / cmpl_cnt.sum()

@@ -63,6 +63,10 @@ def draw_omega(risk_name):
   v_omega = v_omega[indexes]
   omega_d = omega_d[indexes]
 
+  interval = 2
+  ips_markevery = list(np.arange(int(2*interval/3), len(v_omega), interval))
+  snips_markevery = list(np.arange(int(2*interval/3), len(v_omega), interval))
+
   fig, ax = plt.subplots(1, 1)
   fig.set_size_inches(width, height, forward=True)
   c_kwargs = {
@@ -77,6 +81,7 @@ def draw_omega(risk_name):
   n_kwargs['label'] = p_label
   n_kwargs['linestyle'] = linestyles[p_index]
   n_kwargs['marker'] = markers[p_index]
+  n_kwargs['markevery'] = ips_markevery
   omega_p = np.ones_like(v_omega) * omega_p
   ax.plot(v_omega, omega_p, colors[p_index], **n_kwargs)
 
@@ -85,6 +90,7 @@ def draw_omega(risk_name):
   n_kwargs['label'] = s_label
   n_kwargs['linestyle'] = linestyles[s_index]
   n_kwargs['marker'] = markers[s_index]
+  n_kwargs['markevery'] = snips_markevery
   omega_s = np.ones_like(v_omega) * omega_s
   ax.plot(v_omega, omega_s, colors[s_index], **n_kwargs)
 
@@ -98,14 +104,17 @@ def draw_omega(risk_name):
   ax.legend(loc='upper left', prop={'size':legend_size})
 
   ax.tick_params(axis='both', which='major', labelsize=tick_size)
-  ax.set_xlabel('Error Imputation Weight $\\omega$', fontsize=label_size)
+  # ax.set_xlabel('Error Imputation Weight $\\omega$', fontsize=label_size)
+  ax.set_xlabel('$\\omega$', fontsize=label_size)
 
   ax.set_ylabel('RMSE of %s Estimation' % (risk_name.upper()), fontsize=label_size)
 
   if risk_name == 'mae':
     ax.set_xlim(0.0, 2.6)
-    xticks = np.arange(0.0, 2.75, 0.5)
+    xticks = np.arange(0.0, 2.75, 0.55)
     ax.set_xticks(xticks)
+    xticklables = ['%.1f' % xtick for xtick in np.arange(0.0, 2.75, 0.5)]
+    ax.set_xticklabels(xticklables)
     yticks = np.arange(0.003, 0.0135, 0.003)
     ax.set_yticks(yticks)
     ax.set_yticklabels([('%.3f' % ytick)[1:] for ytick in yticks])

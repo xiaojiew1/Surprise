@@ -17,6 +17,10 @@ import numpy as np
 import os
 import pickle
 
+p_label = 'EIB'
+s_label = 'DR-50'
+d_label = 'DR-500'
+
 def load_data(infile):
   data = pickle.load(open(infile, 'rb'))
   omegas = np.asarray(data['o'])
@@ -50,7 +54,7 @@ def draw_omega(risk_name):
   s_rmses = quadratic_fit(omegas, s_rmses, i_rmse, 0.2271)
   l_rmses = quadratic_fit(omegas, l_rmses, i_rmse, 0.0638)
 
-  a_rmse = 0.8050
+  a_rmse = 0.9250
   e_rmses = s_e_rmses = l_e_rmses
   e_rmses = e_rmses.max() - e_rmses
   # e_rmses = np.flip(e_rmses, axis=0)
@@ -74,19 +78,19 @@ def draw_omega(risk_name):
   }
 
   n_kwargs = copy.deepcopy(c_kwargs)
-  n_kwargs['label'] = 'IBE'
+  n_kwargs['label'] = p_label
   n_kwargs['marker'] = markers[p_index]
   n_kwargs['linestyle'] = linestyles[p_index]
   ax.plot(omegas, e_rmses, colors[p_index], **n_kwargs)
 
   n_kwargs = copy.deepcopy(c_kwargs)
-  n_kwargs['label'] = 'DR (50)'
+  n_kwargs['label'] = s_label
   n_kwargs['marker'] = markers[s_index]
   n_kwargs['linestyle'] = linestyles[s_index]
   ax.plot(omegas, s_rmses, colors[s_index], **n_kwargs)
 
   n_kwargs = copy.deepcopy(c_kwargs)
-  n_kwargs['label'] = 'DR (500)'
+  n_kwargs['label'] = d_label
   n_kwargs['marker'] = markers[d_index]
   n_kwargs['linestyle'] = linestyles[d_index]
   ax.plot(omegas, l_rmses, colors[d_index], **n_kwargs)
@@ -94,7 +98,8 @@ def draw_omega(risk_name):
   ax.legend(loc='upper left', prop={'size':legend_size})
 
   ax.tick_params(axis='both', which='major', labelsize=tick_size)
-  ax.set_xlabel('Error Imputation Weight $\\omega$', fontsize=label_size)
+  # ax.set_xlabel('Error Imputation Weight $\\omega$', fontsize=label_size)
+  ax.set_xlabel('$\\omega$', fontsize=label_size)
 
   ax.set_ylabel('RMSE of %s Estimation' % (risk_name.upper()), fontsize=label_size)
 

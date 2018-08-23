@@ -23,43 +23,256 @@ http://www.danielherber.com/latex.php?option=post_5
 ################################################################
 # backup
 ################################################################
-  n_samples = 400
-  m_index = np.argmin(errors)
-  r_samples = n_samples - m_index
-  x, y = [], []
-  for i in range(m_index, m_index+r_samples):
-    x.append(i+1)
-    y.append(errors[i])
-  p = np.polyfit(x, y, 1)
-  p = np.poly1d(p)
-  variances = []
-  for i in range(len(epochs)):
-    # variances.append(p(epochs[i]))
-    if i < m_index:
-      variances.append(0.0)
-    else:
-      variances.append(errors[i]-p(epochs[i]))
+https://tex.stackexchange.com/questions/429393/draw-sine-waves
+https://tex.stackexchange.com/questions/101576/how-to-draw-horizontalrow-legend-without-the-surronding-rectangle
 
-  x = [m_index, len(errors)]
-  y = [errors[m_index], errors[m_index]]
+\newcommand{\toyColumnW}{0.33\linewidth}
+\newcommand{\toySingleH}{0.20cm}
+\newcommand{\toyDoubleH}{0.60cm}
+\newcommand{\toyFMatrixY}{-0.00cm}
+\newcommand{\toyFTextY}{-0.60cm}
+\newcommand{\toySMatrixY}{-1.35cm} % 0.60 + 0.20/2 + 0.65
+\newcommand{\toySTextY}{-2.10cm} % 1.35 + 0.75
+\newcommand{\toyTMatrixY}{-3.05cm} % 2.10 + 0.60/2 + 0.65
+\newcommand{\toyTTextY}{-3.80cm} % 3.05 + 0.75
+\newcommand{\toyFLineY}{0.50cm}
+\newcommand{\toySLineY}{-2.55cm} % 2.10 + 0.60/2 + 0.15
+\newcommand{\toyTLineY}{-2.60cm} % 2.55 + 0.05
+\newcommand{\toyBLineY}{-4.25cm} % 3.80 + 0.60/2 + 0.15
+\tikzstyle{toyExampleStyle} = [
+  every left delimiter/.style={xshift=0.1cm},
+  every right delimiter/.style={xshift=-0.1cm},
+]
+\tikzstyle{toyMatrixStyle} = [
+  column sep=-0.2ex, inner sep=0.0pt, matrix of math nodes, 
+  nodes={ % draw, very thin,
+    minimum height=1.2em, minimum width=1.8em,
+    inner sep=0.0pt, outer sep=0.0pt,},
+  left delimiter={[}, right delimiter={]},
+]
+\begin{figure}[t]
+\small
+% \scriptsize
+\centering
+\thinmuskip=0mu \medmuskip=0mu \thickmuskip=1mu
+\begin{subfigure}[b]{1.0\linewidth}
+\begin{tikzpicture}[toyExampleStyle]
+% \draw[help lines] (0.0,0.0) grid (1.0,-1.0);
 
-  p = np.polyfit(x, y, 1)
-  p = np.poly1d(p)
-  new_errors = []
-  origin = (m_index, errors[m_index])
-  for i in range(len(epochs)):
-    if i < m_index:
-      new_errors.append(errors[i])
-    else:
-      # new_error = rotate(origin, (i, errors[i]), math.radians(-0.018))[1]
-      new_error = p(epochs[i])
-      if i % 2 == 0:
-        new_error += np.random.uniform(0.0002,0.00004)
-      else:
-        new_error -= np.random.uniform(0.0002,0.00004)
-      # choices = [0.00001, 0.00002, 0.00005]
-      # choices += [-choice for choice in choices]
-      # new_error = p(epochs[i]) + float(np.random.choice(choices, 1))
-      new_errors.append(new_error)
-  ax.plot(epochs, new_errors, **{'label':kwargs_str,})
+\node at (\toyColumnW, 0.70) {
+  $^{*}$Row and column denote user and item (matrix indices omitted).
+};
+\matrix (R) [toyMatrixStyle] at (0*\toyColumnW,\toyFMatrixY) {
+  1 & 1 & 1 & 5 \\
+  1 & 1 & 1 & 5 \\
+};
+\node at (0*\toyColumnW,\toyFTextY) {
+  \begin{minipage}[c][\toySingleH][c]{\toyColumnW}
+    \begin{center}$r$: The true rating.\end{center}
+  \end{minipage}
+};
+\matrix (R_hat) [toyMatrixStyle] at (1*\toyColumnW,\toyFMatrixY) {
+  3 & 3 & 3 & 4 \\
+  3 & 3 & 3 & 4 \\
+};
+\node at (1*\toyColumnW,\toyFTextY) {
+  \begin{minipage}[c][\toySingleH][c]{\toyColumnW}
+    \begin{center}$\hat{r}$: Predicted rating.\end{center}
+  \end{minipage}
+};
+\matrix (P_hat) [toyMatrixStyle] at (2*\toyColumnW,\toyFMatrixY) {
+  0.2 & 0.2 & 0.2 & 0.3 \\
+  0.2 & 0.2 & 0.2 & 0.3 \\
+};
+\node at (2*\toyColumnW,\toyFTextY) {
+  \begin{minipage}[c][\toySingleH][c]{\toyColumnW}
+    \begin{center}$\hat{p}$: Propensity.\end{center}
+  \end{minipage}
+};
 
+\matrix (O) [toyMatrixStyle] at (0*\toyColumnW,\toySMatrixY) {
+  1 & 0 & 0 & 0 \\
+  0 & 0 & 0 & 1 \\
+};
+\node at (0*\toyColumnW,\toySTextY) {
+  \begin{minipage}[c][\toyDoubleH][c]{\toyColumnW}
+    \begin{center}
+      $o=0$: $r$ missing.\\
+      $o=1$: $r$ observed.
+    \end{center}
+  \end{minipage}
+};
+\matrix (E) [toyMatrixStyle] at (1*\toyColumnW,\toySMatrixY) {
+  2 & 2 & 2 & 1 \\
+  2 & 2 & 2 & 1 \\
+};
+\node at (1*\toyColumnW, \toySTextY) {
+  \thickmuskip=5mu
+  \begin{minipage}[c][\toyDoubleH][c]{\toyColumnW}
+    \begin{center}
+      $e=|\hat{r}-r|$ \\
+      $e$: The true error.
+    \end{center}
+  \end{minipage}
+};
+\matrix (E_hat) [toyMatrixStyle] at (2*\toyColumnW,\toySMatrixY) {
+  1.5 & 1.5 & 1.5 & 0.5 \\
+  1.5 & 1.5 & 1.5 & 0.5 \\
+};
+\node at (2*\toyColumnW,\toySTextY) {
+  \thickmuskip=5mu
+  \begin{minipage}[c][\toyDoubleH][c]{\toyColumnW}
+    \begin{center}
+      $\hat{e}=|\hat{r}-4.5|$ \\
+      $\hat{e}$: Imputed error.
+    \end{center}
+  \end{minipage}
+};
+
+\draw [dashed,semithick] (-0.47*\toyColumnW,\toyFLineY)--(2.47*\toyColumnW,\toyFLineY);
+
+\draw [dashed,semithick] (-0.47*\toyColumnW,\toySLineY)--(2.47*\toyColumnW,\toySLineY);
+
+\draw [dotted,red,thick] (1.5*\toyColumnW,\toyTLineY)--(2.47*\toyColumnW,\toyTLineY)--(2.47*\toyColumnW,\toyBLineY)--(1.5*\toyColumnW,\toyBLineY)--cycle;
+
+\matrix (EIB) [toyMatrixStyle] at (0*\toyColumnW,\toyTMatrixY) {
+  2 & 1.5 & 1.5 & 0.5 \\
+  1.5 & 1.5 & 1.5 & 1 \\
+};
+\node at (0*\toyColumnW,\toyTTextY) {
+  \begin{minipage}[c][\toyDoubleH][c]{\toyColumnW}
+    \begin{center}
+      $e_{\rm{EIB}}=\hat{e}+oe-o\hat{e}$ \\
+      $\big|{\textstyle\sum}e_{\rm{EIB}}-{\textstyle\sum}e\big|=3$
+    \end{center}
+  \end{minipage}
+};
+\matrix (IPS) [toyMatrixStyle] at (1*\toyColumnW,\toyTMatrixY) {
+  10 & 0 & 0 & 0 \\
+  0 & 0 & 0 & 3.3 \\
+};
+\node at (1*\toyColumnW,\toyTTextY) {
+  \begin{minipage}[c][\toyDoubleH][c]{\toyColumnW}
+    \begin{center}
+      $e_{\rm{IPS}}=oe/\hat{p}$ \\
+      $\big|{\textstyle\sum}e_{\rm{IPS}}-{\textstyle\sum}e\big|=0.7$
+    \end{center}
+  \end{minipage}
+};
+\matrix (DR) [toyMatrixStyle] at (2*\toyColumnW,\toyTMatrixY) {
+  4 & 1.5 & 1.5 & 0.5 \\
+  1.5 & 1.5 & 1.5 & 2.2 \\
+};
+\node at (2*\toyColumnW,\toyTTextY) {
+  \begin{minipage}[c][\toyDoubleH][c]{\toyColumnW}
+    \begin{center}
+      $e_{\rm{DR}}=\hat{e}+o(e-\hat{e})/\hat{p}$ \\
+      $\big|{\textstyle\sum}e_{\rm{DR}}-{\textstyle\sum}e\big|=\mytextbf{0.2}$
+    \end{center}
+  \end{minipage}
+};
+\end{tikzpicture}
+\end{subfigure}
+\caption{
+  Given the partially observed true ratings (indicated by $o$), our DR method ($e_{\rm{DR}}$) for estimating the true error ($e$) reaches a smaller bias (\mytextbf{0.2}) than the EIB ($e_{\rm{EIB}}$) and IPS ($e_{\rm{IPS}}$) methods.
+}
+\label{fig:toy example}
+\end{figure}  
+
+
+
+The DR estimator is unbiased so long as either propensity estimation or error imputation is accurate, a property often referred to as double robustness.
+The double robustness is achieved by cancelling the bias induced by inaccurate propensity estimation with accurate error imputation and vice versa.
+To see this, we first assume that the propensity estimation is accurate ($\anEstPropensity=\aTruePropensity$).
+Under the conditional independence assumption, we can write the expectation of the DR estimator defined in Eq.~\ref{equ:independence propensity dr estimator} as
+
+\begin{equation*}
+% \hspace*{-0.04cm}
+\begin{aligned}
+\expection_{\observations}[\drEstimator]
+=\frac{1}{\numUsersItems}\bAbbrSumUsersItems
+\expection_{\observations}
+\Bigg[
+  \frac{\anObservation\aTrueError}{\anEstPropensity}+
+  \frac{(\anEstPropensity-\anObservation)\anEstError}{\anEstPropensity}
+\Bigg]
+&\\
+\quad=\frac{1}{\numUsersItems}\bAbbrSumUsersItems
+\frac{\aTruePropensity\aTrueError}{\anEstPropensity}+
+\frac{1}{\numUsersItems}\bAbbrSumUsersItems
+\frac{(\anEstPropensity-\aTruePropensity)\anEstError}{\anEstPropensity}
+\text{,}
+&
+\end{aligned}
+\end{equation*}%
+
+which equals the risk $\trueRisk$ as the second term vanishes when $\anEstPropensity=\aTruePropensity$.
+Then, we assume that the error imputation is accurate ($\anEstError=\aTrueError$).
+Under the conditional independence assumption, we can write the expectation of the DR estimator defined in Eq.~\ref{equ:independence imputation dr estimator} as
+which equals the risk $\trueRisk$ as the second term vanishes when $\anEstError=\aTrueError$.
+When both propensity estimation and error imputation are inaccurate, we derive the bias of the DR estimator as follows.
+
+\begin{equation*}
+\begin{aligned}
+\expection_{\observations}[\drEstimator]
+=\frac{1}{\numUsersItems}\bAbbrSumUsersItems
+\expection_{\observations}
+\Bigg[
+  \anEstError+
+  \frac{\anObservation(\aTrueError-\anEstError)}{\anEstPropensity}
+\Bigg]
+&\\
+\quad=\frac{1}{\numUsersItems}\bAbbrSumUsersItems\anEstError+
+\frac{1}{\numUsersItems}\bAbbrSumUsersItems
+\frac{\aTruePropensity(\aTrueError-\anEstError)}{\anEstPropensity}
+\text{,}
+&
+\end{aligned}
+\end{equation*}%
+
+
+Most existing work on rating-based recommender systems does not explicitly considers the MNAR nature of rating data~\cite{adomavicius2005toward,salakhutdinov2007restricted}.
+For example, some of the most successful methods are based on matrix factorization, which predicts ratings by factorizing observed ratings into latent factors for users and items~\cite{bell2007chasing,mnih2008probabilistic}.
+More recently, autoencoders have been adapted for rating prediction by reconstructing a user's ratings given the user's historical ratings as input~\cite{sedhain2015autorec,strub2015collaborative}.
+By comparing against these methods, we show that it is beneficial to model the MNAR nature of rating data but inaccurately modeling MNAR data can lead to an even worse accuracy.
+
+Existing work dealing with MNAR data models missing data with a propensity model that estimates the probability of a rating to be missing~\cite{hernandez2014probabilistic,schnabel2016recommendations}.
+For example, Marlin and Zemel combines a propensity model with a probabilistic model for complete data~\cite{marlin2007collaborative,marlin2009collaborative}
+An alternative method is to model missing data with an imputation model that imputes some rating values for missing data~\cite{lim2015top}.
+For example, Steck considers performance measures that can be estimated without bias from MNAR data based on an imputation model~\cite{steck2010training,steck2011item}.
+Both the propensity and imputation-based methods are vulnerable to inaccurate models of missing data, which is what we aim to deal with in this paper.
+
+In addition to rating prediction, another popular recommendation problem is item ranking~\cite{hu2008collaborative,he2016fast}.
+The problem of item ranking is to provide a ranking list of items to users~\cite{rendle2009bpr,he2017neural}.
+The accuracy for item ranking may suffer with the presence of biased data~\cite{ai2018unbiased,joachims2017unbiased}.
+We leave the problem item ranking with double robustness for future work.
+
+
+We use the following two methods for propensity estimation~\cite{schnabel2016recommendations}.
+\begin{enumerate}[leftmargin=*,noitemsep,topsep=0pt]
+\item \mytextbf{Naive Bayes}.
+Suppose propensities are conditioned on the true ratings only, based on Bayes theorem, we have
+\begin{equation*}
+\anEstPropensity
+=P(\anObservation=1|\aTrueRating)
+=\frac{P(\aTrueRating|\anObservation=1)P(\anObservation=1)}{P(\aTrueRating)}
+\text{.}
+\end{equation*}%
+We estimate $P(\aTrueRating|\anObservation=1)$ and $P(\anObservation=1)$ by maximum likelihood on MNAR data.
+To estimate $P(\aTrueRating)$, we need to use a small sample of MAR data.
+\item \mytextbf{Logistic Regression}.
+Given a vector $\observedFeature$ that encodes all observable features about a user-item pair, we estimate propensities based on logistic regression as follows,
+\begin{equation*}
+\anEstPropensity=\sigma(\logRegrFeatWeight^\transpose\observedFeature+\logRegrUserBias+\logRegrItemBias)
+\text{.}
+\end{equation*}%
+Here, $\sigma(\cdot)$ is the sigmoid function. $\logRegrFeatWeight$, $\logRegrUserBias$, and $\logRegrItemBias$ are trainable parameters.
+\end{enumerate}
+
+the SNIPS estimator~\cite{swaminathan2015self} defined as.
+\begin{equation*}
+\snipsEstimator=
+\frac{1}{\verbSumUsersItems\frac{\anObservation}{\anEstPropensity}}
+\verbSumUsersItems\frac{\anObservation\aTrueError}{\anEstPropensity}
+\text{.}
+\end{equation*}%

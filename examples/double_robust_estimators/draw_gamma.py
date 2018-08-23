@@ -81,7 +81,8 @@ def draw_gamma(risk_name):
 
 
   ax.tick_params(axis='both', which='major', labelsize=tick_size)
-  ax.set_xlabel('Error Imputation Value $\\gamma$', fontsize=label_size)
+  ax.set_xlabel('Imputed Rating Value $\\gamma$', fontsize=label_size)
+  ax.set_xlabel('$\\gamma$', fontsize=label_size)
 
   ax.set_ylabel('RMSE of %s Estimation' % (risk_name.upper()), fontsize=label_size)
 

@@ -153,20 +153,21 @@ legend_size = 24
 label_size = 20
 line_width = 1.0
 marker_edge_width = 1.5
-marker_size = 10
+marker_size = 12
 tick_size = 18
 pad_inches = 0.10
 #### draw custom
 ips_label = 'MF-IPS'
 cpt_label = 'CPT-v'
-ml_label = 'MF-DR-ERM'
-mb_label = 'MF-DR'
+ml_label = 'DRCF-ERM'
+mb_label = 'DRCF'
 ips_index = 0
 cpt_index = 0
 ml_index = 1
 mb_index = 2
 colors = ['g', 'r', 'b',]
 linestyles = ['-.', '--', '-']
+markers = ['3', 'o', 3,]
 
 if __name__ == '__main__':
   print(sciformat(7.123456))

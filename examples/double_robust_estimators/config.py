@@ -208,6 +208,7 @@ def eval_wo_error(recom, dataset, cmpl_props, risk, beta=0.0):
   # print('#user=%d #item=%d #rating=%d' % (n_users, n_items, n_rates))
   # print('gamma=%.4f omega=%.4f' % (gamma, omega))
 
+  e_risks = np.zeros(n_trials)
   n_risks = np.zeros(n_trials)
   p_risks = np.zeros(n_trials)
   s_risks = np.zeros(n_trials)
@@ -221,6 +222,9 @@ def eval_wo_error(recom, dataset, cmpl_props, risk, beta=0.0):
     # print(sum(train_obs / propensities), n_users * n_items)
     propensities = 1.0 / (beta / even_props + (1.0 - beta) / cmpl_props)
     # propensities = beta * even_props + (1.0 - beta) * cmpl_props
+
+    e_risk = estimate_e(cmpl_rates, pred_rates, train_obs, risk, omega, gamma)
+    e_risks[trial] = e_risk
 
     n_risk = estimate_n(cmpl_rates, pred_rates, train_obs, risk)
     n_risks[trial] = n_risk

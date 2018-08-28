@@ -26,6 +26,23 @@ http://www.danielherber.com/latex.php?option=post_5
 https://tex.stackexchange.com/questions/429393/draw-sine-waves
 https://tex.stackexchange.com/questions/101576/how-to-draw-horizontalrow-legend-without-the-surronding-rectangle
 
+Most methods for reducing such bias involve an unbiased error estimator whose unbiasedness largely relies on a single missing data model.
+One major issue with these methods is the lack of robustness to the missing data model's inaccuracy, and thus they can severely biased when such inaccuracy occurs.
+Moreover, exiting methods usually ignore the variance of the estimator at the training stage, which can make the true error arbitrarily larger than the training error.
+To address these issues, we propose double robust collaborative filtering (DRCF), a general framework to jointly minimize a double robust (DR) estimator and a variance regularizer.
+The DR estimator obtains double robustness by combining two missing data models to ensure its unbiasedness so long as one of them is accurate.
+The variance regularizer controls the variance of the DR estimator by favoring the predictions with the tightest upper bound on the true error.
+We instantiate DRCF with matrix factorization, for which we propose an efficient variance-regularized training algorithm.
+Extensive experiments show that DRCF achieves a significant decrease of prediction error on real-world datasets and the DR estimator effectively alleviates the bias on a semi-synthetic dataset.
+
+We often observe discrepancies between a new recommender system's offline performance improvements on historical data and its online business gains in a real production environment. There are mainly two causes for such discrepancies. The first cause is the bias of performance estimators in offline learning, e.g., the expected estimation of rating prediction error differs from the true error. Existing estimators largely rely on a single missing data model to guarantee its unbiasedness and thus can be severely biased when the missing data model is inaccurate. To be less biased in such cases, we propose a double robust (DR) estimator that fuses two missing data models to guarantee its unbiasedness when one of them is accurate. The second cause is the variance of these estimators, e.g., the estimated errors vary across different samples of a rating dataset, which is usually ignored in existing methods. To address this problem, we further propose a general framework double robust collaborative filtering (DRCF) to jointly minimize the DR estimator and its empirical variance. Under this framework, we propose an efficient variance-regularized training algorithm based on matrix factorization. Extensive experiments show that DRCF achieves a significant decrease of prediction error on real-world datasets and the DR estimator effectively alleviates the bias on a semi-synthetic dataset.
+
+Missing data in rating-based recommender systems is usually missing not at random.
+Ignoring missing data can result in a large error of rating prediction by inducing a bias into learning (minimizing an incorrect error function) and evaluation (over- or under-estimating prediction error).
+Most existing methods for reducing such bias use a single missing data model, i.e., an error imputation model or a propensity estimation model.
+However, these methods can also be severely biased in case where the missing data model used is inaccurate.
+To be less biased in such cases.
+
 \newcommand{\toyColumnW}{0.33\linewidth}
 \newcommand{\toySingleH}{0.20cm}
 \newcommand{\toyDoubleH}{0.60cm}

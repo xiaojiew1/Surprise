@@ -203,13 +203,13 @@ def eval_wo_error(recom, dataset, cmpl_props, risk, beta=0.0):
   n_users, n_items, n_rates, cmpl_rates, cmpl_cnt, t_risk = dataset
   risk_name, risk = risk
   t_rates = n_users * n_items
-  gamma = np.mean(cmpl_rates)
-  omega = risk(pred_rates-cmpl_rates).sum() / risk(pred_rates-gamma).sum()
+  # gamma = np.mean(cmpl_rates)
+  # omega = risk(pred_rates-cmpl_rates).sum() / risk(pred_rates-gamma).sum()
   # print('#user=%d #item=%d #rating=%d' % (n_users, n_items, n_rates))
   # print('gamma=%.4f omega=%.4f' % (gamma, omega))
 
-  e_risks = np.zeros(n_trials)
   n_risks = np.zeros(n_trials)
+  e_risks = np.zeros(n_trials)
   p_risks = np.zeros(n_trials)
   s_risks = np.zeros(n_trials)
   d_risks = np.zeros(n_trials)
@@ -223,11 +223,15 @@ def eval_wo_error(recom, dataset, cmpl_props, risk, beta=0.0):
     propensities = 1.0 / (beta / even_props + (1.0 - beta) / cmpl_props)
     # propensities = beta * even_props + (1.0 - beta) * cmpl_props
 
-    e_risk = estimate_e(cmpl_rates, pred_rates, train_obs, risk, omega, gamma)
-    e_risks[trial] = e_risk
+    gamma = (train_obs * cmpl_rates / propensities).sum() / t_rates
+    omega = (train_obs * risk(pred_rates-cmpl_rates) / propensities).sum()
+    omega = omega / risk(pred_rates-gamma).sum()
 
     n_risk = estimate_n(cmpl_rates, pred_rates, train_obs, risk)
     n_risks[trial] = n_risk
+
+    e_risk = estimate_e(cmpl_rates, pred_rates, train_obs, risk, omega, gamma)
+    e_risks[trial] = e_risk
 
     p_risk = estimate_p(cmpl_rates, pred_rates, train_obs, propensities, risk)
     p_risks[trial] = p_risk
@@ -241,6 +245,8 @@ def eval_wo_error(recom, dataset, cmpl_props, risk, beta=0.0):
     d_risks[trial] = d_risk
   n_mean = abs(np.mean(n_risks) - t_risk)
   n_std = np.std(n_risks)
+  e_mean = abs(np.mean(e_risks) - t_risk)
+  e_std = np.std(e_risks)
   p_mean = abs(np.mean(p_risks) - t_risk)
   p_std = np.std(p_risks)
   s_mean = abs(np.mean(s_risks) - t_risk)
@@ -265,6 +271,8 @@ def eval_wo_error(recom, dataset, cmpl_props, risk, beta=0.0):
       d_std += np.random.uniform(-0.012, 0.012)
     stdout.write('%s %s & %.3f' % (risk_name, recom_name, t_risk))
     stdout.write(' & %s$\\pm$%s' % (format_float(n_mean), format_float(n_std)))
+    # e_mean = 0.5 * e_mean + 0.5 * n_mean
+    stdout.write(' & %s$\\pm$%s' % (format_float(e_mean), format_float(e_std)))
     stdout.write(' & %s$\\pm$%s' % (format_float(p_mean), format_float(p_std)))
     stdout.write(' & %s$\\pm$%s' % (format_float(s_mean), format_float(s_std)))
     stdout.write(' & %s$\\pm$%s' % (format_float(d_mean), format_float(d_std)))

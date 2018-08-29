@@ -237,7 +237,9 @@ def eval_wo_error(recom, dataset, cmpl_props, risk, beta=0.0):
     s_risks[trial] = s_risk
 
     # n_risk = estimate_n(cmpl_rates, pred_rates, train_obs, risk)
-    cap_propensities = np.maximum(propensities, 1.0 / 32)
+    # cap_propensities = np.maximum(propensities, 1.0 / 50)
+    cap_propensities = np.maximum(propensities, 1.0 / 40)
+    # cap_propensities = np.maximum(propensities, 1.0 / 32)
     # print('origin min=%.2f max=%.2f' % (min(propensities), max(propensities)))
     # print('capped min=%.2f max=%.2f' % (min(cap_propensities), max(cap_propensities)))
     n_risk = estimate_s(cmpl_rates, pred_rates, train_obs, cap_propensities, risk)

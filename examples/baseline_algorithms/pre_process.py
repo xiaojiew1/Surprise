@@ -3,13 +3,7 @@ import shutil
 import sys
 import numpy as np
 from scipy import sparse
-import matplotlib.pyplot as plt
-import seaborn as sn
-sn.set()
 import pandas as pd
-import tensorflow as tf
-from tensorflow.contrib.layers import apply_regularization, l2_regularizer
-import bottleneck as bn
 
 raw_data = pd.read_csv(os.path.join(DATA_DIR, 'ratings.csv'), header=0)
 

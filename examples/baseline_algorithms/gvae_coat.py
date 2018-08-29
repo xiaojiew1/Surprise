@@ -358,6 +358,8 @@ with tf.Session() as sess:
             if sparse.isspmatrix(X):
                 X = X.toarray()
             X = X.astype('float32')           
+            print(type(X), X.shape)
+            exit()
             
             if total_anneal_steps > 0:
                 anneal = min(anneal_cap, 1. * update_count / total_anneal_steps)

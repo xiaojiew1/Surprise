@@ -208,10 +208,10 @@ def eval_wo_error(recom, dataset, cmpl_props, risk, beta=0.0):
   # print('#user=%d #item=%d #rating=%d' % (n_users, n_items, n_rates))
   # print('gamma=%.4f omega=%.4f' % (gamma, omega))
 
-  n_risks = np.zeros(n_trials)
   e_risks = np.zeros(n_trials)
   p_risks = np.zeros(n_trials)
   s_risks = np.zeros(n_trials)
+  n_risks = np.zeros(n_trials)
   d_risks = np.zeros(n_trials)
   for trial in range(n_trials):
     train_obs = sample_train(cmpl_props)
@@ -227,9 +227,6 @@ def eval_wo_error(recom, dataset, cmpl_props, risk, beta=0.0):
     omega = (train_obs * risk(pred_rates-cmpl_rates) / propensities).sum()
     omega = omega / risk(pred_rates-gamma).sum()
 
-    n_risk = estimate_n(cmpl_rates, pred_rates, train_obs, risk)
-    n_risks[trial] = n_risk
-
     e_risk = estimate_e(cmpl_rates, pred_rates, train_obs, risk, omega, gamma)
     e_risks[trial] = e_risk
 
@@ -238,6 +235,13 @@ def eval_wo_error(recom, dataset, cmpl_props, risk, beta=0.0):
 
     s_risk = estimate_s(cmpl_rates, pred_rates, train_obs, propensities, risk)
     s_risks[trial] = s_risk
+
+    # n_risk = estimate_n(cmpl_rates, pred_rates, train_obs, risk)
+    cap_propensities = np.maximum(propensities, 1.0 / 32)
+    # print('origin min=%.2f max=%.2f' % (min(propensities), max(propensities)))
+    # print('capped min=%.2f max=%.2f' % (min(cap_propensities), max(cap_propensities)))
+    n_risk = estimate_s(cmpl_rates, pred_rates, train_obs, cap_propensities, risk)
+    n_risks[trial] = n_risk
 
     if recom_name == 'recones':
       omega = 0.52
@@ -249,14 +253,14 @@ def eval_wo_error(recom, dataset, cmpl_props, risk, beta=0.0):
       omega = 0.44
     d_risk = estimate_d(cmpl_rates, pred_rates, train_obs, propensities, risk, omega, gamma)
     d_risks[trial] = d_risk
-  n_mean = abs(np.mean(n_risks) - t_risk)
-  n_std = np.std(n_risks)
   e_mean = abs(np.mean(e_risks) - t_risk)
   e_std = np.std(e_risks)
   p_mean = abs(np.mean(p_risks) - t_risk)
   p_std = np.std(p_risks)
   s_mean = abs(np.mean(s_risks) - t_risk)
   s_std = np.std(s_risks)
+  n_mean = abs(np.mean(n_risks) - t_risk)
+  n_std = np.std(n_risks)
   d_mean = abs(np.mean(d_risks) - t_risk)
   d_std = np.std(d_risks)
 
@@ -272,22 +276,22 @@ def eval_wo_error(recom, dataset, cmpl_props, risk, beta=0.0):
       s_mean += np.random.uniform(0.000, 0.003)
       p_std += np.random.uniform(0.003, 0.006)
 
-    n_mean = n_mean / t_risk
     e_mean = e_mean / t_risk
     p_mean = p_mean / t_risk
     s_mean = s_mean / t_risk
+    n_mean = n_mean / t_risk
     d_mean = d_mean / t_risk
-    n_std /= t_risk
     e_std /= t_risk
     p_std /= t_risk
     s_std /= t_risk
+    n_std /= t_risk
     d_std /= t_risk
 
     stdout.write('%s %s & %.3f' % (risk_name, recom_name, t_risk))
-    # stdout.write(' & %s$\\pm$%s' % (format_float(n_mean), format_float(n_std)))
     stdout.write(' & %s$\\pm$%s' % (format_float(e_mean), format_float(e_std)))
     stdout.write(' & %s$\\pm$%s' % (format_float(p_mean), format_float(p_std)))
     stdout.write(' & %s$\\pm$%s' % (format_float(s_mean), format_float(s_std)))
+    stdout.write(' & %s$\\pm$%s' % (format_float(n_mean), format_float(n_std)))
     stdout.write(' & %s$\\pm$%s' % (format_float(d_mean), format_float(d_std)))
     if risk_name == 'mse':
       stdout.write(' \\\\')

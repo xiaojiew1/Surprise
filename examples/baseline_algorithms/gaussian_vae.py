@@ -11,7 +11,8 @@ import tensorflow as tf
 from tensorflow.contrib.layers import apply_regularization, l2_regularizer
 import bottleneck as bn
 
-DATA_DIR = '/home/xiaojie/Downloads/ml-20m'
+# DATA_DIR = '/home/xiaojie/Downloads/ml-20m'
+DATA_DIR = '/home/xiaojie/Downloads/Webscope_R3'
 pro_dir = os.path.join(DATA_DIR, 'pro_sg')
 
 class MultiDAE(object):
@@ -318,15 +319,17 @@ merged_valid = tf.summary.merge([ndcg_summary, ndcg_dist_summary])
 
 arch_str = "I-%s-I" % ('-'.join([str(d) for d in vae.dims[1:-1]]))
 
-log_dir = '/home/xiaojie/Downloads/ml-20m/log/VAE_anneal{}K_cap{:1.1E}/{}'.format(
+log_dir = 'log/VAE_anneal{}K_cap{:1.1E}/{}'.format(
     total_anneal_steps/1000, anneal_cap, arch_str)
+log_dir = path.join(DATA_DIR, log_dir)
 if os.path.exists(log_dir):
     shutil.rmtree(log_dir)
 print("log directory: %s" % log_dir)
 summary_writer = tf.summary.FileWriter(log_dir, graph=tf.get_default_graph())
 
-chkpt_dir = '/home/xiaojie/Downloads/ml-20m/chkpt/VAE_anneal{}K_cap{:1.1E}/{}'.format(
+chkpt_dir = 'chkpt/VAE_anneal{}K_cap{:1.1E}/{}'.format(
     total_anneal_steps/1000, anneal_cap, arch_str)
+chkpt_dir = path.join(DATA_DIR, chkpt_dir)
 if not os.path.isdir(chkpt_dir):
     os.makedirs(chkpt_dir) 
 print("chkpt directory: %s" % chkpt_dir)

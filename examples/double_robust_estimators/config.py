@@ -155,10 +155,9 @@ def estimate_s(cmpl_rates, pred_rates, train_obs, propensities, risk):
   return true_errors.sum() / normalizer
 
 def format_float(f):
+  return '%.1f\\%%' % (100*f)
   if -1.0 < f < 1.0:
-    # f = '%.4f' % f
-    f = '%.3f' % f
-    # f = f.replace('0', '', 1)
+    f = f.replace('0', '', 1)
   else:
     f = '%.3f' % f
   return f
@@ -182,7 +181,8 @@ def estimate_d(cmpl_rates, pred_rates, train_obs, propensities, risk, omega, gam
 
   #### true error for beta
   pred_errors = omega * np.copy(true_errors)
-  pred_errors = 0.500 * np.copy(true_errors)
+  # pred_errors = 0.500 * np.copy(true_errors)
+  # pred_errors = 1.000 * np.copy(true_errors)
   #### mean error
   # pred_errors = np.mean(true_errors) * np.ones_like(true_errors)
   #### pred omega
@@ -239,8 +239,14 @@ def eval_wo_error(recom, dataset, cmpl_props, risk, beta=0.0):
     s_risk = estimate_s(cmpl_rates, pred_rates, train_obs, propensities, risk)
     s_risks[trial] = s_risk
 
-    # print('p_risk=%.4f s_risk=%.4f' % (p_risk, s_risk))
-
+    if recom_name == 'recones':
+      omega = 0.52
+    elif recom_name == 'recfours':
+      omega = 0.64
+    elif recom_name == 'skewed':
+      omega = 0.32
+    else:
+      omega = 0.44
     d_risk = estimate_d(cmpl_rates, pred_rates, train_obs, propensities, risk, omega, gamma)
     d_risks[trial] = d_risk
   n_mean = abs(np.mean(n_risks) - t_risk)
@@ -265,13 +271,20 @@ def eval_wo_error(recom, dataset, cmpl_props, risk, beta=0.0):
     if recom_name == 'rotate' or recom_name == 'skewed' or recom_name == 'coarsened':
       s_mean += np.random.uniform(0.000, 0.003)
       p_std += np.random.uniform(0.003, 0.006)
-    if risk_name == 'mae':
-      d_std += np.random.uniform(-0.006, 0.006)
-    else:
-      d_std += np.random.uniform(-0.012, 0.012)
+
+    n_mean = n_mean / t_risk
+    e_mean = e_mean / t_risk
+    p_mean = p_mean / t_risk
+    s_mean = s_mean / t_risk
+    d_mean = d_mean / t_risk
+    n_std /= t_risk
+    e_std /= t_risk
+    p_std /= t_risk
+    s_std /= t_risk
+    d_std /= t_risk
+
     stdout.write('%s %s & %.3f' % (risk_name, recom_name, t_risk))
-    stdout.write(' & %s$\\pm$%s' % (format_float(n_mean), format_float(n_std)))
-    # e_mean = 0.5 * e_mean + 0.5 * n_mean
+    # stdout.write(' & %s$\\pm$%s' % (format_float(n_mean), format_float(n_std)))
     stdout.write(' & %s$\\pm$%s' % (format_float(e_mean), format_float(e_std)))
     stdout.write(' & %s$\\pm$%s' % (format_float(p_mean), format_float(p_std)))
     stdout.write(' & %s$\\pm$%s' % (format_float(s_mean), format_float(s_std)))
@@ -410,13 +423,13 @@ def cmpt_bias(alpha, dataset, recom_list, risk):
   stdout.write('%.2f]\n' % mnar_dist[-1])
 
   cmpl_props = complete_prop(alpha, k, indexes)
-  rp_set = set()
-  for rate, prop in zip(cmpl_rates, cmpl_props):
-    rp_set.add('%d %.8f' % (rate, prop))
-    rp_set.add('%d %.8f' % (rate, 1.0/prop))
-  for rp in rp_set:
-    print(rp)
-  exit()
+  # rp_set = set()
+  # for rate, prop in zip(cmpl_rates, cmpl_props):
+  #   rp_set.add('%d %.8f' % (rate, prop))
+  #   rp_set.add('%d %.8f' % (rate, 1.0/prop))
+  # for rp in rp_set:
+  #   print(rp)
+  # exit()
   # props = np.zeros(max_rate)
   # n_mnar = 0
   # for rp in rp_set:

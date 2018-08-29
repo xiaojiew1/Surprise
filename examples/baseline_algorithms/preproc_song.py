@@ -65,7 +65,8 @@ with open(os.path.join(pro_dir, 'unique_sid.txt'), 'w') as f:
         f.write('%s\n' % sid)
 
 te_users = pd.unique(te_data['userId'])
-train_plays = tr_data.loc[~tr_data['userId'].isin(te_users)]
+# train_plays = tr_data.loc[~tr_data['userId'].isin(te_users)]
+train_plays = tr_data
 
 test_plays_tr = tr_data.loc[tr_data['userId'].isin(te_users)]
 test_plays_te = te_data

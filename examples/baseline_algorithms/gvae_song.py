@@ -306,7 +306,8 @@ def Recall_at_k_batch(X_pred, heldout_batch, k=100):
     recall = tmp / np.minimum(k, X_true_binary.sum(axis=1))
     return recall
 
-p_dims = [200, 600, n_items]
+# p_dims = [200, 600, n_items]
+p_dims = [200, n_items]
 
 tf.reset_default_graph()
 vae = MultiVAE(p_dims, lam=0.0, random_seed=98765)

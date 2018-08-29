@@ -5,6 +5,9 @@ import numpy as np
 from scipy import sparse
 import pandas as pd
 
+DATA_DIR = '/home/xiaojie/Downloads/ml-20m'
+pro_dir = os.path.join(DATA_DIR, 'pro_sg')
+
 raw_data = pd.read_csv(os.path.join(DATA_DIR, 'ratings.csv'), header=0)
 
 raw_data = raw_data[raw_data['rating'] > 3.5]

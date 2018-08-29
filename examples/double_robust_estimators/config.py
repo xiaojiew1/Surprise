@@ -410,9 +410,13 @@ def cmpt_bias(alpha, dataset, recom_list, risk):
   stdout.write('%.2f]\n' % mnar_dist[-1])
 
   cmpl_props = complete_prop(alpha, k, indexes)
-  # rp_set = set()
-  # for rate, prop in zip(cmpl_rates, cmpl_props):
-  #   rp_set.add('%d %.8f' % (rate, prop))
+  rp_set = set()
+  for rate, prop in zip(cmpl_rates, cmpl_props):
+    rp_set.add('%d %.8f' % (rate, prop))
+    rp_set.add('%d %.8f' % (rate, 1.0/prop))
+  for rp in rp_set:
+    print(rp)
+  exit()
   # props = np.zeros(max_rate)
   # n_mnar = 0
   # for rp in rp_set:

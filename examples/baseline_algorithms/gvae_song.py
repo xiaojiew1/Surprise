@@ -38,7 +38,6 @@ class MultiDAE(object):
         self.keep_prob_ph = tf.placeholder_with_default(1.0, shape=None)
 
     def build_graph(self):
-
         self.construct_weights()
 
         saver, logits = self.forward_pass()
@@ -310,7 +309,11 @@ def Recall_at_k_batch(X_pred, heldout_batch, k=100):
 p_dims = [200, n_items]
 
 tf.reset_default_graph()
-vae = MultiVAE(p_dims, lam=0.0, random_seed=98765)
+vae = MultiVAE(p_dims, 
+    lam=0.0,
+    random_seed=98765,
+    lr=1e-2,
+)
 saver, logits_var, loss_var, train_op_var, merged_var = vae.build_graph()
 ndcg_var = tf.Variable(0.0)
 ndcg_dist_var = tf.placeholder(dtype=tf.float64, shape=None)

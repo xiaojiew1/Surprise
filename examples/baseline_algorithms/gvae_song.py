@@ -260,12 +260,12 @@ vad_data_tr, vad_data_te = load_tr_te_data(os.path.join(pro_dir, 'validation_tr.
 N = train_data.shape[0]
 idxlist = list(range(N))
 # training batch size
-batch_size = 500
+batch_size = 100
 batches_per_epoch = int(np.ceil(float(N) / batch_size))
 N_vad = vad_data_tr.shape[0]
 idxlist_vad = list(range(N_vad))
 # validation batch size (since the entire validation set might not fit into GPU memory)
-batch_size_vad = 2000
+batch_size_vad = 200
 # the total number of gradient updates for annealing
 total_anneal_steps = 200000
 # largest annealing parameter
@@ -374,27 +374,27 @@ with tf.Session() as sess:
             
             update_count += 1
         
-        # compute validation NDCG
-        ndcg_dist = []
-        for bnum, st_idx in enumerate(range(0, N_vad, batch_size_vad)):
-            end_idx = min(st_idx + batch_size_vad, N_vad)
-            X = vad_data_tr[idxlist_vad[st_idx:end_idx]]
+            # compute validation NDCG
+            ndcg_dist = []
+            for bnum, st_idx in enumerate(range(0, N_vad, batch_size_vad)):
+                end_idx = min(st_idx + batch_size_vad, N_vad)
+                X = vad_data_tr[idxlist_vad[st_idx:end_idx]]
 
-            if sparse.isspmatrix(X):
-                X = X.toarray()
-            X = X.astype('float32')
-        
-            pred_val = sess.run(logits_var, feed_dict={vae.input_ph: X} )
-            # exclude examples from training and validation (if any)
-            pred_val[X.nonzero()] = -np.inf
-            ndcg_dist.append(NDCG_binary_at_k_batch(pred_val, vad_data_te[idxlist_vad[st_idx:end_idx]]))
-        
-        ndcg_dist = np.concatenate(ndcg_dist)
-        ndcg_ = ndcg_dist.mean()
-        ndcgs_vad.append(ndcg_)
-        print('epoch=%d ndcg=%.4f' % (epoch, ndcg_))
-        merged_valid_val = sess.run(merged_valid, feed_dict={ndcg_var: ndcg_, ndcg_dist_var: ndcg_dist})
-        summary_writer.add_summary(merged_valid_val, epoch)
+                if sparse.isspmatrix(X):
+                    X = X.toarray()
+                X = X.astype('float32')
+            
+                pred_val = sess.run(logits_var, feed_dict={vae.input_ph: X} )
+                # exclude examples from training and validation (if any)
+                pred_val[X.nonzero()] = -np.inf
+                ndcg_dist.append(NDCG_binary_at_k_batch(pred_val, vad_data_te[idxlist_vad[st_idx:end_idx]]))
+            
+            ndcg_dist = np.concatenate(ndcg_dist)
+            ndcg_ = ndcg_dist.mean()
+            ndcgs_vad.append(ndcg_)
+            print('epoch=%d ndcg=%.4f' % (epoch, ndcg_))
+            merged_valid_val = sess.run(merged_valid, feed_dict={ndcg_var: ndcg_, ndcg_dist_var: ndcg_dist})
+            summary_writer.add_summary(merged_valid_val, epoch)
 
         # update the best model (if necessary)
         if ndcg_ > best_ndcg:

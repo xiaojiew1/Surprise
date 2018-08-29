@@ -321,7 +321,7 @@ arch_str = "I-%s-I" % ('-'.join([str(d) for d in vae.dims[1:-1]]))
 
 log_dir = 'log/VAE_anneal{}K_cap{:1.1E}/{}'.format(
     total_anneal_steps/1000, anneal_cap, arch_str)
-log_dir = path.join(DATA_DIR, log_dir)
+log_dir = os.path.join(DATA_DIR, log_dir)
 if os.path.exists(log_dir):
     shutil.rmtree(log_dir)
 print("log directory: %s" % log_dir)
@@ -329,7 +329,7 @@ summary_writer = tf.summary.FileWriter(log_dir, graph=tf.get_default_graph())
 
 chkpt_dir = 'chkpt/VAE_anneal{}K_cap{:1.1E}/{}'.format(
     total_anneal_steps/1000, anneal_cap, arch_str)
-chkpt_dir = path.join(DATA_DIR, chkpt_dir)
+chkpt_dir = os.path.join(DATA_DIR, chkpt_dir)
 if not os.path.isdir(chkpt_dir):
     os.makedirs(chkpt_dir) 
 print("chkpt directory: %s" % chkpt_dir)

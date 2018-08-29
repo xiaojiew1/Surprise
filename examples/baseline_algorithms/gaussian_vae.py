@@ -257,12 +257,12 @@ vad_data_tr, vad_data_te = load_tr_te_data(os.path.join(pro_dir, 'validation_tr.
                                            os.path.join(pro_dir, 'validation_te.csv'))
 
 N = train_data.shape[0]
-idxlist = range(N)
+idxlist = list(range(N))
 # training batch size
 batch_size = 500
 batches_per_epoch = int(np.ceil(float(N) / batch_size))
 N_vad = vad_data_tr.shape[0]
-idxlist_vad = range(N_vad)
+idxlist_vad = list(range(N_vad))
 # validation batch size (since the entire validation set might not fit into GPU memory)
 batch_size_vad = 2000
 # the total number of gradient updates for annealing

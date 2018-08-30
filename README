@@ -26,6 +26,143 @@ http://www.danielherber.com/latex.php?option=post_5
 https://tex.stackexchange.com/questions/429393/draw-sine-waves
 https://tex.stackexchange.com/questions/101576/how-to-draw-horizontalrow-legend-without-the-surronding-rectangle
 
+\newcommand{\toySColumnR}{0.000\linewidth}
+\newcommand{\toySColumnRhat}{0.210\linewidth}
+\newcommand{\toySColumnO}{0.405\linewidth}
+\newcommand{\toySColumnE}{0.595\linewidth}
+\newcommand{\toySColumnP}{0.795\linewidth}
+\newcommand{\toySTextY}{0.64}
+\newcommand{\toyLColumnW}{0.32\linewidth}
+\newcommand{\toyLMatrixY}{0.72}
+\newcommand{\toyEIBTextY}{0.08} % toyLMatrixY - toySTextY
+\newcommand{\toyEIBMissTY}{1.36} % 2 * toyLMatrixY - toyEIBTextY
+\newcommand{\toyEIBMissSTopY}{1.60} % toyEIBMissTY + 0.24
+\newcommand{\toyEIBMissSBtmY}{-1.56} % toyIPSBtmY
+\newcommand{\toyIPSTextY}{-1.28} % -toyLMatrixY - toySTextY
+\newcommand{\toyLSquareLX}{1.62}
+\newcommand{\toyLSquareIX}{-0.60}
+\newcommand{\toyLSquareMX}{0.58} % -toyLSquareIX - 0.04
+\newcommand{\toyLSquareRX}{1.54}
+\newcommand{\toyLSquareLTX}{1.48}
+\newcommand{\toyLSquareRTX}{0.92}
+\newcommand{\toyLSquareEIBY}{1.20}
+\newcommand{\toyLSquareIPSY}{0.80} % 2 - toyLSquareEIBY
+\newcommand{\toyEIBTopY}{1.16}
+\newcommand{\toyEIBBtmY}{-0.20}
+\newcommand{\toyIPSTopY}{-0.28} % toyEIBTopY - 2 * toyLMatrixY
+\newcommand{\toyIPSBtmY}{-1.56} % toyIPSTopY + toyEIBBtmY - toyEIBTopY
+\newcommand{\toyDRTopY}{1.16} % toyEIBTopY + 0.00
+\newcommand{\toyDRBtmY}{-1.56} % toyIPSBtmY - 0.00
+\newcommand{\toyArrowCenterBX}{0.66}
+\newcommand{\toyArrowCenterEX}{0.34}
+\newcommand{\toyArrowLeftBX}{1.52}
+\newcommand{\toyArrowLeftEX}{1.36} % toyArrowCenterEX + 1
+\tikzstyle{toySExampleS} = [
+  every left delimiter/.style={xshift=0.05cm},
+  every right delimiter/.style={xshift=-0.05cm},
+]
+\tikzstyle{toyLExampleS} = [
+  every left delimiter/.style={xshift=0.05cm},
+  every right delimiter/.style={xshift=-0.05cm},
+]
+\tikzstyle{toySMatrixS} = [
+  column sep=-0.65ex, inner sep=0.0pt, matrix of math nodes, 
+  nodes={ % draw, very thin,
+    minimum width=1.35em, minimum height=1.20em, 
+    inner sep=0.0pt, outer sep=0.0pt,},
+  left delimiter={[}, right delimiter={]},
+]
+\tikzstyle{toyLMatrixS} = [
+  column sep=-0.20ex, inner sep=0.0pt, matrix of math nodes, 
+  nodes={ % draw, very thin,
+    minimum width=1.80em, minimum height=1.20em, 
+    inner sep=0.0pt, outer sep=0.0pt,},
+  left delimiter={[}, right delimiter={]},
+]
+
+\matrix (R) [toySMatrixS] at (\toySColumnR,0) {
+  1 & 1 & 5 \\
+  1 & 1 & 5 \\
+};
+\matrix (R_hat) [toySMatrixS] at (\toySColumnRhat,0) {
+  3 & 3 & 4 \\
+  3 & 3 & 4 \\
+};
+\matrix (O) [toySMatrixS] at (\toySColumnO,0) {
+  1 & 0 & 0 \\
+  0 & 0 & 1 \\
+};
+\matrix (E) [toySMatrixS] at (\toySColumnE,0) {
+  2 & 2 & 1 \\
+  2 & 2 & 1 \\
+};
+\matrix (P) [toyLMatrixS] at (\toySColumnP,0) {
+  \nicefrac{1}{4} & \nicefrac{1}{4} & \nicefrac{1}{2} \\
+  \nicefrac{1}{4} & \nicefrac{1}{4} & \nicefrac{1}{2} \\
+%   \frac{1}{4} & \frac{1}{4} & \frac{1}{2} \\
+%   \frac{1}{4} & \frac{1}{4} & \frac{1}{2} \\
+};
+
+\node at (\toySColumnO, \toySTextY) {
+  $^{*}$Row and column denote user and item (matrix indices omitted).
+};
+\node at (\toySColumnR, -\toySTextY) {True rating $r$.};
+\node at (\toySColumnRhat, -\toySTextY) {Prediction $\hat{r}$.};
+\node at (\toySColumnO, -\toySTextY) {Indicator $o$.};
+\node at (\toySColumnE, -\toySTextY) {True error $e$.};
+\node at (\toySColumnP, -\toySTextY) {Propensity $p$.};
+
+\matrix (EIB) [toyLMatrixS] at (-1*\toyLColumnW,\toyLMatrixY) {
+  2 & 1.5 & 0.5 \\
+  1.5 & 1.5 & 1 \\
+};
+\matrix (IPS) [toyLMatrixS] at (-1*\toyLColumnW,-\toyLMatrixY) {
+  6.7 & 0 & 0 \\
+  0 & 0 & 2.5 \\
+};
+\matrix (E_hat) [toyLMatrixS] at (0*\toyLColumnW,\toyLMatrixY) {
+  1.5 & 1.5 & 0.5 \\
+  1.5 & 1.5 & 0.5 \\
+};
+\matrix (P_hat) [toyLMatrixS] at (0*\toyLColumnW,-\toyLMatrixY) {
+  0.3 & 0.3 & 0.4 \\
+  0.3 & 0.3 & 0.4 \\
+};
+\matrix (DR) [toyLMatrixS] at (1*\toyLColumnW,0) {
+  3.2 & 1.5 & 0.5 \\
+  1.5 & 1.5 & 1.7 \\
+};
+% \node [rectangle] at (1*\toyLColumnW,1.28*\toyLMatrixY) {\normalsize Our DR method.};
+
+
+\draw [<-,solid,thick] (-\toyArrowCenterBX*\toyLColumnW,\toyLMatrixY)--(-\toyArrowCenterEX*\toyLColumnW,\toyLMatrixY);
+\draw [<-,solid,thick] (-\toyArrowCenterBX*\toyLColumnW,-\toyLMatrixY)--(-\toyArrowCenterEX*\toyLColumnW,-\toyLMatrixY);
+\draw [<-,solid,thick] (\toyArrowCenterBX*\toyLColumnW,0.04)--(\toyArrowCenterEX*\toyLColumnW,\toyLMatrixY);
+\draw [<-,solid,thick] (\toyArrowCenterBX*\toyLColumnW,-0.04)--(\toyArrowCenterEX*\toyLColumnW,-\toyLMatrixY);
+
+\draw [solid,black!16!red,thin] (-\toyLSquareLX*\toyLColumnW,\toyEIBTopY)--(\toyLSquareIX*\toyLColumnW,\toyEIBTopY)--(\toyLSquareIX*\toyLColumnW,\toyEIBBtmY)--(-\toyLSquareLX*\toyLColumnW,\toyEIBBtmY)--cycle;
+\draw [solid,black!16!green,thin] (-\toyLSquareLX*\toyLColumnW,\toyIPSTopY)--(\toyLSquareIX*\toyLColumnW,\toyIPSTopY)--(\toyLSquareIX*\toyLColumnW,\toyIPSBtmY)--(-\toyLSquareLX*\toyLColumnW,\toyIPSBtmY)--cycle;
+\draw [solid,black!16!blue,thin] (-\toyLSquareIX*\toyLColumnW,\toyDRTopY)--(\toyLSquareRX*\toyLColumnW,\toyDRTopY)--(\toyLSquareRX*\toyLColumnW,\toyDRBtmY)--(-\toyLSquareIX*\toyLColumnW,\toyDRBtmY)--cycle;
+\draw [dashed,black!16!magenta,thin] (-\toyLSquareMX*\toyLColumnW,\toyEIBMissSTopY)--(\toyLSquareMX*\toyLColumnW,\toyEIBMissSTopY)--(\toyLSquareMX*\toyLColumnW,\toyEIBMissSBtmY)--(-\toyLSquareMX*\toyLColumnW,\toyEIBMissSBtmY)--cycle;
+
+
+\node at (-1.10*\toyLColumnW,\toyEIBTextY) {$\big|{\textstyle\sum}e_{\rm{EIB}}-{\textstyle\sum}e\big|=\mytextbf{2}$};
+\node at (-1.10*\toyLColumnW,\toyIPSTextY) {$\big|{\textstyle\sum}e_{\rm{IPS}}-{\textstyle\sum}e\big|=\mytextbf{0.8}$};
+\node at (0*\toyLColumnW,\toyEIBTextY) {Error imputation $\hat{e}$.};
+\node at (0*\toyLColumnW,\toyIPSTextY) {Propensity estimation $\hat{p}$.};
+\node at (1.07*\toyLColumnW,-\toySTextY) {$\big|{\textstyle\sum}e_{\rm{DR}}-{\textstyle\sum}e\big|=\mytextbf{0.1}$};
+\node at (0*\toyLColumnW,\toyEIBMissTY) {Missing data models.};
+
+% \draw [->,solid,thick] (-\toyArrowLeftBX*\toyLColumnW,\toyLMatrixY)--(-\toyArrowLeftEX*\toyLColumnW,\toyLMatrixY);
+% \draw [->,solid,thick] (-\toyArrowLeftBX*\toyLColumnW,-\toyLMatrixY)--(-\toyArrowLeftEX*\toyLColumnW,-\toyLMatrixY);
+
+\node [rectangle] at (-\toyLSquareLTX*\toyLColumnW,\toyLSquareEIBY*\toyLMatrixY) {\normalsize EIB.};
+\node [rectangle] at (-\toyLSquareLTX*\toyLColumnW,-\toyLSquareIPSY*\toyLMatrixY) {\normalsize IPS.};
+\node [rectangle] at (\toyLSquareRTX*\toyLColumnW,\toyLSquareEIBY*\toyLMatrixY) {\normalsize DR (Ours).};
+\node [rectangle] at (1.06*\toyLColumnW,\toyIPSTextY) {\emph{Note}: \mytextbf{0.1} is a bias.};
+
+
+
 Most methods for reducing such bias involve an unbiased error estimator whose unbiasedness largely relies on a single missing data model.
 One major issue with these methods is the lack of robustness to the missing data model's inaccuracy, and thus they can severely biased when such inaccuracy occurs.
 Moreover, exiting methods usually ignore the variance of the estimator at the training stage, which can make the true error arbitrarily larger than the training error.

@@ -19,6 +19,54 @@ http://www.shivani-agarwal.net/Teaching/E0370/Aug-2011/Lectures/3.pdf
 # latex
 ################################################################
 http://www.danielherber.com/latex.php?option=post_5
+https://tex.stackexchange.com/questions/401490/how-to-reduce-the-space-around-a-table-spanning-two-columns
+
+\begin{figure*}[!t]
+\begin{minipage}[t]{0.5\linewidth}
+\centering
+\begin{figure}[H] %% the package "float" and [H] is necessary for this
+\centering
+\begin{subfigure}{0.476\textwidth}
+  \centering
+  \includegraphics[width=1.00\linewidth]{fig/mae_error.eps}
+  \caption{Inaccurate error imputation.}
+  \label{fig:mae error}
+\end{subfigure}
+\hspace*{-0.75em} % \hfill
+\begin{subfigure}{0.476\textwidth}
+  \centering
+  \includegraphics[width=1.00\linewidth]{fig/mae_beta.eps}
+  \caption{Inaccurate propensities.}
+  \label{fig:mae beta}
+\end{subfigure}
+\caption{Robustness of the DR, EIB, IPS, and SNIPS estimators.}
+\end{figure}
+\end{minipage}
+% \hspace{-1.0em}
+\begin{minipage}[t]{0.5\linewidth}
+\centering
+\begin{figure}[H] %% the package "float" and [H] is necessary for this
+\centering
+\begin{subfigure}{0.476\textwidth}
+  \centering
+  \includegraphics[width=1.00\linewidth]{fig/mae_omega.eps}
+  \caption{Varying the weight $\imputationQuality$.}
+  \label{fig:mae omega}
+\end{subfigure}
+\hspace*{-0.75em} % \hfill
+\begin{subfigure}{0.476\textwidth}
+  \centering
+  \includegraphics[width=1.00\linewidth]{fig/mae_gamma.eps}
+  \caption{Varying the imputed value $\anImputedRating$.}
+  \label{fig:mae gamma}
+\end{subfigure}
+\caption{Effects of parameters on the accuracy of the DR estimator.}
+\end{figure}
+\end{minipage}
+\end{figure*}
+
+
+  Our DR estimator, $e_{\rm{DR}}=\hat{e}+o(e-\hat{e})/\hat{p}$, of the true error ($e=|\hat{r}-r|$) has a smaller bias (\mytextbf{0.1}) than the EIB ($e_{\rm{EIB}}=\hat{e}+oe-o\hat{e}$) and IPS ($e_{\rm{IPS}}=oe/\hat{p}$) estimators. The imputed error $\hat{e}=|\hat{r}-4.5|$.
 
 ################################################################
 # backup

@@ -159,7 +159,7 @@ pad_inches = 0.10
 #### draw custom
 ips_label = 'MF-IPS'
 cpt_label = 'CPT-v'
-ml_label = 'DRCF-b'
+ml_label = 'DRCF-v'
 mb_label = 'DRCF'
 ips_index = 0
 cpt_index = 0

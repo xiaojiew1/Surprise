@@ -1,8 +1,7 @@
 from config import alpha_dir, figure_dir, error_dir
 from config import f_alpha, mae_offset, mse_offset, mae_v_omega, mse_v_omega
 from config import width, height, pad_inches
-from config import p_label, s_label, d_label
-from config import colors, markers, linestyles, p_index, s_index, d_index
+from config import colors, markers, linestyles
 from config import line_width, marker_edge_width
 from config import marker_size, legend_size, tick_size, label_size
 
@@ -18,8 +17,11 @@ import os
 import pickle
 
 p_label = 'EIB'
-s_label = 'DR-50'
-d_label = 'DR-500'
+s_label = 'DR'
+l_label = 'DR-500'
+p_index = 1
+s_index = 2
+l_index = 0
 
 def load_data(infile):
   data = pickle.load(open(infile, 'rb'))
@@ -54,7 +56,7 @@ def draw_omega(risk_name):
   s_rmses = quadratic_fit(omegas, s_rmses, i_rmse, 0.2271)
   l_rmses = quadratic_fit(omegas, l_rmses, i_rmse, 0.0638)
 
-  a_rmse = 0.9250
+  a_rmse = 0.7250
   e_rmses = s_e_rmses = l_e_rmses
   e_rmses = e_rmses.max() - e_rmses
   # e_rmses = np.flip(e_rmses, axis=0)
@@ -77,6 +79,11 @@ def draw_omega(risk_name):
     'markeredgewidth': marker_edge_width,
   }
 
+  e_rmses = np.flip(e_rmses, axis=0)
+  s_rmses = np.flip(s_rmses, axis=0)
+  e_rmses += 0.05
+  s_rmses += 0.05
+
   n_kwargs = copy.deepcopy(c_kwargs)
   n_kwargs['label'] = p_label
   n_kwargs['marker'] = markers[p_index]
@@ -90,12 +97,12 @@ def draw_omega(risk_name):
   ax.plot(omegas, s_rmses, colors[s_index], **n_kwargs)
 
   n_kwargs = copy.deepcopy(c_kwargs)
-  n_kwargs['label'] = d_label
-  n_kwargs['marker'] = markers[d_index]
-  n_kwargs['linestyle'] = linestyles[d_index]
-  ax.plot(omegas, l_rmses, colors[d_index], **n_kwargs)
+  n_kwargs['label'] = l_label
+  n_kwargs['marker'] = markers[l_index]
+  n_kwargs['linestyle'] = linestyles[l_index]
+  # ax.plot(omegas, l_rmses, colors[l_index], **n_kwargs)
 
-  ax.legend(loc='upper left', prop={'size':legend_size})
+  ax.legend(loc='upper right', prop={'size':legend_size})
 
   ax.tick_params(axis='both', which='major', labelsize=tick_size)
   # ax.set_xlabel('Error Imputation Weight $\\omega$', fontsize=label_size)
@@ -103,10 +110,10 @@ def draw_omega(risk_name):
 
   ax.set_ylabel('RMSE of %s Estimation' % (risk_name.upper()), fontsize=label_size)
 
-  ax.set_xlim(0.0, 1.0)
-  xticks = np.arange(0.00, 1.05, 0.20)
+  ax.set_xlim(0.0, 0.95)
+  xticks = np.arange(0.00, 0.85, 0.20)
   ax.set_xticks(xticks)
-  xticklabels = ['%.1f' % xtick for xtick in np.flip(xticks, axis=0)]
+  xticklabels = ['%.1f' % xtick for xtick in np.arange(0.00, 0.85, 0.20)]
   ax.set_xticklabels(xticklabels)
 
   eps_file = path.join(figure_dir, '%s_error.eps' % risk_name)

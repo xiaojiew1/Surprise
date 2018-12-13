@@ -149,12 +149,12 @@ concatenator = '-'
 
 #### draw common
 width, height = 6.4, 4.8
-legend_size = 24
-label_size = 20
+legend_size = 26
+label_size = 22
 line_width = 1.0
 marker_edge_width = 1.5
-marker_size = 12
-tick_size = 18
+marker_size = 14
+tick_size = 20
 pad_inches = 0.10
 #### draw custom
 ips_label = 'MF-IPS'

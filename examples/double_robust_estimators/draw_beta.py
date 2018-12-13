@@ -68,6 +68,9 @@ def draw_beta(risk_name):
     continue
     s_rmses[i] = s_rmses[i] - p(v_beta[i])
 
+  for beta, p_rmse, d_rmse in zip(v_beta, p_rmses, d_rmses):
+    print('%s %.1f %.2f %.2f' % (risk_name, beta, p_rmse, d_rmse))
+
   fig, ax = plt.subplots(1, 1)
   fig.set_size_inches(width, height, forward=True)
   # ax.plot(alphas, n_rmses)
@@ -84,7 +87,7 @@ def draw_beta(risk_name):
   n_kwargs['label'] = p_label
   n_kwargs['linestyle'] = linestyles[p_index]
   print('p %.4f %.4f' % (p_rmses[2], p_rmses[-3]))
-  p_line, = ax.plot(v_beta, p_rmses, colors[p_index], **n_kwargs)
+  # p_line, = ax.plot(v_beta, p_rmses, colors[p_index], **n_kwargs)
 
   ## snips estimator
   n_kwargs = copy.deepcopy(c_kwargs)

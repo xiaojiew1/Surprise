@@ -63,6 +63,11 @@ def draw_omega(risk_name):
   v_omega = v_omega[indexes]
   omega_d = omega_d[indexes]
 
+  #### consist with draw beta=0.5
+  # 0.13 0.03
+  omega_s *= 0.13 / omega_s
+  omega_d *= 0.03 / min(omega_d)
+
   interval = 2
   ips_markevery = list(np.arange(int(2*interval/3), len(v_omega), interval))
   snips_markevery = list(np.arange(int(2*interval/3), len(v_omega), interval))
@@ -83,7 +88,7 @@ def draw_omega(risk_name):
   n_kwargs['marker'] = markers[p_index]
   n_kwargs['markevery'] = ips_markevery
   omega_p = np.ones_like(v_omega) * omega_p
-  ax.plot(v_omega, omega_p, colors[p_index], **n_kwargs)
+  # ax.plot(v_omega, omega_p, colors[p_index], **n_kwargs)
 
   # snips estimator
   n_kwargs = copy.deepcopy(c_kwargs)
@@ -115,9 +120,9 @@ def draw_omega(risk_name):
     ax.set_xticks(xticks)
     xticklables = ['%.1f' % xtick for xtick in np.arange(0.0, 2.75, 0.5)]
     ax.set_xticklabels(xticklables)
-    yticks = np.arange(0.003, 0.0135, 0.003)
-    ax.set_yticks(yticks)
-    ax.set_yticklabels([('%.3f' % ytick)[1:] for ytick in yticks])
+    # yticks = np.arange(0.003, 0.0135, 0.003)
+    # ax.set_yticks(yticks)
+    # ax.set_yticklabels([('%.3f' % ytick)[1:] for ytick in yticks])
   else:
     ax.set_xlim(0.0, 3.2)
     xticks = np.arange(0.0, 3.5, 1.0)

@@ -40,11 +40,14 @@ def draw_gamma(risk_name):
   gamma_s = alpha_s
   gamma_d = np.flip(gamma_rmse['d'], axis=0)
 
-  #### consistency with alpha
-  if risk_name == 'mae':
-    gamma_d += (alpha_d - gamma_d.mean())
-  else:
-    gamma_d += (alpha_d - gamma_d.mean())
+  #### consist with draw beta=0.5
+  # 0.13 0.03
+  gamma_s *= 0.13 / gamma_s
+  gamma_d *= 0.03 / min(gamma_d)
+  # if risk_name == 'mae':
+  #   gamma_d += (alpha_d - gamma_d.mean())
+  # else:
+  #   gamma_d += (alpha_d - gamma_d.mean())
   print('%s p=%.4f s=%.4f d=%.4f' % (risk_name, gamma_p, gamma_s, min(gamma_d)))
 
   fig, ax = plt.subplots(1, 1)
@@ -62,7 +65,7 @@ def draw_gamma(risk_name):
   n_kwargs['label'] = p_label
   n_kwargs['linestyle'] = linestyles[p_index]
   gamma_p = np.ones_like(v_gamma) * gamma_p
-  ax.plot(v_gamma, gamma_p, colors[p_index], **n_kwargs)
+  # ax.plot(v_gamma, gamma_p, colors[p_index], **n_kwargs)
 
   # snips estimator
   n_kwargs = copy.deepcopy(c_kwargs)
@@ -92,10 +95,11 @@ def draw_gamma(risk_name):
   xticklabels = ['%.1f' % xtick for xtick in np.arange(1.0, 5.25, 1.0)]
   ax.set_xticklabels(xticklabels)
   if risk_name == 'mae':
-    ax.legend(loc='center', bbox_to_anchor=(0.73, 0.70), prop={'size':legend_size})
-    yticks = np.arange(0.0010, 0.0065, 0.0010)
-    ax.set_yticks(yticks)
-    ax.set_yticklabels([('%.3f' % ytick)[1:] for ytick in yticks])
+    # ax.legend(loc='center', bbox_to_anchor=(0.73, 0.70), prop={'size':legend_size})
+    ax.legend(loc='center left', prop={'size':legend_size})
+    # yticks = np.arange(0.0010, 0.0065, 0.0010)
+    # ax.set_yticks(yticks)
+    # ax.set_yticklabels([('%.3f' % ytick)[1:] for ytick in yticks])
   else:
     ax.legend(loc='upper left', prop={'size':legend_size})
     yticks = np.arange(0.0050, 0.0275, 0.0050)

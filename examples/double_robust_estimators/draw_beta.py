@@ -120,6 +120,7 @@ def draw_beta(risk_name):
   ax.set_yticks(yticks)
   ax.set_yticklabels([('%.1f' % ytick) for ytick in yticks])
 
+  figure_dir = path.expanduser('~/Projects/drrec/arxiv/figure')
   eps_file = path.join(figure_dir, '%s_beta.eps' % risk_name)
   config.make_file_dir(eps_file)
   fig.savefig(eps_file, format='eps', bbox_inches='tight', pad_inches=pad_inches)

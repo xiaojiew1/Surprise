@@ -116,6 +116,7 @@ def draw_omega(risk_name):
   xticklabels = ['%.1f' % xtick for xtick in np.arange(0.00, 0.85, 0.20)]
   ax.set_xticklabels(xticklabels)
 
+  figure_dir = path.expanduser('~/Projects/drrec/arxiv/figure')
   eps_file = path.join(figure_dir, '%s_error.eps' % risk_name)
   config.make_file_dir(eps_file)
   fig.savefig(eps_file, format='eps', bbox_inches='tight', pad_inches=pad_inches)

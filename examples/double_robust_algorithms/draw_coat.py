@@ -18,6 +18,13 @@ import numpy as np
 import operator
 import time
 
+from matplotlib import rc
+rc('font', **{'family': 'serif', 'serif': ['Times']})
+rc('text', usetex=True)
+import matplotlib
+matplotlib.rcParams['text.usetex'] = True
+matplotlib.rcParams['text.latex.unicode'] = True
+
 def coat_s_index(errors):
   pre_error = '%.2f' % errors[0]
   for i in range(1, len(errors)):

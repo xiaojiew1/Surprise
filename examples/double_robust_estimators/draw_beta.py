@@ -17,6 +17,14 @@ import numpy as np
 import os
 import pickle
 
+from matplotlib import rc
+rc('font', **{'family': 'serif', 'serif': ['Times']})
+rc('text', usetex=True)
+import matplotlib
+matplotlib.rcParams['text.usetex'] = True
+matplotlib.rcParams['text.latex.unicode'] = True
+
+
 def draw_beta(risk_name):
   alpha_file = path.join(alpha_dir, '%s_%.1f.p' % (risk_name, f_alpha))
   alpha_rmse = pickle.load(open(alpha_file, 'rb'))
@@ -91,9 +99,9 @@ def draw_beta(risk_name):
 
   ## snips estimator
   n_kwargs = copy.deepcopy(c_kwargs)
-  n_kwargs['marker'] = markers[s_index]
+  # n_kwargs['marker'] = markers[s_index]
   n_kwargs['label'] = s_label
-  n_kwargs['linestyle'] = linestyles[s_index]
+  # n_kwargs['linestyle'] = linestyles[s_index]
   s_line, = ax.plot(v_beta, s_rmses, colors[s_index], **n_kwargs)
 
   ## dr estimator
@@ -108,7 +116,8 @@ def draw_beta(risk_name):
 
   ax.tick_params(axis='both', which='major', labelsize=tick_size)
   # ax.set_xlabel('Propensity Estimation Quality $\\beta$', fontsize=label_size)
-  ax.set_xlabel('$\\beta$', fontsize=label_size)
+  ax.set_xlabel('$\\beta$: Error Imputation Accuracy',
+                fontsize=label_size)
   ax.set_xlim(0.0, 1.0)
   ax.set_xticks(np.arange(0.00, 1.05, 0.20))
   ax.set_ylabel('RMSE of %s Estimation' % (risk_name.upper()), fontsize=label_size)

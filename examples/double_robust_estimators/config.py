@@ -488,17 +488,17 @@ mse_v_gamma = np.arange(-2.00, 2.25, 0.50)
 # import matplotlib as mpl
 # print(mpl.rcParams['figure.figsize'])
 width, height = 6.4, 4.8
-legend_size = 26
-label_size = 22
+legend_size = 22
+label_size = 20
 line_width = 1.0
 marker_edge_width = 1.5
-marker_size = 16
-tick_size = 20
+marker_size = 12
+tick_size = 18
 pad_inches = 0.10
 markers = [(4, 2, 45), (6, 2, 0), (8, 2, 22.5)]
 markers = ['s', '+', 'v',]
 colors = ['g', 'r', 'b']
-linestyles = ['--', '-', '-.',]
+linestyles = ['--', '--', '--',]
 p_index, s_index, d_index = 0, 1, 2
 p_label, s_label, d_label = 'IPS', 'SNIPS', 'DR'
 

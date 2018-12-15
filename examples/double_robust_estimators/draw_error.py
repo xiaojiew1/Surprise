@@ -16,6 +16,14 @@ import numpy as np
 import os
 import pickle
 
+from matplotlib import rc
+rc('font', **{'family': 'serif', 'serif': ['Times']})
+rc('text', usetex=True)
+import matplotlib
+matplotlib.rcParams['text.usetex'] = True
+matplotlib.rcParams['text.latex.unicode'] = True
+
+
 p_label = 'EIB'
 s_label = 'DR'
 l_label = 'DR-500'
@@ -86,8 +94,8 @@ def draw_omega(risk_name):
 
   n_kwargs = copy.deepcopy(c_kwargs)
   n_kwargs['label'] = p_label
-  n_kwargs['marker'] = markers[p_index]
-  n_kwargs['linestyle'] = linestyles[p_index]
+  # n_kwargs['marker'] = markers[p_index]
+  # n_kwargs['linestyle'] = linestyles[p_index]
   ax.plot(omegas, e_rmses, colors[p_index], **n_kwargs)
 
   n_kwargs = copy.deepcopy(c_kwargs)
@@ -106,7 +114,8 @@ def draw_omega(risk_name):
 
   ax.tick_params(axis='both', which='major', labelsize=tick_size)
   # ax.set_xlabel('Error Imputation Weight $\\omega$', fontsize=label_size)
-  ax.set_xlabel('$\\omega$', fontsize=label_size)
+  ax.set_xlabel('$\\omega$: Propensity Estimation Accuracy',
+                fontsize=label_size)
 
   ax.set_ylabel('RMSE of %s Estimation' % (risk_name.upper()), fontsize=label_size)
 

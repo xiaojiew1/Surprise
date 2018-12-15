@@ -25,10 +25,12 @@ epochs = np.arange(1, 1+n_epochs)
 
 lr_all_opt = sorted(list(lr_all_opt))
 reg_all_opt = sorted(list(reg_all_opt))
-lr_part_opt = [lr_all_opt[i] for i in [1, 2,]]
+lr_part_opt = [lr_all_opt[i] for i in [2,]]
+lr_part_opt = [lr_all_opt[i] for i in [0, 1, 2,]]
 reg_part_opt = [reg_all_opt[i] for i in [0, 2, 4, 6,]]
 reg_part_opt = [reg_all_opt[i] for i in [0, 3, 6,]]
 reg_part_opt = [reg_all_opt[i] for i in [2, 3, 4,]]
+reg_part_opt = [reg_all_opt[i] for i in [4,]]
 print(lr_all_opt)
 print(lr_part_opt)
 print(reg_all_opt)
